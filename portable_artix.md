@@ -90,7 +90,7 @@
 
     pacman -S --noconfirm neovim zsh nano artix-live-base rsm
     pacman -S --noconfirm ttf-linux-libertine noto-fonts-emoji ttf-liberation adobe-source-han-sans-cn-fonts adobe-source-han-sans-jp-fonts adobe-source-han-serif-cn-fonts adobe-source-han-serif-jp-fonts
-    pacman -S --noconfirm dosfstools libnotify dunst exfat-utils sxiv xwallpaper ffmpeg gnome-keyring mpc mpd mpv man-db ncmpcpp ntfs-3g maim unclutter unrar unzip p7zip xclip xdotool youtube-dl zathura zathura-pdf-mupdf mediainfo atool fzf highlight texlive-most biber sxhkd gimp inkscape blender artix-keyring artix-archlinux-support bmon
+    pacman -S --noconfirm dosfstools libnotify dunst exfat-utils sxiv xwallpaper ffmpeg gnome-keyring mpc mpd mpv man-db ncmpcpp ntfs-3g maim unclutter unrar unzip p7zip xclip xdotool youtube-dl zathura zathura-pdf-mupdf mediainfo atool fzf highlight texlive-most biber sxhkd gimp inkscape blender artix-keyring artix-archlinux-support bmon moreutils
 
 ### Suckless download
 
@@ -187,7 +187,7 @@
 
     paru -S lf lxappearance arc-gtk-theme brave-bin sc-im-git zsh-fast-syntax-highlighting task-spooler simple-mtpfs htop-vim-git xkb-switch
     paru -S ttf-liberation ttf-linux-libertine ttf-ms-fonts ttf-opensans ttf-arphic-ukai ttf-arphic-uming ttf-baekmuk ttf-hannom ttf-cmu-serif ttf-cmu-sans-serif ttf-cmu-bright ttf-cmu-concrete ttf-cmu-typewriter ttf-hack-ibx ttf-sazanami-hanazono ttf-paratype latex-mk
-    paru -S urlview mutt-wizard-git scidavis tor-browser betterlockscreen write-good
+    paru -S urlview mutt-wizard-git scidavis tor-browser betterlockscreen write-good perl-file-mimeinfo
 
 ### For wi-fi adapter Archer T4UH v2
 
