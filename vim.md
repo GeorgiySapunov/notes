@@ -10,6 +10,7 @@
 
     zt, zz, zb -- shift window to make cursor at top, middle and bottom
 
+    ~ -- switch case of the character
     % -- next ()
     {, } -- previous and next empty line
     f, F -- jump to syllable forward and backward
@@ -57,7 +58,9 @@
     ctrl+w c -- close current window
 
     Ctrl+x + Ctrl+f -- autocomplete path in insert mode
-    Ctrl+n Ctrl+p -- move up and down in the autocomplete dropdown menu
+    Ctrl+n, Ctrl+p -- move up and down in the autocomplete dropdown menu
+
+    Ctrl+g -- prints the current file name
 
     gd -- go to definition
     gw -- format line

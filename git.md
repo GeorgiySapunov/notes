@@ -44,6 +44,10 @@ git log --graph
 ```
 
 ```zsh
+git reset
+```
+
+```zsh
 git stash
 git stash apply
 ```
