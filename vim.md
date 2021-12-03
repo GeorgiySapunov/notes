@@ -18,7 +18,7 @@
     ;, , -- jump to the next and previous match
     $  -- to end of the line
     0 -- to the beginning of the line
-    * -- to the beginning of the first non-blank on the line
+    ^ -- to the beginning of the first non-blank on the line
     (, ) -- to the beginning and end of the paragraph
 
     yy -- yank
