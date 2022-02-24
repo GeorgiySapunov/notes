@@ -187,7 +187,7 @@
 
     paru -S lf lxappearance arc-gtk-theme brave-bin sc-im-git zsh-fast-syntax-highlighting-git task-spooler simple-mtpfs htop-vim-git xkb-switch
     paru -S ttf-liberation ttf-linux-libertine ttf-ms-fonts ttf-opensans ttf-arphic-ukai ttf-arphic-uming ttf-baekmuk ttf-hannom ttf-cmu-serif ttf-cmu-sans-serif ttf-cmu-bright ttf-cmu-concrete ttf-cmu-typewriter nerd-fonts-hack ttf-hack-ibx ttf-sazanami-hanazono ttf-paratype latex-mk ttf-dejavu
-    paru -S urlview mutt-wizard-git scidavis tor-browser betterlockscreen write-good perl-file-mimeinfo
+    paru -S urlview mutt-wizard-git scidavis tor-browser betterlockscreen xidlehook write-good perl-file-mimeinfo
 
 ### pip
     pip install jupyterlab-vim
