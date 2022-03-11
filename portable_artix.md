@@ -90,7 +90,7 @@
 
     pacman -S --noconfirm neovim zsh nano artix-live-base rsm
     pacman -S --noconfirm ttf-linux-libertine noto-fonts-emoji noto-fonts ttf-liberation adobe-source-han-sans-cn-fonts adobe-source-han-sans-jp-fonts adobe-source-han-serif-cn-fonts adobe-source-han-serif-jp-fonts
-    pacman -S --noconfirm dosfstools libnotify dunst exfat-utils sxiv xwallpaper ffmpeg gnome-keyring mpc mpd mpv man-db ncmpcpp ntfs-3g maim unclutter unrar unzip p7zip xclip xdotool youtube-dl zathura zathura-pdf-mupdf mediainfo atool fzf highlight texlive-most biber sxhkd gimp inkscape blender artix-keyring artix-archlinux-support bmon moreutils
+    pacman -S --noconfirm dosfstools libnotify dunst exfat-utils sxiv xwallpaper ffmpeg gnome-keyring mpc mpd mpv man-db ncmpcpp ntfs-3g maim unclutter unrar unzip p7zip xclip xdotool youtube-dl zathura zathura-pdf-mupdf mediainfo atool fzf bat texlive-most biber sxhkd gimp inkscape blender artix-keyring artix-archlinux-support bmon moreutils
 
 ### Suckless download
 
