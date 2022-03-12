@@ -89,8 +89,8 @@
 ### Packages
 
     pacman -S --noconfirm neovim zsh nano artix-live-base rsm
-    pacman -S --noconfirm ttf-linux-libertine noto-fonts-emoji noto-fonts ttf-liberation adobe-source-han-sans-cn-fonts adobe-source-han-sans-jp-fonts adobe-source-han-serif-cn-fonts adobe-source-han-serif-jp-fonts
-    pacman -S --noconfirm dosfstools libnotify dunst exfat-utils sxiv xwallpaper ffmpeg gnome-keyring mpc mpd mpv man-db ncmpcpp ntfs-3g maim unclutter unrar unzip p7zip xclip xdotool youtube-dl zathura zathura-pdf-mupdf mediainfo atool fzf bat texlive-most biber sxhkd gimp inkscape blender artix-keyring artix-archlinux-support bmon moreutils
+    pacman -S --noconfirm ttf-linux-libertine noto-fonts-emoji noto-fonts ttf-liberation adobe-source-han-sans-cn-fonts adobe-source-han-sans-jp-fonts adobe-source-han-serif-cn-fonts adobe-source-han-serif-jp-fonts ttf-font-awesome
+    pacman -S --noconfirm dosfstools libnotify dunst exfat-utils sxiv xwallpaper ffmpeg gnome-keyring mpc mpd mpv man-db ncmpcpp ntfs-3g maim unclutter unrar unzip p7zip xclip xdotool yt-dlp zathura zathura-pdf-mupdf mediainfo atool fzf bat texlive-most biber sxhkd gimp inkscape blender artix-keyring artix-archlinux-support bmon moreutils testdisk
 
 ### Suckless download
 
@@ -183,7 +183,7 @@
 ## Personal
 ### Packages
 
-    sudo pacman -S --noconfirm pcmanfm xcape fcitx-im fcitx-configtool fcitx-mozc neomutt isync msmtp lynx notmuch abook libbluray libaacs libreoffice tor torsocks tldr texlive-lang tldr htop anki ipython python-pip tmate texlab calcurse r tk syncthing rsync python-black jupyterlab python-tensorflow python-sklearn-pandas python-scikit-learn python-pandas python-numpy python-matplotlib
+    sudo pacman -S --noconfirm pcmanfm xcape fcitx-im fcitx-configtool fcitx-mozc neomutt isync msmtp lynx notmuch abook libbluray libaacs libreoffice tor torsocks tldr texlive-lang tldr htop anki ipython python-pip tmate texlab calcurse r tk syncthing rsync python-black jupyterlab python-tensorflow python-sklearn-pandas python-scikit-learn python-pandas python-numpy python-matplotlib ueberzug
 
     paru -S lf lxappearance arc-gtk-theme brave-bin sc-im-git zsh-fast-syntax-highlighting-git task-spooler simple-mtpfs htop-vim-git xkb-switch
     paru -S ttf-liberation ttf-linux-libertine ttf-ms-fonts ttf-opensans ttf-arphic-ukai ttf-arphic-uming ttf-baekmuk ttf-hannom ttf-cmu-serif ttf-cmu-sans-serif ttf-cmu-bright ttf-cmu-concrete ttf-cmu-typewriter nerd-fonts-hack ttf-hack-ibx ttf-sazanami-hanazono ttf-paratype latex-mk ttf-dejavu
