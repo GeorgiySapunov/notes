@@ -52,7 +52,8 @@
     echo "127.0.0.1    portable.localdomain portable" >> /etc/hosts
 
     pacman -S --noconfirm networkmanager networkmanager-runit grub efibootmgr cryptsetup mkinitcpio
-    pacman -S --noconfirm bluez bluez-utils bluez-runit cups cups-runit git reflector alsa-utils pulseaudio pulseaudio-alsa pulsemixer pamixer wget curl ca-certificates openssh openssh-runit cronie cronie-runit
+    pacman -S --noconfirm bluez bluez-utils bluez-runit cups cups-runit git reflector alsa-utils pipewire pipewire-pulse pulsemixer pamixer wget curl ca-certificates openssh openssh-runit cronie cronie-runit
+    %%pacman -S --noconfirm pulseaudio pulseaudio-alsa
 
     ln -s /etc/runit/sv/NetworkManager/ /etc/runit/runsvdir/default
     ln -s /etc/runit/sv/bluetoothd/ /etc/runit/runsvdir/default
