@@ -184,23 +184,25 @@
 ## Personal
 ### Packages
 
-    sudo pacman -S --noconfirm pcmanfm xcape fcitx-im fcitx-configtool fcitx-mozc neomutt isync msmtp lynx notmuch abook libbluray libaacs libreoffice tor torsocks tldr texlive-lang tldr htop anki ipython python-pip tmate texlab calcurse r tk syncthing rsync python-black jupyterlab python-tensorflow python-sklearn-pandas python-scikit-learn python-pandas python-numpy python-matplotlib ueberzug
+    sudo pacman -S --noconfirm pcmanfm xcape fcitx-im fcitx-configtool fcitx-mozc neomutt isync msmtp lynx notmuch abook libbluray libaacs libreoffice tor torsocks tldr texlive-lang tldr htop anki ipython python-pip tmate texlab calcurse r tk syncthing rsync python-black jupyterlab python-tensorflow python-sklearn-pandas python-scikit-learn python-pandas python-numpy python-matplotlib ueberzug lxappearance arc-gtk-theme
+    sudo pacman -S ttf-liberation ttf-linux-libertine ttf-opensans ttf-arphic-ukai ttf-arphic-uming ttf-baekmuk ttf-hannom
 
-    paru -S lf lxappearance arc-gtk-theme brave-bin sc-im-git zsh-fast-syntax-highlighting-git task-spooler simple-mtpfs htop-vim-git xkb-switch
-    paru -S ttf-liberation ttf-linux-libertine ttf-ms-fonts ttf-opensans ttf-arphic-ukai ttf-arphic-uming ttf-baekmuk ttf-hannom ttf-cmu-serif ttf-cmu-sans-serif ttf-cmu-bright ttf-cmu-concrete ttf-cmu-typewriter nerd-fonts-hack ttf-hack-ibx ttf-sazanami-hanazono ttf-paratype latex-mk ttf-dejavu
+    paru -S lf brave-bin sc-im-git zsh-fast-syntax-highlighting-git task-spooler simple-mtpfs htop-vim-git xkb-switch latex-mk
+    paru -S ttf-ms-fonts ttf-cmu-serif ttf-cmu-sans-serif ttf-cmu-bright ttf-cmu-concrete ttf-cmu-typewriter nerd-fonts-hack ttf-hack-ibx ttf-sazanami-hanazono ttf-paratype ttf-dejavu
     paru -S urlview mutt-wizard-git scidavis tor-browser betterlockscreen xidlehook write-good perl-file-mimeinfo
 
 ### pip
     pip install jupyterlab-vim
 
-### For wi-fi adapter Archer T4UH v2
+### Wi-fi adapter Archer T4UH v2
 
     sudo pacman -S --noconfirm linux-headers
     paru -S rtl8814au-dkms-git
 
 ### Language servers
 
-    paru -S tsserver rust-analyzer pyright
+    sudo pacman -S rust-analyzer pyright
+    paru -S tsserver
 
 In R:
 
