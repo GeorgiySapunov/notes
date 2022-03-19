@@ -52,14 +52,15 @@
     echo "127.0.0.1    portable.localdomain portable" >> /etc/hosts
 
     pacman -S --noconfirm networkmanager networkmanager-runit grub efibootmgr cryptsetup mkinitcpio
-    pacman -S --noconfirm bluez bluez-utils bluez-runit cups cups-runit git reflector alsa-utils pipewire pipewire-pulse pulsemixer pamixer wget curl ca-certificates openssh openssh-runit cronie cronie-runit
-    %%pacman -S --noconfirm pulseaudio pulseaudio-alsa
+    pacman -S --noconfirm bluez bluez-utils bluez-runit cups cups-runit git reflector pipewire pipewire-pulse pulsemixer pamixer wget curl ca-certificates openssh openssh-runit cronie cronie-runit tor torsocks tor-runit
+    %%pacman -S --noconfirm pulseaudio pulseaudio-alsa alsa-utils
 
     ln -s /etc/runit/sv/NetworkManager/ /etc/runit/runsvdir/default
     ln -s /etc/runit/sv/bluetoothd/ /etc/runit/runsvdir/default
     ln -s /etc/runit/sv/cupsd/ /etc/runit/runsvdir/default
     ln -s /etc/runit/sv/sshd/ /etc/runit/runsvdir/default/
     ln -s /etc/runit/sv/cronie/ /etc/runit/runsvdir/default/
+    ln -s /etc/runit/sv/tor/ /etc/runit/runsvdir/default/
 
     passwd
 
@@ -91,7 +92,7 @@
 
     pacman -S --noconfirm neovim zsh nano artix-live-base rsm
     pacman -S --noconfirm ttf-linux-libertine noto-fonts-emoji noto-fonts ttf-liberation adobe-source-han-sans-cn-fonts adobe-source-han-sans-jp-fonts adobe-source-han-serif-cn-fonts adobe-source-han-serif-jp-fonts ttf-font-awesome
-    pacman -S --noconfirm dosfstools libnotify dunst exfat-utils sxiv xwallpaper ffmpeg gnome-keyring mpc mpd mpv man-db ncmpcpp ntfs-3g maim unclutter unrar unzip p7zip xclip xdotool yt-dlp zathura zathura-pdf-mupdf mediainfo atool fzf bat texlive-most biber sxhkd gimp inkscape blender artix-keyring artix-archlinux-support bmon moreutils testdisk
+    pacman -S --noconfirm dosfstools libnotify dunst exfat-utils sxiv xwallpaper ffmpeg gnome-keyring mpc mpd mpv man-db ncmpcpp ntfs-3g maim unclutter unrar unzip p7zip xclip xdotool yt-dlp zathura zathura-pdf-mupdf mediainfo atool fzf bat texlive-most biber sxhkd gimp inkscape blender artix-keyring artix-archlinux-support bmon moreutils testdisk newsboat
 
 ### Suckless download
 
@@ -184,12 +185,14 @@
 ## Personal
 ### Packages
 
-    sudo pacman -S --noconfirm pcmanfm xcape fcitx-im fcitx-configtool fcitx-mozc neomutt isync msmtp lynx notmuch abook libbluray libaacs libreoffice tor torsocks tldr texlive-lang tldr htop anki ipython python-pip tmate texlab calcurse r tk syncthing rsync python-black jupyterlab python-tensorflow python-sklearn-pandas python-scikit-learn python-pandas python-numpy python-matplotlib ueberzug lxappearance arc-gtk-theme
+    sudo pacman -S --noconfirm pcmanfm xcape fcitx-im fcitx-configtool fcitx-mozc neomutt isync msmtp lynx notmuch abook libbluray libaacs libreoffice tldr texlive-lang tldr htop anki ipython python-pip tmate texlab calcurse r tk syncthing rsync python-black jupyterlab python-tensorflow python-sklearn-pandas python-scikit-learn python-pandas python-numpy python-matplotlib ueberzug lxappearance arc-gtk-theme python-qdarkstyle
     sudo pacman -S ttf-liberation ttf-linux-libertine ttf-opensans ttf-arphic-ukai ttf-arphic-uming ttf-baekmuk ttf-hannom
 
     paru -S lf brave-bin sc-im-git zsh-fast-syntax-highlighting-git task-spooler simple-mtpfs htop-vim-git xkb-switch latex-mk
     paru -S ttf-ms-fonts ttf-cmu-serif ttf-cmu-sans-serif ttf-cmu-bright ttf-cmu-concrete ttf-cmu-typewriter nerd-fonts-hack ttf-hack-ibx ttf-sazanami-hanazono ttf-paratype ttf-dejavu
     paru -S urlview mutt-wizard-git scidavis tor-browser betterlockscreen xidlehook write-good perl-file-mimeinfo
+
+    pacman-key --populate archlinux
 
 ### pip
     pip install jupyterlab-vim
@@ -233,3 +236,7 @@ In R:
 
     paru -S picom-ibhagwan-git
     picom --config ~/.config/picom.conf
+
+### crontab -e
+
+    */15 * * * * newsboat -x reload
