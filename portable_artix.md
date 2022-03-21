@@ -80,8 +80,13 @@
     echo "::1          localhost" >> /etc/hosts
     echo "127.0.0.1    portable.localdomain portable" >> /etc/hosts
 
-    pacman -S --noconfirm networkmanager networkmanager-runit grub efibootmgr cryptsetup mkinitcpio
-    pacman -S --noconfirm bluez bluez-utils bluez-runit cups cups-runit git reflector pipewire pipewire-pulse pulsemixer pamixer wget curl ca-certificates openssh openssh-runit cronie cronie-runit tor torsocks tor-runit
+    pacman -S --noconfirm networkmanager networkmanager-runit grub efibootmgr cryptsetup
+
+    pacman -S --noconfirm bluez bluez-utils bluez-runit cups cups-runit git pipewire pipewire-pulse wget openssh openssh-runit cronie cronie-runit tor torsocks tor-runit artix-keyring artix-archlinux-support
+
+    pacman-key --populate archlinux
+
+    vim /etc/pacman.conf
 
     ln -s /etc/runit/sv/NetworkManager/ /etc/runit/runsvdir/default
     ln -s /etc/runit/sv/bluetoothd/ /etc/runit/runsvdir/default
@@ -126,14 +131,6 @@
     %wheel ALL=(ALL) ALL
     %wheel ALL=(ALL) NOPASSWD: /usr/bin/shutdown,/usr/bin/reboot,/usr/bin/systemctl suspend,/usr/bin/wifi-menu,/usr/bin/mount,/usr/bin/umount,/usr/bin/pacman -Syu,/usr/bin/pacman -Syyu,/usr/bin/packer -Syu,/usr/bin/packer -Syyu,/usr/bin/systemctl restart NetworkManager,/usr/bin/rc-service NetworkManager restart,/usr/bin/pacman -Syyu --noconfirm,/usr/bin/loadkeys,/usr/bin/paru,/usr/bin/pacman -Syyuw --noconfirm
 
-### Make configs
-
-    sudo nvim /etc/pacman.conf
-    sudo nvim /etc/paru.conf
-    sudo nvim /usr/lib/elogind/system-sleep/lock.sh
-
-    sudo chmod +x /usr/lib/elogind/system-sleep/lock.sh
-
 ### Video drivers and xorg
 
     pacman -S --noconfirm mesa
@@ -147,11 +144,17 @@
 
 ### Packages
 
+    pacman -S --noconfirm reflector pulsemixer pamixer
+
+    reflector -c Russia -c China -c Switzerland -c France -a 12 --sort rate --save /etc/pacman.d/mirrorlist-arch
+     curl https://gitea.artixlinux.org/packagesA/artix-mirrorlist/raw/branch/master/trunk/mirrorlist -o /etc/pacman.d/mirrorlist
+
     pacman -S --noconfirm neovim zsh nano artix-live-base rsm
     pacman -S --noconfirm noto-fonts-emoji noto-fonts ttf-liberation ttf-font-awesome ttf-joypixels
     pacman -S --noconfirm libertinus-font adobe-source-han-sans-cn-fonts adobe-source-han-sans-jp-fonts adobe-source-han-serif-cn-fonts adobe-source-han-serif-jp-fonts
-    pacman -S --noconfirm dosfstools libnotify dunst exfat-utils ffmpeg gnome-keyring mpd mpv man-db ntfs-3g maim unrar unzip p7zip xclip yt-dlp mediainfo fzf texlive-most sxhkd gimp inkscape artix-keyring artix-archlinux-support moreutils newsboat
-    pacman -S --noconfirm sxiv xwallpaper mpc ncmpcpp unclutter xdotool zathura zathura-pdf-mupdf zathura-djvu bat biber blender bmon testdisk reflector pulsemixer pamixer
+    pacman -S --noconfirm dosfstools libnotify dunst exfat-utils ffmpeg gnome-keyring mpd mpv man-db ntfs-3g maim unrar unzip p7zip xclip yt-dlp mediainfo fzf sxhkd gimp inkscape moreutils newsboat
+    pacman -S --noconfirm texlive-most texlive-lang biber
+    pacman -S --noconfirm sxiv xwallpaper mpc ncmpcpp unclutter xdotool zathura zathura-pdf-mupdf zathura-djvu bat blender bmon testdisk
 
 
 ### Suckless installation
@@ -169,15 +172,22 @@
 
 ### Paru
 
-     cd /home/gs
+     cd /home/gs/git
      git clone https://aur.archlinux.org/paru.git
      cd paru
      makepkg -si
 
+### Make configs
+
+    sudo nvim /etc/paru.conf
+    sudo nvim /usr/lib/elogind/system-sleep/lock.sh
+
+    sudo chmod +x /usr/lib/elogind/system-sleep/lock.sh
+
 ## Luke's settings
 ### Installing \`libxft-bgra\` to enable color emoji in suckless software without crashes
 
-    paru libxft-bgra
+    paru -S libxft-bgra
 
 ### Synchronizing system time
 
@@ -186,7 +196,7 @@
 
 ### Use all cores for compilation.
 
-    sed -i "s/-j2/-j$(nproc)/;s/^#MAKEFLAGS/MAKEFLAGS/" /etc/makepkg.conf
+    sudo sed -i "s/-j2/-j$(nproc)/;s/^#MAKEFLAGS/MAKEFLAGS/" /etc/makepkg.conf
 
 ### Most important command! Get rid of the beep!
 
@@ -205,6 +215,7 @@
     sudo dbus-uuidgen > /var/lib/dbus/machine-id
 
 ### (just copy /etc/X11) Tap to click
+### (sudo cp /etc/X11/xorg.conf.d/* /mnt/etc/X11/xorg.conf.d/)
 
     [ ! -f /etc/X11/xorg.conf.d/40-libinput.conf ] && printf 'Section "InputClass"
             Identifier "libinput touchpad catchall"
@@ -218,11 +229,11 @@
 ## Personal
 ### Packages
 
-    sudo pacman -S --noconfirm pcmanfm xcape fcitx-im fcitx-configtool fcitx-mozc neomutt isync msmtp lynx notmuch libbluray libaacs libreoffice tldr texlive-lang tldr htop ipython python-pip tmate texlab calcurse r tk syncthing rsync python-black jupyterlab python-tensorflow python-scikit-learn python-pandas python-numpy python-matplotlib ueberzug lxappearance arc-gtk-theme python-qdarkstyle
+    sudo pacman -S --noconfirm pcmanfm xcape fcitx-im fcitx-configtool fcitx-mozc neomutt isync msmtp lynx notmuch libbluray libaacs libreoffice tldr tldr ipython python-pip tmate calcurse r tk syncthing rsync python-black jupyterlab python-tensorflow python-scikit-learn python-pandas python-numpy python-matplotlib ueberzug lxappearance arc-gtk-theme python-qdarkstyle
     sudo pacman -S --noconfirm ttf-opensans ttf-arphic-ukai ttf-arphic-uming ttf-baekmuk ttf-hannom
 
     paru -S atool
-    paru -S lf brave-bin sc-im-git zsh-fast-syntax-highlighting-git task-spooler simple-mtpfs xkb-switch latex-mk obfs4proxy-bin anki abook
+    paru -S lf brave-bin sc-im-git zsh-fast-syntax-highlighting-git task-spooler simple-mtpfs xkb-switch latex-mk obfs4proxy-bin abook
     paru -S ttf-ms-fonts ttf-cmu-serif ttf-cmu-sans-serif ttf-cmu-bright ttf-cmu-concrete ttf-cmu-typewriter nerd-fonts-hack ttf-sazanami-hanazono ttf-paratype ttf-dejavu ttf-hack
     paru -S urlview mutt-wizard-git betterlockscreen xidlehook write-good perl-file-mimeinfo htop-vim
 
@@ -230,10 +241,7 @@
     gpg --auto-key-locate nodefault,wkd --locate-keys torbrowser@torproject.org
     paru -S tor-browser
     paru -S scidavis
-
-####fail to build
-
-    paru -S anki
+    paru -S anki-bin
 
 ### pip
 
@@ -246,8 +254,9 @@
 
 ### Language servers
 
-    sudo pacman -S rust-analyzer pyright
-    paru -S typescript-language-server
+    sudo pacman -S pyright
+   #sudo pacman -S rust-analyzer
+   #paru -S typescript-language-server
 
 In R:
 
