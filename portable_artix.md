@@ -27,13 +27,13 @@
     (root)
     w - write table to disk and exit
 
-    mkfs.fat -F32 /dev/sdc2
-    cryptsetup luksFormat /dev/sdc3
-    cryptsetup open /dev/sdc3 cryptroot
+    mkfs.fat -F32 /dev/sdX2
+    cryptsetup luksFormat /dev/sdX3
+    cryptsetup open /dev/sdX3 cryptroot
     mkfs.ext4 /dev/mapper/cryptroot
     mount /dev/mapper/cryptroot /mnt
     mkdir /mnt/boot
-    mount /dev/sdc2 /mnt/boot
+    mount /dev/sdX2 /mnt/boot
 
 #### without encryption UEFI
 
@@ -81,6 +81,7 @@
     echo "127.0.0.1    portable.localdomain portable" >> /etc/hosts
 
     pacman -S --noconfirm networkmanager networkmanager-runit grub efibootmgr cryptsetup
+    pacman -S --noconfirm polkit polkit-qt5
 
     pacman -S --noconfirm bluez bluez-utils bluez-runit cups cups-runit git pipewire pipewire-pulse wget openssh openssh-runit cronie cronie-runit tor torsocks tor-runit artix-keyring artix-archlinux-support
 
@@ -231,7 +232,6 @@
 
     sudo pacman -S --noconfirm pcmanfm xcape fcitx-im fcitx-configtool fcitx-mozc neomutt isync msmtp lynx notmuch libbluray libaacs libreoffice tldr tldr ipython python-pip tmate calcurse r tk syncthing rsync python-black jupyterlab python-tensorflow python-scikit-learn python-pandas python-numpy python-matplotlib ueberzug lxappearance arc-gtk-theme python-qdarkstyle
     sudo pacman -S --noconfirm ttf-opensans ttf-arphic-ukai ttf-arphic-uming ttf-baekmuk ttf-hannom
-    pacman -S --noconfirm polkit polkit-qt5
 
     paru -S atool
     paru -S lf brave-bin sc-im-git zsh-fast-syntax-highlighting-git task-spooler simple-mtpfs xkb-switch latex-mk obfs4proxy-bin abook
@@ -256,8 +256,8 @@
 ### Language servers
 
     sudo pacman -S pyright
-   #sudo pacman -S rust-analyzer
-   #paru -S typescript-language-server
+    sudo pacman -S rust-analyzer
+    paru -S typescript-language-server
 
 In R:
 
