@@ -130,12 +130,15 @@
 
     sudo nvim /etc/pacman.conf
     sudo nvim /etc/paru.conf
+    sudo nvim /usr/lib/elogind/system-sleep/lock.sh
 
-    pacman-key --populate archlinux
+    sudo chmod +x /usr/lib/elogind/system-sleep/lock.sh
 
 ### Video drivers and xorg
 
-    pacman -S --noconfirm xf86-video-intel xf86-video-amdgpu xf86-video-nouveau xf86-video-ati xf86-video-vesa
+    pacman -S --noconfirm mesa
+    pacman -S --noconfirm xf86-video-intel xf86-video-nouveau
+    pacman -S --noconfirm xf86-video-amdgpu xf86-video-ati xf86-video-vesa
     pacman -S --noconfirm xorg-server xf86-input-libinput libinput xorg-xinit xorg-xbacklight xorg-xprop xorg-xdpyinfo neofetch
     pacman -S --noconfirm xorg-xwininfo
 
@@ -145,7 +148,7 @@
 ### Packages
 
     pacman -S --noconfirm neovim zsh nano artix-live-base rsm
-    pacman -S --noconfirm noto-fonts-emoji noto-fonts ttf-liberation ttf-font-awesome
+    pacman -S --noconfirm noto-fonts-emoji noto-fonts ttf-liberation ttf-font-awesome ttf-joypixels
     pacman -S --noconfirm libertinus-font adobe-source-han-sans-cn-fonts adobe-source-han-sans-jp-fonts adobe-source-han-serif-cn-fonts adobe-source-han-serif-jp-fonts
     pacman -S --noconfirm dosfstools libnotify dunst exfat-utils ffmpeg gnome-keyring mpd mpv man-db ntfs-3g maim unrar unzip p7zip xclip yt-dlp mediainfo fzf texlive-most sxhkd gimp inkscape artix-keyring artix-archlinux-support moreutils newsboat
     pacman -S --noconfirm sxiv xwallpaper mpc ncmpcpp unclutter xdotool zathura zathura-pdf-mupdf zathura-djvu bat biber blender bmon testdisk reflector pulsemixer pamixer
@@ -174,7 +177,7 @@
 ## Luke's settings
 ### Installing \`libxft-bgra\` to enable color emoji in suckless software without crashes
 
-    paru libxft-bgra-git
+    paru libxft-bgra
 
 ### Synchronizing system time
 
@@ -212,17 +215,6 @@
     	Option "Tapping" "on"
     EndSection' > /etc/X11/xorg.conf.d/40-libinput.conf
 
-### Fix fluidsynth/pulseaudio issue.
-
-    sudo mkdir -p /etc/conf.d/
-    grep -q "OTHER_OPTS='-a pulseaudio -m alsa_seq -r 48000'" /etc/conf.d/fluidsynth ||
-	echo "OTHER_OPTS='-a pulseaudio -m alsa_seq -r 48000'" >> /etc/conf.d/fluidsynth
-
-### Start/restart PulseAudio.
-
-    pkill -15 -x 'pulseaudio'; sudo -u "$name" pulseaudio --start
-
-
 ## Personal
 ### Packages
 
@@ -231,19 +223,20 @@
 
     paru -S atool
     paru -S lf brave-bin sc-im-git zsh-fast-syntax-highlighting-git task-spooler simple-mtpfs xkb-switch latex-mk obfs4proxy-bin anki abook
-    paru -S ttf-ms-fonts ttf-cmu-serif ttf-cmu-sans-serif ttf-cmu-bright ttf-cmu-concrete ttf-cmu-typewriter nerd-fonts-hack ttf-sazanami-hanazono ttf-paratype ttf-dejavu
-    paru -S ttf-hack-ibx
+    paru -S ttf-ms-fonts ttf-cmu-serif ttf-cmu-sans-serif ttf-cmu-bright ttf-cmu-concrete ttf-cmu-typewriter nerd-fonts-hack ttf-sazanami-hanazono ttf-paratype ttf-dejavu ttf-hack
+    paru -S urlview mutt-wizard-git betterlockscreen xidlehook write-good perl-file-mimeinfo htop-vim
+
 
     gpg --auto-key-locate nodefault,wkd --locate-keys torbrowser@torproject.org
-
-    paru -S urlview mutt-wizard-git betterlockscreen xidlehook write-good perl-file-mimeinfo
     paru -S tor-browser
     paru -S scidavis
 
 ####fail to build
-    paru -S anki htop-vim-git python-sklearn-pandas
+
+    paru -S anki
 
 ### pip
+
     pip install jupyterlab-vim
 
 ### Wi-fi adapter Archer T4UH v2
@@ -288,7 +281,7 @@ In R:
 
 ### crontab -e
 
-    */15 * * * * newsup
+    */15 * * * * ~/.local/bin/cron/newsup
 
 ### Blu-ray (aacs)
 
