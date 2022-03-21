@@ -231,6 +231,7 @@
 
     sudo pacman -S --noconfirm pcmanfm xcape fcitx-im fcitx-configtool fcitx-mozc neomutt isync msmtp lynx notmuch libbluray libaacs libreoffice tldr tldr ipython python-pip tmate calcurse r tk syncthing rsync python-black jupyterlab python-tensorflow python-scikit-learn python-pandas python-numpy python-matplotlib ueberzug lxappearance arc-gtk-theme python-qdarkstyle
     sudo pacman -S --noconfirm ttf-opensans ttf-arphic-ukai ttf-arphic-uming ttf-baekmuk ttf-hannom
+    pacman -S --noconfirm polkit polkit-qt5
 
     paru -S atool
     paru -S lf brave-bin sc-im-git zsh-fast-syntax-highlighting-git task-spooler simple-mtpfs xkb-switch latex-mk obfs4proxy-bin abook
