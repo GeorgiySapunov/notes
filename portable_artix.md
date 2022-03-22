@@ -234,7 +234,7 @@
     sudo pacman -S --noconfirm ttf-opensans ttf-arphic-ukai ttf-arphic-uming ttf-baekmuk ttf-hannom
 
     paru -S atool
-    paru -S lf brave-bin sc-im-git zsh-fast-syntax-highlighting-git task-spooler simple-mtpfs xkb-switch latex-mk obfs4proxy-bin abook
+    paru -S lf brave-bin sc-im-git zsh-fast-syntax-highlighting-git task-spooler simple-mtpfs xkb-switch latex-mk obfs4proxy-bin abook telegram-desktop
     paru -S ttf-ms-fonts ttf-cmu-serif ttf-cmu-sans-serif ttf-cmu-bright ttf-cmu-concrete ttf-cmu-typewriter nerd-fonts-hack ttf-sazanami-hanazono ttf-paratype ttf-dejavu ttf-hack
     paru -S urlview mutt-wizard-git betterlockscreen xidlehook write-good perl-file-mimeinfo htop-vim
 
@@ -243,6 +243,11 @@
     paru -S tor-browser
     paru -S scidavis
     paru -S anki-bin
+
+### Torrent
+
+    sudo pacman -S transmission-cli
+    paru -S tremc
 
 ### pip
 
