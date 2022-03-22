@@ -140,8 +140,8 @@
     pacman -S --noconfirm xorg-server xf86-input-libinput libinput xorg-xinit xorg-xbacklight xorg-xprop xorg-xdpyinfo neofetch
     pacman -S --noconfirm xorg-xwininfo
 
-    exit
-    umount -a
+    %%exit
+    %%umount -a
 
 ### Packages
 
@@ -166,6 +166,8 @@
     make clean install
     cd /home/gs/.local/src/st
     make clean install
+    cd /home/gs/.local/src/dwmblocks
+    make clean install
 
 ### Everything after this is under user gs
 
@@ -178,12 +180,9 @@
      cd paru
      makepkg -si
 
-### Make configs
+### Make configs (see "Should be done")
 
     sudo nvim /etc/paru.conf
-    sudo nvim /usr/lib/elogind/system-sleep/lock.sh
-
-    sudo chmod +x /usr/lib/elogind/system-sleep/lock.sh
 
 ## Luke's settings
 ### Installing \`libxft-bgra\` to enable color emoji in suckless software without crashes
@@ -212,20 +211,24 @@
 
 ### dbus UUID must be generated for Artix runit.
 
-    sudo mkdir -p /var/lib/dbus
-    sudo dbus-uuidgen > /var/lib/dbus/machine-id
+    %%sudo mkdir -p /var/lib/dbus
 
-### (just copy /etc/X11) Tap to click
+        %%dbus-uuidgen
+        %%sudo nvim /var/lib/dbus/machine-id
+
+    %%dbus-uuidgen > /var/lib/dbus/machine-id
+
+### Tap to click (just copy /etc/X11)
 ### (sudo cp /etc/X11/xorg.conf.d/* /mnt/etc/X11/xorg.conf.d/)
 
-    [ ! -f /etc/X11/xorg.conf.d/40-libinput.conf ] && printf 'Section "InputClass"
-            Identifier "libinput touchpad catchall"
-            MatchIsTouchpad "on"
-            MatchDevicePath "/dev/input/event*"
-            Driver "libinput"
-    	# Enable left mouse button by tapping
-    	Option "Tapping" "on"
-    EndSection' > /etc/X11/xorg.conf.d/40-libinput.conf
+    %%[ ! -f /etc/X11/xorg.conf.d/40-libinput.conf ] && printf 'Section "InputClass"
+            %%Identifier "libinput touchpad catchall"
+            %%MatchIsTouchpad "on"
+            %%MatchDevicePath "/dev/input/event*"
+            %%Driver "libinput"
+        %%# Enable left mouse button by tapping
+        %%Option "Tapping" "on"
+    %%EndSection' > /etc/X11/xorg.conf.d/40-libinput.conf
 
 ## Personal
 ### Packages
@@ -241,7 +244,7 @@
 
     gpg --auto-key-locate nodefault,wkd --locate-keys torbrowser@torproject.org
     paru -S tor-browser
-    paru -S scidavis
+    %%paru -S scidavis
     paru -S anki-bin
 
 ### Torrent
@@ -251,7 +254,7 @@
 
 ### pip
 
-    pip install jupyterlab-vim
+    %%pip install jupyterlab-vim
 
 ### Wi-fi adapter Archer T4UH v2
 
@@ -261,14 +264,14 @@
 ### Language servers
 
     sudo pacman -S pyright
-    sudo pacman -S rust-analyzer
-    paru -S typescript-language-server
+    %%sudo pacman -S rust-analyzer
+    %%paru -S typescript-language-server
 
-In R:
+%%In R:
 
-    install.packages("languageserver")
+    %%install.packages("languageserver")
 
-### (just copy /usr/lib/elogind/system-sleep) Sleep settings
+### Sleep settings (just copy /usr/lib/elogind/system-sleep)
 
     sudo nvim /usr/lib/elogind/system-sleep/lock.sh
 
@@ -298,6 +301,45 @@ In R:
 
     */15 * * * * ~/.local/bin/cron/newsup
 
-### Blu-ray (aacs)
+### To do:
+
+##### Should be done:
+
+    sudo cp /etc/X11/xorg.conf.d/* /mnt/etc/X11/xorg.conf.d/
+    sudo cp /etc/pacman.conf /mnt/etc/pacman.conf
+    sudo cp /etc/paru.conf /mnt/etc/paru.conf
+    sudo cp usr/lib/elogind/system-sleep/lock.sh mnt/usr/lib/elogind/system-sleep/lock.sh
+    sudo chmod +x mnt/usr/lib/elogind/system-sleep/lock.sh
+
+##### Copy aacs for blue-ray
+
+    cp -r ~/.config/aacs /mnt/home/gs/.config/
 
     https://wiki.archlinux.org/title/Blu-ray
+
+##### Copy ssh and gpg keys
+
+    cp -r ~/.ssh /mnt/home/gs/
+    cp -r ~/.local/share/password-store /mnt/home/gs/.local/share
+
+##### Copy ~/.config/mpd/playlists and specify Music folder
+
+    cp -r ~/.config/mpd/playlists /mnt/home/gs/.config/mpd
+
+##### Setup torrc
+
+    sudo cp /etc/tor/torrc /mnt/etc/tor/torrc
+
+##### Neovim
+
+    sh -c 'curl -fLo "${XDG_DATA_HOME:-$HOME/.local/share}"/nvim/site/autoload/plug.vim --create-dirs \
+       https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
+
+    or
+
+    cp -r ~/.local/share/nvim /mnt/home/gs/.local/share
+
+##### Also
+
+    1. lxappearance, brave, anki, telegram-desktop
+    2. dbus UUID must be generated for Artix runit.
