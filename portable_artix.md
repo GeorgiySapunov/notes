@@ -241,6 +241,7 @@
     paru -S ttf-ms-fonts ttf-cmu-serif ttf-cmu-sans-serif ttf-cmu-bright ttf-cmu-concrete ttf-cmu-typewriter nerd-fonts-hack ttf-sazanami-hanazono ttf-paratype ttf-dejavu ttf-hack
     paru -S urlview mutt-wizard-git betterlockscreen xidlehook write-good perl-file-mimeinfo htop-vim
 
+    betterlockscreen -u ~/.local/share/wallpaper.jpg
 
     gpg --auto-key-locate nodefault,wkd --locate-keys torbrowser@torproject.org
     paru -S tor-browser
@@ -341,5 +342,5 @@
 
 ##### Also
 
-    1. lxappearance, brave, anki, telegram-desktop
+    1. lxappearance, brave, anki, telegram-desktop, abook, calcurse, mutt
     2. dbus UUID must be generated for Artix runit.
