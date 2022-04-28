@@ -196,7 +196,7 @@
 
 ### Use all cores for compilation.
 
-    sudo sed -i "s/-j2/-j$(nproc)/;s/^#MAKEFLAGS/MAKEFLAGS/" /etc/makepkg.conf
+    sudo sed -i "s/-j2/-j$(nproc)/;/^#MAKEFLAGS/s/^#//" /etc/makepkg.conf
 
 ### Most important command! Get rid of the beep!
 
