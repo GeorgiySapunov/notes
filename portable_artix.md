@@ -246,7 +246,7 @@
     gpg --auto-key-locate nodefault,wkd --locate-keys torbrowser@torproject.org
     paru -S tor-browser
     %%paru -S scidavis
-    paru -S anki-bin
+    paru -S anki-bin cozy-audiobooks
 
 ### Torrent
 
