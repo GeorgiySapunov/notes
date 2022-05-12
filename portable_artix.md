@@ -233,7 +233,7 @@
 ## Personal
 ### Packages
 
-    sudo pacman -S --noconfirm pcmanfm xcape fcitx-im fcitx-configtool fcitx-mozc neomutt isync msmtp lynx notmuch libbluray libaacs libreoffice tldr tldr ipython python-pip tmate calcurse r tk syncthing rsync python-black jupyterlab python-tensorflow python-scikit-learn python-pandas python-numpy python-matplotlib ueberzug lxappearance arc-gtk-theme python-qdarkstyle
+    sudo pacman -S --noconfirm pcmanfm xcape fcitx-im fcitx-configtool fcitx-mozc neomutt isync msmtp lynx notmuch libbluray libaacs libreoffice tldr tldr ipython python-pip tmate calcurse r tk syncthing rsync python-black jupyterlab python-tensorflow python-scikit-learn python-pandas python-numpy python-matplotlib ueberzug lxappearance arc-gtk-theme python-qdarkstyle okular breeze-icons
     sudo pacman -S --noconfirm ttf-opensans ttf-arphic-ukai ttf-arphic-uming ttf-baekmuk ttf-hannom
 
     paru -S atool neovim-plug
