@@ -236,6 +236,7 @@
     sudo pacman -S --noconfirm pcmanfm xcape fcitx-im fcitx-configtool fcitx-mozc neomutt isync msmtp lynx notmuch libbluray libaacs libreoffice tldr tldr ipython python-pip tmate calcurse r tk syncthing rsync python-black jupyterlab python-tensorflow python-scikit-learn python-pandas python-numpy python-matplotlib ueberzug lxappearance arc-gtk-theme python-qdarkstyle okular breeze-icons
     sudo pacman -S --noconfirm ttf-opensans ttf-arphic-ukai ttf-arphic-uming ttf-baekmuk ttf-hannom
     sudo pacman -S papirus-icon-theme
+    sudo pacman -S nordic-theme
 
     paru -S atool neovim-plug
     paru -S lf brave-bin sc-im-git zsh-fast-syntax-highlighting-git task-spooler simple-mtpfs xkb-switch latex-mk obfs4proxy-bin abook telegram-desktop
