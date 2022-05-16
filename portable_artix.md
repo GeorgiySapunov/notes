@@ -95,6 +95,7 @@
     ln -s /etc/runit/sv/sshd/ /etc/runit/runsvdir/default/
     ln -s /etc/runit/sv/cronie/ /etc/runit/runsvdir/default/
     ln -s /etc/runit/sv/tor/ /etc/runit/runsvdir/default/
+    ln -s /etc/runit/sv/ntpd/ /etc/runit/runsvdir/default/
 
     passwd
 
@@ -191,7 +192,7 @@
 
 ### Synchronizing system time
 
-    sudo pacman -S ntp
+    sudo pacman -S ntp ntp-runit
     sudo ntpdate 0.us.pool.ntp.org
 
 ### Use all cores for compilation.
