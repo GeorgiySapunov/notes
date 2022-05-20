@@ -153,10 +153,13 @@
 
     pacman -S --noconfirm neovim zsh nano artix-live-base rsm
     pacman -S --noconfirm noto-fonts-emoji noto-fonts ttf-liberation ttf-font-awesome ttf-joypixels
-    pacman -S --noconfirm libertinus-font adobe-source-han-sans-cn-fonts adobe-source-han-sans-jp-fonts adobe-source-han-serif-cn-fonts adobe-source-han-serif-jp-fonts
-    pacman -S --noconfirm dosfstools libnotify dunst exfat-utils ffmpeg gnome-keyring mpd mpv man-db ntfs-3g maim unrar unzip p7zip xclip yt-dlp mediainfo fzf sxhkd gimp inkscape moreutils newsboat
-    pacman -S --noconfirm texlive-most texlive-lang biber
-    pacman -S --noconfirm sxiv xwallpaper mpc ncmpcpp unclutter xdotool zathura zathura-pdf-mupdf zathura-djvu bat blender bmon testdisk
+    pacman -S --noconfirm libertinus-font adobe-source-han-sans-cn-fonts adobe-source-han-sans-jp-fonts
+    pacman -S --noconfirm adobe-source-han-serif-cn-fonts adobe-source-han-serif-jp-fonts
+    pacman -S --noconfirm dosfstools libnotify dunst exfat-utils ffmpeg gnome-keyring mpd mpv
+    pacman -S --noconfirm man-db ntfs-3g maim unrar unzip p7zip xclip yt-dlp mediainfo fzf sxhkd
+    pacman -S --noconfirm texlive-most texlive-lang biber gimp inkscape moreutils newsboat
+    pacman -S --noconfirm sxiv xwallpaper mpc ncmpcpp unclutter xdotool zathura zathura-pdf-mupdf zathura-djvu
+    pacman -S --noconfirm bat blender bmon testdisk
 
 
 ### Suckless installation
@@ -234,14 +237,21 @@
 ## Personal
 ### Packages
 
-    sudo pacman -S --noconfirm pcmanfm xcape fcitx-im fcitx-configtool fcitx-mozc neomutt isync msmtp lynx notmuch libbluray libaacs libreoffice tldr tldr ipython python-pip tmate calcurse r tk syncthing rsync python-black flake8 jupyterlab python-tensorflow python-scikit-learn python-pandas python-numpy python-matplotlib ueberzug lxappearance arc-gtk-theme python-qdarkstyle okular breeze-icons
+    sudo pacman -S --noconfirm pcmanfm xcape fcitx-im fcitx-configtool fcitx-mozc neomutt
+    sudo pacman -S --noconfirm isync msmtp lynx notmuch libbluray libaacs libreoffice tldr
+    sudo pacman -S --noconfirm tldr ipython python-pip tmate calcurse tk syncthing rsync
+    sudo pacman -S --noconfirm flake8 stylua jupyterlab lazygit ncdu
+    sudo pacman -S --noconfirm python-tensorflow python-scikit-learn python-pandas python-numpy python-matplotlib
+    sudo pacman -S --noconfirm ueberzug lxappearance arc-gtk-theme python-qdarkstyle okular breeze-icons
     sudo pacman -S --noconfirm ttf-opensans ttf-arphic-ukai ttf-arphic-uming ttf-baekmuk ttf-hannom
-    sudo pacman -S papirus-icon-theme
+    sudo pacman -S --noconfirm papirus-icon-theme
 
     paru -S atool
-    paru -S lf brave-bin sc-im-git zsh-fast-syntax-highlighting-git task-spooler simple-mtpfs xkb-switch latex-mk obfs4proxy-bin abook telegram-desktop
-    paru -S ttf-ms-fonts ttf-cmu-serif ttf-cmu-sans-serif ttf-cmu-bright ttf-cmu-concrete ttf-cmu-typewriter nerd-fonts-hack ttf-sazanami-hanazono ttf-paratype ttf-dejavu ttf-hack
-    paru -S urlview mutt-wizard-git betterlockscreen xidlehook write-good perl-file-mimeinfo htop-vim nordic-theme stylua
+    paru -S lf brave-bin sc-im-git zsh-fast-syntax-highlighting-git task-spooler simple-mtpfs
+    paru -S xkb-switch latex-mk obfs4proxy-bin abook telegram-desktop
+    paru -S ttf-ms-fonts ttf-cmu-serif ttf-cmu-sans-serif ttf-cmu-bright ttf-cmu-concrete
+    paru -S ttf-cmu-typewriter nerd-fonts-hack ttf-sazanami-hanazono ttf-paratype ttf-dejavu ttf-hack
+    paru -S urlview mutt-wizard-git betterlockscreen xidlehook write-good perl-file-mimeinfo htop-vim nordic-theme
 
     betterlockscreen -u ~/.local/share/wallpaper.jpg
 
@@ -255,6 +265,13 @@
     sudo pacman -S transmission-cli
     paru -S tremc
 
+### LSP in neovim
+    :LspInstallInfo
+    1. pytight
+    2. sumneko_lua
+    3. texlab
+    4. jsonls
+
 ### pip
 
     %%pip install jupyterlab-vim
@@ -264,15 +281,6 @@
     sudo pacman -S --noconfirm linux-headers
     paru -S rtl8814au-dkms-git
 
-### Language servers
-
-    sudo pacman -S pyright
-    %%sudo pacman -S rust-analyzer
-    %%paru -S typescript-language-server
-
-%%In R:
-
-    %%install.packages("languageserver")
 
 ### Sleep settings (just copy /usr/lib/elogind/system-sleep)
 
