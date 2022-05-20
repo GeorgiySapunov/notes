@@ -70,10 +70,3 @@
     zf, zd -- create and delete a fold
     zc, zo, za -- close, open, toggle one folding level
     zC, zO, zA -- close, open, toggle all folding levels
-
-
-### git (Plug 'tpope/vim-fugitive')
-
-    :G -- git status (leader+gs) s for stage, u for unstage, dv to resolve merge conflict
-    :Git commit -- git commit
-    :Git push -- git push
