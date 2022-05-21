@@ -151,12 +151,13 @@
     reflector -c Russia -c China -c Switzerland -c France -a 12 --sort rate --save /etc/pacman.d/mirrorlist-arch
      curl https://gitea.artixlinux.org/packagesA/artix-mirrorlist/raw/branch/master/trunk/mirrorlist -o /etc/pacman.d/mirrorlist
 
-    pacman -S --noconfirm neovim zsh nano artix-live-base rsm
+    pacman -S --noconfirm zsh artix-live-base rsm
+    pacman -S --noconfirm neovim xsel python-pynvim
     pacman -S --noconfirm noto-fonts-emoji noto-fonts ttf-liberation ttf-font-awesome ttf-joypixels
     pacman -S --noconfirm libertinus-font adobe-source-han-sans-cn-fonts adobe-source-han-sans-jp-fonts
     pacman -S --noconfirm adobe-source-han-serif-cn-fonts adobe-source-han-serif-jp-fonts
     pacman -S --noconfirm dosfstools libnotify dunst exfat-utils ffmpeg gnome-keyring mpd mpv
-    pacman -S --noconfirm man-db ntfs-3g maim unrar unzip p7zip xclip yt-dlp mediainfo fzf sxhkd
+    pacman -S --noconfirm man-db ntfs-3g maim unrar unzip p7zip xclip yt-dlp mediainfo fzf sxhkd nano
     pacman -S --noconfirm texlive-most texlive-lang biber gimp inkscape moreutils newsboat
     pacman -S --noconfirm sxiv xwallpaper mpc ncmpcpp unclutter xdotool zathura zathura-pdf-mupdf zathura-djvu
     pacman -S --noconfirm bat blender bmon testdisk
@@ -240,7 +241,7 @@
     sudo pacman -S --noconfirm pcmanfm xcape fcitx-im fcitx-configtool fcitx-mozc neomutt
     sudo pacman -S --noconfirm isync msmtp lynx notmuch libbluray libaacs libreoffice tldr
     sudo pacman -S --noconfirm tldr ipython python-pip tmate calcurse tk syncthing rsync
-    sudo pacman -S --noconfirm flake8 stylua jupyterlab lazygit ncdu
+    sudo pacman -S --noconfirm python-black flake8 stylua lazygit ncdu jupyterlab
     sudo pacman -S --noconfirm python-tensorflow python-scikit-learn python-pandas python-numpy python-matplotlib
     sudo pacman -S --noconfirm ueberzug lxappearance arc-gtk-theme python-qdarkstyle okular breeze-icons
     sudo pacman -S --noconfirm ttf-opensans ttf-arphic-ukai ttf-arphic-uming ttf-baekmuk ttf-hannom
@@ -340,15 +341,6 @@
 ##### Setup torrc
 
     sudo cp /etc/tor/torrc /mnt/etc/tor/torrc
-
-##### Neovim
-
-    sh -c 'curl -fLo "${XDG_DATA_HOME:-$HOME/.local/share}"/nvim/site/autoload/plug.vim --create-dirs \
-       https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
-
-    or
-
-    cp -r ~/.local/share/nvim /mnt/home/gs/.local/share
 
 ##### Also
 
