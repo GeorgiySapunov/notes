@@ -152,15 +152,22 @@
      curl https://gitea.artixlinux.org/packagesA/artix-mirrorlist/raw/branch/master/trunk/mirrorlist -o /etc/pacman.d/mirrorlist
 
     pacman -S --noconfirm zsh artix-live-base rsm
-    pacman -S --noconfirm neovim xsel python-pynvim
+    pacman -S --noconfirm neovim python-pynvim
+    
+    pacman -S --noconfirm dosfstools exfat-utils ntfs-3g gnome-keyring
+    pacman -S --noconfirm libnotify dunst ffmpeg mpd mpv mpc ncmpcpp
+    pacman -S --noconfirm man-db maim unrar unzip xclip mediainfo fzf sxhkd nano
+    pacman -S --noconfirm texlive-most texlive-lang biber moreutils newsboat
+    pacman -S --noconfirm sxiv xwallpaper unclutter xdotool zathura zathura-pdf-mupdf zathura-djvu
+    pacman -S --noconfirm gimp inkscape blender libreoffice
+    pacman -S --noconfirm bat bmon testdisk yt-dlp
+
+#### Fonts
+
     pacman -S --noconfirm noto-fonts-emoji noto-fonts ttf-liberation ttf-font-awesome ttf-joypixels
     pacman -S --noconfirm libertinus-font adobe-source-han-sans-cn-fonts adobe-source-han-sans-jp-fonts
     pacman -S --noconfirm adobe-source-han-serif-cn-fonts adobe-source-han-serif-jp-fonts
-    pacman -S --noconfirm dosfstools libnotify dunst exfat-utils ffmpeg gnome-keyring mpd mpv
-    pacman -S --noconfirm man-db ntfs-3g maim unrar unzip p7zip xclip yt-dlp mediainfo fzf sxhkd nano
-    pacman -S --noconfirm texlive-most texlive-lang biber gimp inkscape moreutils newsboat
-    pacman -S --noconfirm sxiv xwallpaper mpc ncmpcpp unclutter xdotool zathura zathura-pdf-mupdf zathura-djvu
-    pacman -S --noconfirm bat blender bmon testdisk
+    pacman -S --noconfirm ttf-opensans ttf-arphic-ukai ttf-arphic-uming ttf-baekmuk ttf-hannom
 
 
 ### Suckless installation
@@ -238,32 +245,33 @@
 ## Personal
 ### Packages
 
-    sudo pacman -S --noconfirm pcmanfm xcape fcitx-im fcitx-configtool fcitx-mozc neomutt
-    sudo pacman -S --noconfirm isync msmtp lynx notmuch libbluray libaacs libreoffice tldr
-    sudo pacman -S --noconfirm tldr ipython python-pip tmate calcurse tk syncthing rsync
-    sudo pacman -S --noconfirm python-black flake8 stylua lazygit ncdu jupyterlab
+    sudo pacman -S --noconfirm pcmanfm xcape fcitx-im fcitx-configtool fcitx-mozc
+    sudo pacman -S --noconfirm neomutt isync msmtp lynx notmuch
+    sudo pacman -S --noconfirm libbluray libaacs
+    sudo pacman -S --noconfirm tldr tmate calcurse tk syncthing rsync ueberzug
+    sudo pacman -S --noconfirm ipython python-pip python-black flake8 stylua lazygit ncdu jupyterlab
     sudo pacman -S --noconfirm python-tensorflow python-scikit-learn python-pandas python-numpy python-matplotlib
-    sudo pacman -S --noconfirm ueberzug lxappearance arc-gtk-theme python-qdarkstyle okular breeze-icons
-    sudo pacman -S --noconfirm ttf-opensans ttf-arphic-ukai ttf-arphic-uming ttf-baekmuk ttf-hannom
-    sudo pacman -S --noconfirm papirus-icon-theme
-
+    sudo pacman -S --noconfirm lxappearance arc-gtk-theme python-qdarkstyle papirus-icon-theme okular breeze-icons
+    
     paru -S atool
     paru -S lf brave-bin sc-im-git zsh-fast-syntax-highlighting-git task-spooler simple-mtpfs
     paru -S xkb-switch latex-mk obfs4proxy-bin abook telegram-desktop
+    paru -S urlview mutt-wizard-git betterlockscreen xidlehook write-good perl-file-mimeinfo htop-vim nordic-theme
+    
     paru -S ttf-ms-fonts ttf-cmu-serif ttf-cmu-sans-serif ttf-cmu-bright ttf-cmu-concrete
     paru -S ttf-cmu-typewriter nerd-fonts-hack ttf-sazanami-hanazono ttf-paratype ttf-dejavu ttf-hack
-    paru -S urlview mutt-wizard-git betterlockscreen xidlehook write-good perl-file-mimeinfo htop-vim nordic-theme
 
     betterlockscreen -u ~/.local/share/wallpaper.jpg
 
     gpg --auto-key-locate nodefault,wkd --locate-keys torbrowser@torproject.org
+    
     paru -S tor-browser
     %%paru -S scidavis
     paru -S anki cozy-audiobooks
 
 ### Torrent
 
-    sudo pacman -S transmission-cli
+    sudo pacman -S --noconfirm transmission-cli
     paru -S tremc
 
 ### LSP in neovim
