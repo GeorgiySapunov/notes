@@ -125,7 +125,7 @@
 
 ### Make a user
 
-    useradd -mG wheel gs
+    useradd -mg wheel gs
     passwd gs
 
     EDITOR=vim visudo
@@ -155,7 +155,7 @@
     pacman -S --noconfirm neovim python-pynvim
     
     pacman -S --noconfirm dosfstools exfat-utils ntfs-3g gnome-keyring
-    pacman -S --noconfirm libnotify dunst ffmpeg mpd mpv mpc ncmpcpp
+    pacman -S --noconfirm libnotify dunst ffmpeg mpd mpv mpc ncmpcpp ffmpegthumbnailer
     pacman -S --noconfirm man-db maim unrar unzip xclip mediainfo fzf sxhkd nano
     pacman -S --noconfirm texlive-most texlive-lang biber moreutils newsboat
     pacman -S --noconfirm sxiv xwallpaper unclutter xdotool zathura zathura-pdf-mupdf zathura-djvu
@@ -208,7 +208,7 @@
 
 ### Use all cores for compilation.
 
-    sudo sed -i "s/-j2/-j$(nproc)/;/^#MAKEFLAGS/s/^#//" /etc/makepkg.conf
+sed -i "s/-j2/-j$(nproc)/;/^#MAKEFLAGS/s/^#//" /etc/makepkg.conf
 
 ### Most important command! Get rid of the beep!
 
