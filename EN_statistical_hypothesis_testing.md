@@ -1,7 +1,15 @@
+1. [Shapiro--Wilk test](#Shapiro--Wilk_test)
+2. [Mann–Whitney--Wilcoxon U test](#Mann–Whitney--Wilcoxon_U_test)
+3. [Fligner--Killeen test](#Fligner--Killeen_test)
+4. [Student's t-test](#Student's_t-test)
+5. [$\chi^2$ test](#$\chi^2$_test)
+6. [Pearson correlation coefficient](#Pearson_correlation_coefficient)
+7. [A/B testing](#A/B_testing)
+
 The null hypothesis is rejected if a p_value is less then chosen $\alpha$
 (the type I error probability)
 
-## Shapiro--Wilk test
+## Shapiro--Wilk test <a name="Shapiro--Wilk_test"></a>
 
 Perform the Shapiro-Wilk test for normality.
 
@@ -24,7 +32,7 @@ Usually is used in case of less then 2000 observation.
 In other case Kolmogorov–Smirnov test is preferred for computational reasons.
 
 
-## Mann--Whitney--Wilcoxon U test
+## Mann--Whitney--Wilcoxon U test <a name="Mann–Whitney--Wilcoxon_U_test"></a>
 
 A nonparametric test of the null hypothesis that, for randomly selected values
 X and Y from two populations, the probability of X being greater than Y is
@@ -51,7 +59,7 @@ res = stats.mannwhitneyu(df[], df[])
 print('p value:', res[1])
 ```
 
-## Fligner--Killeen test
+## Fligner--Killeen test <a name="Fligner--Killeen_test"></a>
 
 Performs a Fligner--Killeen (median) test of the null that the variances in each
 of the groups (samples) are the same.
@@ -68,7 +76,7 @@ res = stats.fligner(df[], df[])
 print('p value:', res[1])
 ```
 
-## Student's t-test
+## Student's t-test <a name="Student's_t-test"></a>
 
 Among the most frequently used t-tests are:
 * A **one-sample** location test of whether the mean of a population has a
@@ -120,7 +128,7 @@ res = stats.ttest_rel(df[], df[])
 print('p value:', res[1])
 ```
 
-## $\chi^2$ test
+## $\chi^2$ test <a name="$\chi^2$_test"></a>
 
 Chi-square test of independence of variables in a contingency table.
 
@@ -138,7 +146,7 @@ print('p value:', res[1])
 chi2, p_value, dof, exp = res
 ```
 
-## Pearson correlation coefficient
+## Pearson correlation coefficient <a name="Pearson_correlation_coefficient"></a>
 
 Pearson correlation coefficient and p-value for testing *non-correlation*.
 
@@ -161,7 +169,7 @@ print('Preason rho:', res[0])
 print('p value:', res[1])
 ```
 
-## A/B testing
+## A/B testing <a name="A/B_testing"></a>
 
 Null-hypothesis is that success rates for both samples (p1 and p2) are equal.
 

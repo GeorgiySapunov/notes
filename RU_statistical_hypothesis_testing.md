@@ -1,7 +1,15 @@
+1. [Тест нормальности Шапиро -- Уилка (Shapiro--Wilk test)](#Shapiro--Wilk_test)
+2. [U-критерий Манна -- Уитни -- Уилкоксона (Mann–Whitney--Wilcoxon U test)](#Mann–Whitney--Wilcoxon_U_test)
+3. [Тест Флигнера -- Киллина (Fligner--Killeen test)](#Fligner--Killeen_test)
+4. [t-критерий Стьюдента (Student's t-test)](#Student's_t-test)
+5. [Критерий согласия Пирсона ($\chi^2$ test)](#$\chi^2$_test)
+6. [Коэффициент корреляции Пирсона (Pearson correlation coefficient)](#Pearson_correlation_coefficient)
+7. [A/B тестирование (A/B testing)](#A/B_testing)
+
 Нулевая гипотеза отклоняется, если значение p_value меньше выбранного $\alpha$
 (вероятность ошибки первого рода)
 
-## Тест нормальности Шапиро -- Уилка (Shapiro-–Wilk test)
+## Тест нормальности Шапиро -- Уилка (Shapiro--Wilk test) <a name="Shapiro--Wilk_test"></a>
 
 Тест Шапиро -- Уилка проверяет нулевую гипотезу о том, что данные были получены
 из нормального распределения.
@@ -23,7 +31,7 @@ print('p value:', res[1])
 вычислительным соображениям.
 
 
-## U-критерий Манна -- Уитни -- Уилкоксона (Mann–Whitney--Wilcoxon U test)
+## U-критерий Манна -- Уитни -- Уилкоксона (Mann–Whitney--Wilcoxon U test) <a name="Mann–Whitney--Wilcoxon_U_test"></a>
 
 Используется для оценки различий между двумя независимыми выборками по уровню
 какого-либо количественного признака.
@@ -54,7 +62,7 @@ res = stats.mannwhitneyu(df[], df[])
 print('p value:', res[1])
 ```
 
-## Тест Флигнера -- Киллина (Fligner--Killeen test)
+## Тест Флигнера -- Киллина (Fligner--Killeen test) <a name="Fligner--Killeen_test"></a>
 
 Нулевая гипотеза состоит в том, что дисперсии двух выборок не различаются.
 
@@ -70,7 +78,7 @@ res = stats.fligner(df[], df[])
 print('p value:', res[1])
 ```
 
-## t-критерий Стьюдента (Student's t-test)
+## t-критерий Стьюдента (Student's t-test) <a name="Student's_t-test"></a>
 
 Среди наиболее часто используемых t-тестов:
 * **Одновыборочный** тест, определяющий, имеет ли среднее значение генеральной
@@ -122,7 +130,7 @@ res = stats.ttest_rel(df[], df[])
 print('p value:', res[1])
 ```
 
-## Критерий согласия Пирсона ($\chi^2$ test)
+## Критерий согласия Пирсона ($\chi^2$ test) <a name="$\chi^2$_test"></a>
 
 Критерий хи-квадрат независимости переменных.
 
@@ -139,7 +147,7 @@ print('p value:', res[1])
 chi2, p_value, dof, exp = res
 ```
 
-## Коэффициент корреляции Пирсона (Pearson correlation coefficient)
+## Коэффициент корреляции Пирсона (Pearson correlation coefficient) <a name="Pearson_correlation_coefficient"></a>
 
 Коэффициент корреляции Пирсона и p-значение для проверки *некорреляции*.
 
@@ -163,7 +171,7 @@ print('Preason rho:', res[0])
 print('p value:', res[1])
 ```
 
-## A/B тестирование (A/B testing)
+## A/B тестирование (A/B testing) <a name="A/B_testing"></a>
 
 Нулевая гипотеза состоит в том, что вероятности успеха для обеих выборок (p1 и p2) равны.
 
