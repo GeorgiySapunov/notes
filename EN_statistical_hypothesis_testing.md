@@ -1,7 +1,7 @@
 The null hypothesis is rejected if a p_value is less then chosen $\alpha$
 (the type I error probability)
 
-## Shapiro–Wilk test
+## Shapiro--Wilk test
 
 Perform the Shapiro-Wilk test for normality.
 
@@ -24,7 +24,7 @@ Usually is used in case of less then 2000 observation.
 In other case Kolmogorov–Smirnov test is preferred for computational reasons.
 
 
-## Mann–Whitney–Wilcoxon U test
+## Mann--Whitney--Wilcoxon U test
 
 A nonparametric test of the null hypothesis that, for randomly selected values
 X and Y from two populations, the probability of X being greater than Y is
@@ -51,12 +51,12 @@ res = stats.mannwhitneyu(df[], df[])
 print('p value:', res[1])
 ```
 
-## Fligner-Killeen test
+## Fligner--Killeen test
 
-Performs a Fligner-Killeen (median) test of the null that the variances in each
+Performs a Fligner--Killeen (median) test of the null that the variances in each
 of the groups (samples) are the same.
 
-(as alternative: Brown-Forsythe test)
+(as alternative: Brown--Forsythe test)
 
 ```python
 import pandas as pd
@@ -100,7 +100,7 @@ from scipy import stats
 df = pd.read_csv('link')
 
 res = stats.ttest_ind(df[], df[], equal_var=False)
-#equal_var=False is for not equal dispersions (see. Fligner-Killeen test)
+#equal_var=False is for not equal dispersions (see. Fligner--Killeen test)
 print('p value:', res[1])
 ```
 
