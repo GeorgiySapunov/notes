@@ -5,8 +5,7 @@
 [python](python.md) - python commands
 [gpg](gpg.md) - gpg and pass commands
 
-[EN_statistical_hypothesis_testing](EN_statistical_hypothesis_testing)
-[RU_проверка_статистических_гипотез](RU_statistical_hypothesis_testing)
+[проверка_статистических_гипотез](statistical_hypothesis_testing)
 
 Press **<Leader>ww** to go to your index page.
 Press **Enter** to create a link.
