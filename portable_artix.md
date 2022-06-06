@@ -152,13 +152,14 @@
      curl https://gitea.artixlinux.org/packagesA/artix-mirrorlist/raw/branch/master/trunk/mirrorlist -o /etc/pacman.d/mirrorlist
 
     pacman -S --noconfirm zsh artix-live-base rsm
-    pacman -S --noconfirm neovim python-pynvim
+    pacman -S --noconfirm neovim python-pynvim tmux
     
     pacman -S --noconfirm dosfstools exfat-utils ntfs-3g gnome-keyring
     pacman -S --noconfirm libnotify dunst ffmpeg mpd mpv mpc ncmpcpp ffmpegthumbnailer
     pacman -S --noconfirm man-db maim unrar unzip xclip mediainfo fzf sxhkd nano
     pacman -S --noconfirm texlive-most texlive-lang biber moreutils newsboat
-    pacman -S --noconfirm sxiv xwallpaper unclutter xdotool zathura zathura-pdf-mupdf zathura-djvu
+    pacman -S --noconfirm sxiv xwallpaper unclutter xdotool
+    pacman -S --noconfirm zathura zathura-pdf-mupdf zathura-djvu pdfpc
     pacman -S --noconfirm gimp inkscape blender libreoffice
     pacman -S --noconfirm bat bmon testdisk yt-dlp
 
@@ -251,10 +252,11 @@ sed -i "s/-j2/-j$(nproc)/;/^#MAKEFLAGS/s/^#//" /etc/makepkg.conf
     sudo pacman -S --noconfirm tldr tmate calcurse tk syncthing rsync ueberzug
     sudo pacman -S --noconfirm ipython python-pip python-black flake8 stylua lazygit ncdu jupyterlab
     sudo pacman -S --noconfirm python-tensorflow python-scikit-learn python-pandas python-numpy python-matplotlib
-    sudo pacman -S --noconfirm lxappearance arc-gtk-theme python-qdarkstyle papirus-icon-theme okular breeze-icons
+    sudo pacman -S --noconfirm lxappearance arc-gtk-theme python-qdarkstyle papirus-folders-nordic
+    sudo pacman -S --noconfirm okular breeze-icons
     
     paru -S atool
-    paru -S lf brave-bin sc-im-git zsh-fast-syntax-highlighting-git task-spooler simple-mtpfs
+    paru -S lf brave-bin qutebrowser sc-im-git zsh-fast-syntax-highlighting-git task-spooler simple-mtpfs
     paru -S xkb-switch latex-mk obfs4proxy-bin abook telegram-desktop
     paru -S urlview mutt-wizard-git betterlockscreen xidlehook write-good perl-file-mimeinfo htop-vim nordic-theme
     
