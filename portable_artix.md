@@ -83,7 +83,8 @@
     pacman -S --noconfirm networkmanager networkmanager-runit grub efibootmgr cryptsetup
     pacman -S --noconfirm polkit polkit-qt5
 
-    pacman -S --noconfirm bluez bluez-utils bluez-runit cups cups-runit git pipewire pipewire-pulse wget openssh openssh-runit cronie cronie-runit tor torsocks tor-runit artix-keyring artix-archlinux-support
+    pacman -S --noconfirm bluez bluez-utils bluez-runit cups cups-runit git pipewire pipewire-pulse
+    pacman -S --noconfirm wget openssh openssh-runit cronie cronie-runit tor torsocks tor-runit artix-keyring artix-archlinux-support
 
     pacman-key --populate archlinux
 
@@ -96,6 +97,11 @@
     ln -s /etc/runit/sv/cronie/ /etc/runit/runsvdir/default/
     ln -s /etc/runit/sv/tor/ /etc/runit/runsvdir/default/
     ln -s /etc/runit/sv/ntpd/ /etc/runit/runsvdir/default/
+    
+    ln -s /etc/runit/sv/bumblebeed /etc/runit/runsvdir/default
+    (
+    sudo ln -s /etc/runit/sv/bumblebeed /run/runit/service/bumblebeed
+    )
 
     passwd
 
@@ -140,7 +146,14 @@
     pacman -S --noconfirm xf86-video-amdgpu xf86-video-ati xf86-video-vesa
     pacman -S --noconfirm xorg-server xf86-input-libinput libinput xorg-xinit xorg-xbacklight xorg-xprop xorg-xdpyinfo neofetch
     pacman -S --noconfirm xorg-xwininfo
-
+    
+    Proprietary nvidia driver instead of nouveu:
+    pacman -S --noconfirm nvidia lib32-nvidia-utils cuda vulkan-tools
+    
+    pacman -S --noconfirm nvidia-prime
+    or
+    pacman -S --noconfirm bumblebe
+    
     %%exit
     %%umount -a
 
