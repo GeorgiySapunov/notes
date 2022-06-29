@@ -329,7 +329,7 @@ sed -i "s/-j2/-j$(nproc)/;/^#MAKEFLAGS/s/^#//" /etc/makepkg.conf
 
 ### Picom
 
-    paru -S picom-ibhagwan-git
+    paru -S picom-git
     picom --config ~/.config/picom.conf
 
 ### crontab -e
