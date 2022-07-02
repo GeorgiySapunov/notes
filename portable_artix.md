@@ -291,10 +291,11 @@ sed -i "s/-j2/-j$(nproc)/;/^#MAKEFLAGS/s/^#//" /etc/makepkg.conf
 
 ### LSP in neovim
     :LspInstallInfo
-    1. pytight
+    1. pyright
     2. sumneko_lua
     3. texlab
     4. jsonls
+    5. bashls
 
 ### pip
 
