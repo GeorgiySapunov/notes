@@ -289,13 +289,19 @@ sed -i "s/-j2/-j$(nproc)/;/^#MAKEFLAGS/s/^#//" /etc/makepkg.conf
     sudo pacman -S --noconfirm transmission-cli
     paru -S tremc
 
-### LSP in neovim
+### Neovim
     :LspInstallInfo
     1. pyright
     2. sumneko_lua
     3. texlab
     4. jsonls
     5. bashls
+    
+    :DIInstall python
+    
+    :DIInstall <debugger> installs <debugger>.
+    :DIUninstall <debugger> uninstalls <debugger>.
+    :DIList lists installed debuggers.
 
 ### pip
 
