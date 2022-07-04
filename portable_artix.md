@@ -283,6 +283,8 @@ sed -i "s/-j2/-j$(nproc)/;/^#MAKEFLAGS/s/^#//" /etc/makepkg.conf
     paru -S tor-browser
     %%paru -S scidavis
     paru -S anki cozy-audiobooks
+    
+    paru -S pam-gnupg
 
 ### Torrent
 

@@ -99,7 +99,8 @@ pass generate -c path/to/data num
 
 https://stackoverflow.com/questions/33361068/gnupg-there-is-no-assurance-this-key-belongs-to-the-named-user
 
-I had the same issue after copying my key pair from one machine to another. The solution for me was the set the trust level of the keys:
+I had the same issue after copying my key pair from one machine to another. The
+solution for me was the set the trust level of the keys:
 
 ```
 gpg --edit-key <KEY_ID>
@@ -115,7 +116,8 @@ You will be asked to select the trust level from the following:
 5 = I trust ultimately
 m = back to the main menu
 ```
-I selected 5 since I created the key so of course I trust it ultimately :). It will ask you to confirm your decision:
+I selected 5 since I created the key so of course I trust it ultimately :). It
+will ask you to confirm your decision:
 
 ```
 Your decision? 5
