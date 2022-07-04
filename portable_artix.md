@@ -284,7 +284,18 @@ sed -i "s/-j2/-j$(nproc)/;/^#MAKEFLAGS/s/^#//" /etc/makepkg.conf
     %%paru -S scidavis
     paru -S anki cozy-audiobooks
     
+### Pam-gnupg
+
     paru -S pam-gnupg
+    
+    echo UPDATESTARTUPTTY | gpg-connect-agent
+    shh-add
+    
+    add keygrips to .config/pam-gnupg
+    for gpg:
+    gpg -K --with-keygrip
+    for ssh:
+    gpg-connect-agent 'keyinfo --ssh-list' /bye
 
 ### Torrent
 
