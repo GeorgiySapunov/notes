@@ -426,15 +426,45 @@ sed -i "s/-j2/-j$(nproc)/;/^#MAKEFLAGS/s/^#//" /etc/makepkg.conf
     1. lxappearance, brave, anki, telegram-desktop, abook, calcurse, mutt
     2. dbus UUID must be generated for Artix runit.
 
-##### Xorg
+##### Xorg/Wayland
 
-    pacman -S --noconfirm xorg-server xorg-xwininfo xorg-xinit xorg-xbacklight xorg-xprop xorg-xdpyinfo arandr 
-    pacman -S --noconfirm xf86-input-libinput libinput 
-    pacman -S --noconfirm maim xclip 
-    pacman -S --noconfirm xwallpaper unclutter xdotool xcape 
-    pacman -S --noconfirm sxiv
-    pacman -S --noconfirm zathura zathura-pdf-mupdf zathura-djvu pdfpc
-    sudo pacman -S --noconfirm fcitx-im fcitx-configtool fcitx-mozc
-    sudo pacman -S --noconfirm lxappearance arc-gtk-theme python-qdarkstyle papirus-folders-nordic
-    sudo pacman -S --noconfirm okular
-    sudo pacman -S --noconfirm ueberzug ffmpegthumbnailer
+    xorg-server
+    xorg-xwininfo
+    xorg-xinit
+    xorg-xbacklight                  xbacklight (backlight management) → light / brightnessctl
+    xorg-xprop
+    xorg-xdpyinfo
+    arandr                           arandr (GUI to configure outputs) → wdisplays
+                                     xrandr → swaymsg output …, wlr-randr
+    xf86-input-libinput
+    libinput 
+    
+    libnotify
+    dunst                            dunst (notification daemon) → dunst (supports wayland) / mako / fnott / swaync
+    betterlockscreen
+    i3lock                           swaylock
+    (feh)                            feh (wallpaper setting) → sway output configuration, see man 5 sway-output (or oguri, which supports animated wallpapers)
+    xidlehook
+    maim                             scrot (screenshot) → grim + slurp (or grimshot, which wraps around both).
+    xclip                            xclip / xsel (clipboard copy/paste) → wl-clipboard, wl-clipboard-rs, wayclip
+    xwallpaper                       feh (wallpaper setting) → sway output configuration, see man 5 sway-output (or oguri, which supports animated wallpapers)
+    unclutter                        unclutter (hiding cursor after some time) → seat <name> hide_cursor <timeout>
+    xdotool                          xdotool → wtype, wlrctl, swaymsg seat <seat> cursor …, ydotool
+    xcape 
+    sxiv
+    zathura zathura-pdf-mupdf zathura-djvu
+    pdfpc
+    fcitx-im fcitx-configtool fcitx-mozc
+    lxappearance arc-gtk-theme python-qdarkstyle papirus-folders-nordic
+    okular
+    ueberzug
+    ffmpegthumbnailer
+    dmenu                            dmenu → wmenu, bemenu, fuzzel, gmenu, wldash
+                                     bemenu: To use the same color scheme used in dmenu, use bemenu-run -p "" --tb "#285577" --hb "#285577" --tf "#eeeeee" --hf "#eeeeee" --nf "#bbbbbb"
+    sxhkd                            sxhkd (an X daemon that reacts to input events by executing commands), shkd (a simple hotkey daemon for the Linux console. ) → swhkd
+    
+    To emulate xset dpms force off, use swayidle timeout 600 'swaymsg "output * dpms off"' resume 'swaymsg "output * dpms on"' then run pkill -USR1 swayidle to trigger timeout immediately.
+    Use the output command to configure outputs instead of xrandr
+    Use the output command to configure your wallpaper instead of feh
+    Use the input command to configure input devices
+
