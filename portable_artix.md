@@ -83,7 +83,7 @@
     pacman -S --noconfirm networkmanager networkmanager-runit grub efibootmgr cryptsetup
     pacman -S --noconfirm polkit polkit-qt5
 
-    pacman -S --noconfirm bluez bluez-utils bluez-runit cups cups-runit git pipewire pipewire-pulse
+    pacman -S --noconfirm bluez bluez-utils bluez-runit cups cups-runit git pipewire pipewire-pulse man-db 
     pacman -S --noconfirm wget openssh openssh-runit cronie cronie-runit tor torsocks tor-runit artix-keyring artix-archlinux-support
 
     pacman-key --populate archlinux
@@ -144,8 +144,8 @@
     pacman -S --noconfirm mesa
     pacman -S --noconfirm xf86-video-intel xf86-video-nouveau
     pacman -S --noconfirm xf86-video-amdgpu xf86-video-ati xf86-video-vesa
-    pacman -S --noconfirm xorg-server xf86-input-libinput libinput xorg-xinit xorg-xbacklight xorg-xprop xorg-xdpyinfo neofetch
-    pacman -S --noconfirm xorg-xwininfo
+    pacman -S --noconfirm xorg-server xorg-xwininfo xorg-xinit xorg-xbacklight xorg-xprop xorg-xdpyinfo arandr 
+    pacman -S --noconfirm xf86-input-libinput libinput 
     
     Proprietary nvidia driver instead of nouveu:
     pacman -S --noconfirm nvidia lib32-nvidia-utils cuda vulkan-tools
@@ -159,22 +159,42 @@
 
 ### Packages
 
-    pacman -S --noconfirm reflector pulsemixer pamixer
+##### pacman
+
+    pacman -S --noconfirm reflector
 
     reflector -c Russia -c China -c Switzerland -c France -a 12 --sort rate --save /etc/pacman.d/mirrorlist-arch
      curl https://gitea.artixlinux.org/packagesA/artix-mirrorlist/raw/branch/master/trunk/mirrorlist -o /etc/pacman.d/mirrorlist
 
-    pacman -S --noconfirm zsh artix-live-base rsm
-    pacman -S --noconfirm neovim python-pynvim tmux
+    %% rms: Runit service manager
+    pacman -S --noconfirm rsm
+    pacman -S --noconfirm artix-live-base
+    pacman -S --noconfirm gnome-keyring
     
-    pacman -S --noconfirm dosfstools exfat-utils ntfs-3g gnome-keyring
-    pacman -S --noconfirm libnotify dunst ffmpeg mpd mpv mpc ncmpcpp ffmpegthumbnailer
-    pacman -S --noconfirm man-db maim unrar unzip xclip mediainfo fzf sxhkd nano
-    pacman -S --noconfirm texlive-most texlive-lang biber moreutils newsboat
-    pacman -S --noconfirm sxiv xwallpaper unclutter xdotool
+    pacman -S --noconfirm zsh tmux
+    
+    pacman -S --noconfirm pulsemixer pamixer
+    pacman -S --noconfirm dosfstools exfat-utils ntfs-3g
+    
+##### dwm
+
+    pacman -S --noconfirm libnotify dunst
+    pacman -S --noconfirm maim xclip 
+    pacman -S --noconfirm xwallpaper unclutter xdotool xcape bmon 
+    
+    pacman -S --noconfirm ffmpeg mpd mpv mpc ncmpcpp newsboat sxiv calcurse
     pacman -S --noconfirm zathura zathura-pdf-mupdf zathura-djvu pdfpc
-    pacman -S --noconfirm gimp inkscape blender libreoffice
-    pacman -S --noconfirm bat bmon testdisk yt-dlp
+    
+    pacman -S --noconfirm gimp inkscape blender libreoffice nano pcmanfm 
+    pacman -S --noconfirm texlive-most texlive-lang biber
+    
+    pacman -S --noconfirm mediainfo fzf sxhkd
+    pacman -S --noconfirm testdisk yt-dlp moreutils
+
+##### neovim
+
+    pacman -S --noconfirm neovim
+    pacman -S --noconfirm lazygit ncdu ripgrep
 
 #### Fonts
 
@@ -259,30 +279,49 @@ sed -i "s/-j2/-j$(nproc)/;/^#MAKEFLAGS/s/^#//" /etc/makepkg.conf
 ## Personal
 ### Packages
 
-    sudo pacman -S --noconfirm pcmanfm xcape fcitx-im fcitx-configtool fcitx-mozc
-    sudo pacman -S --noconfirm neomutt isync msmtp lynx notmuch
+##### pacman
+
+    sudo pacman -S --noconfirm fcitx-im fcitx-configtool fcitx-mozc
+    
     sudo pacman -S --noconfirm libbluray libaacs
-    sudo pacman -S --noconfirm tldr tmate calcurse tk syncthing rsync ueberzug
-    sudo pacman -S --noconfirm ipython python-pip python-black flake8 stylua lazygit ncdu jupyterlab
-    sudo pacman -S --noconfirm python-tensorflow python-scikit-learn python-pandas python-numpy python-matplotlib
+    sudo pacman -S --noconfirm tmate syncthing rsync neofetch tldr 
+    
     sudo pacman -S --noconfirm lxappearance arc-gtk-theme python-qdarkstyle papirus-folders-nordic
     sudo pacman -S --noconfirm okular breeze-icons
     
-    paru -S atool
-    paru -S lf brave-bin qutebrowser sc-im-git zsh-fast-syntax-highlighting-git task-spooler simple-mtpfs
-    paru -S xkb-switch latex-mk obfs4proxy-bin abook telegram-desktop
-    paru -S urlview mutt-wizard-git betterlockscreen xidlehook write-good perl-file-mimeinfo htop-vim nordic-theme
-    
-    paru -S ttf-ms-fonts ttf-cmu-serif ttf-cmu-sans-serif ttf-cmu-bright ttf-cmu-concrete
-    paru -S ttf-cmu-typewriter nerd-fonts-hack ttf-sazanami-hanazono ttf-paratype ttf-dejavu ttf-hack
+##### python
 
+    sudo pacman -S --noconfirm ipython python-pip python-black flake8 stylua jupyterlab
+    sudo pacman -S --noconfirm python-tensorflow python-scikit-learn python-pandas python-numpy python-matplotlib
+    
+##### paru
+
+    paru -S zsh-fast-syntax-highlighting-git task-spooler simple-mtpfs xkb-switch urlview 
+    
+    paru -S brave-bin sc-im-git telegram-desktop latex-mk write-good htop-vim
+    paru -S anki cozy-audiobooks
+    
+    paru -S betterlockscreen xidlehook
     betterlockscreen -u ~/.local/share/wallpaper.jpg
 
     gpg --auto-key-locate nodefault,wkd --locate-keys torbrowser@torproject.org
+    paru -S tor-browser obfs4proxy-bin 
     
-    paru -S tor-browser
-    %%paru -S scidavis
-    paru -S anki cozy-audiobooks
+##### fonts
+
+    paru -S ttf-ms-fonts ttf-cmu-serif ttf-cmu-sans-serif ttf-cmu-bright ttf-cmu-concrete
+    paru -S ttf-cmu-typewriter nerd-fonts-hack ttf-sazanami-hanazono ttf-paratype ttf-dejavu
+
+##### lf
+
+    paru -S lf atool perl-file-mimeinfo
+    sudo pacman -S --noconfirm ueberzug ffmpegthumbnailer bat
+    
+##### neomutt
+
+    sudo pacman -S --noconfirm neomutt isync msmtp lynx notmuch
+    paru -S abook 
+    paru -S mutt-wizard-git
     
 ### Pam-gnupg
 
@@ -303,6 +342,7 @@ sed -i "s/-j2/-j$(nproc)/;/^#MAKEFLAGS/s/^#//" /etc/makepkg.conf
     paru -S tremc
 
 ### Neovim
+
     :LspInstallInfo
     1. pyright
     2. sumneko_lua
@@ -315,10 +355,6 @@ sed -i "s/-j2/-j$(nproc)/;/^#MAKEFLAGS/s/^#//" /etc/makepkg.conf
     :DIInstall <debugger> installs <debugger>.
     :DIUninstall <debugger> uninstalls <debugger>.
     :DIList lists installed debuggers.
-
-### pip
-
-    %%pip install jupyterlab-vim
 
 ### Wi-fi adapter Archer T4UH v2
 
@@ -349,7 +385,7 @@ sed -i "s/-j2/-j$(nproc)/;/^#MAKEFLAGS/s/^#//" /etc/makepkg.conf
 
 ### Picom
 
-    paru -S picom-git
+    paru -S picom-ibhagwan-git
     picom --config ~/.config/picom.conf
 
 ### crontab -e
