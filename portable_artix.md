@@ -296,7 +296,7 @@ sed -i "s/-j2/-j$(nproc)/;/^#MAKEFLAGS/s/^#//" /etc/makepkg.conf
     
 ##### paru
 
-    paru -S zsh-fast-syntax-highlighting-git task-spooler simple-mtpfs xkb-switch urlview 
+    paru -S zsh-fast-syntax-highlighting-git task-spooler simple-mtpfs urlview 
     
     paru -S brave-bin sc-im-git telegram-desktop latex-mk write-good htop-vim
     paru -S anki cozy-audiobooks
@@ -425,3 +425,16 @@ sed -i "s/-j2/-j$(nproc)/;/^#MAKEFLAGS/s/^#//" /etc/makepkg.conf
 
     1. lxappearance, brave, anki, telegram-desktop, abook, calcurse, mutt
     2. dbus UUID must be generated for Artix runit.
+
+##### Xorg
+
+    pacman -S --noconfirm xorg-server xorg-xwininfo xorg-xinit xorg-xbacklight xorg-xprop xorg-xdpyinfo arandr 
+    pacman -S --noconfirm xf86-input-libinput libinput 
+    pacman -S --noconfirm maim xclip 
+    pacman -S --noconfirm xwallpaper unclutter xdotool xcape 
+    pacman -S --noconfirm sxiv
+    pacman -S --noconfirm zathura zathura-pdf-mupdf zathura-djvu pdfpc
+    sudo pacman -S --noconfirm fcitx-im fcitx-configtool fcitx-mozc
+    sudo pacman -S --noconfirm lxappearance arc-gtk-theme python-qdarkstyle papirus-folders-nordic
+    sudo pacman -S --noconfirm okular
+    sudo pacman -S --noconfirm ueberzug ffmpegthumbnailer
