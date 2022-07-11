@@ -1,3 +1,7 @@
+%% Gentoo
+[Чек-лист_установки_gentoo_linux](gentoo_installation_checklist.md) - gentoo installation
+
+
 [portable_artix](portable_artix.md) - artix installation
 
 [vim](vim.md)  - vim commands

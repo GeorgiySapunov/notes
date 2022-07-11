@@ -284,7 +284,7 @@ sed -i "s/-j2/-j$(nproc)/;/^#MAKEFLAGS/s/^#//" /etc/makepkg.conf
     sudo pacman -S --noconfirm fcitx-im fcitx-configtool fcitx-mozc
     
     sudo pacman -S --noconfirm libbluray libaacs
-    sudo pacman -S --noconfirm tmate syncthing rsync neofetch tldr 
+    sudo pacman -S --noconfirm tmate syncthing rsync neofetch
     
     sudo pacman -S --noconfirm lxappearance arc-gtk-theme python-qdarkstyle papirus-folders-nordic
     sudo pacman -S --noconfirm okular breeze-icons
@@ -298,7 +298,7 @@ sed -i "s/-j2/-j$(nproc)/;/^#MAKEFLAGS/s/^#//" /etc/makepkg.conf
 
     paru -S zsh-fast-syntax-highlighting-git task-spooler simple-mtpfs urlview 
     
-    paru -S brave-bin sc-im-git telegram-desktop latex-mk write-good htop-vim
+    paru -S brave-bin sc-im-git telegram-desktop latex-mk write-good htop-vim tldr++
     paru -S anki cozy-audiobooks
     
     paru -S betterlockscreen xidlehook
@@ -451,6 +451,7 @@ sed -i "s/-j2/-j$(nproc)/;/^#MAKEFLAGS/s/^#//" /etc/makepkg.conf
     unclutter                        unclutter (hiding cursor after some time) → seat <name> hide_cursor <timeout>
     xdotool                          xdotool → wtype, wlrctl, swaymsg seat <seat> cursor …, ydotool
     xcape 
+    st
     sxiv
     zathura zathura-pdf-mupdf zathura-djvu
     pdfpc
