@@ -1,18 +1,18 @@
 %% Gentoo
-[gentoo installation checklist](gentoo_installation_checklist.md) - gentoo installation
-[gentoo_apps](gentoo_apps)
+[gentoo installation checklist](gentoo/gentoo_installation_checklist.md) - gentoo installation
+[gentoo_apps](gentoo/gentoo_apps)
 
 %% drafts
-[gentoo_x org_dwm](gentoo_xorg_dwm.md)
-[gentoo_x org_xfce](gentoo_xorg_xfce.md)
+[gentoo_x org_dwm](gentoo/gentoo_xorg_dwm.md)
+[gentoo_x org_xfce](gentoo/gentoo_xorg_xfce.md)
 
 %% artix
 [portable_artix](portable_artix.md) - artix installation
 
-[vim](vim.md)  - vim commands
-[git](git.md) - git commands
-[python](python.md) - python commands
-[gpg](gpg.md) - gpg and pass commands
+[vim](commands/vim.md)  - vim commands
+[git](commands/git.md) - git commands
+[python](commands/python.md) - python commands
+[gpg](commands/gpg.md) - gpg and pass commands
 
 [проверка_статистических_гипотез](statistical_hypothesis_testing)
 
