@@ -1,4 +1,4 @@
-# Чек-лист установки gentoo linux
+# Gentoo installation checklist
 
     lsblk -f
     
@@ -122,11 +122,16 @@ Download the stage3 [desktop profile | openrc] to /mnt/gentoo from Gentoo mirror
 
     links https://www.gentoo.org/downloads/mirrors/
     
-or use wget 
+or use wget, e.g.
+
+    wget http://linux.rz.ruhr-uni-bochum.de/download/gentoo-mirror/releases/amd64/autobuilds/current-stage3-amd64/stage3-amd64-20170706.tar.xz
 
 Extract the downloaded archive
 
-    tar xJpvf stage3-*.tar.xz --xattrs-include='*.*' --numeric-owner
+    tar xpvf stage3-*.tar.xz --xattrs-include='*.*' --numeric-owner
+    ? or
+    tar xvJpf stage3-*.tar.xz --xattrs --numeric-owner
+    tar xvjpf stage3-*.tar.bz2 --xattrs --numeric-owner
 
 ### Configuring compile options
 
@@ -140,6 +145,7 @@ XFCE. Эта оболочка легче Gnome и KDE, но всё-таки си
 ниже.
 
 Переменная CFLAGS по умолчанию имеет значение -O2 -pipe.
+https://wiki.gentoo.org/wiki/Safe_CFLAGS
 
     -O2 (буква O — Optimization, а не ноль) контролирует общий уровень
     оптимизации. Не рекомендуется менять без острой необходимости.
@@ -164,6 +170,14 @@ XFCE. Эта оболочка легче Gnome и KDE, но всё-таки си
 С помощью текстового редактора nano (или другого по выбору) редактируем
 файл /mnt/gentoo/etc/portage/make.conf:
 
+---
+
+??? 
+    
+    CHOST="x86_64-pc-linux-gnu"
+
+---
+
     CFLAGS="-march=native -O2 -pipe"
     # Для 8 потоков
     MAKEOPTS="-j8"
@@ -174,7 +188,18 @@ XFCE. Эта оболочка легче Gnome и KDE, но всё-таки си
     # Xorg
     USE="X pam elogind harfbuzz truetype"
     # dwm
-    USE="-gnome -kde -dvd -dvdr -cdr harfbuzz"
+    USE="-systemd -gnome -kde -dvd -dvdr -cdr harfbuzz"
+    # kde
+    USE="-systemd -gnome -dvd -dvdr -cdr harfbuzz"
+    
+---
+
+Probably also
+
+    ACCEPT_LICENSE="*"
+
+---
+    
 
 ### Choose mirrors
 
@@ -250,6 +275,35 @@ Synchronize ebuild repository:
 
 ---
 
+## Reading news items
+
+When the Gentoo ebuild repository is synchronized, Portage may output
+informational messages similar to the following:
+
+    * IMPORTANT: 2 news items need reading for repository 'gentoo'.
+    * Use eselect news to read news items.
+
+News items were created to provide a communication medium to push critical
+messages to users via the Gentoo ebuild repository. To manage them, use **eselect
+news**. The **eselect** application is a Gentoo-specific utility that allows for a
+common management interface for system administration. In this case, **eselect** is
+asked to use its *news* module.
+
+For the *news* module, three operations are most used:
+
+* With *list* an overview of the available news items is displayed.
+* With *read* the news items can be read.
+* With *purge* news items can be removed once they have been read and will not be reread anymore.
+
+        eselect news list
+        eselect news read
+
+More information about the news reader is available through its manual page:
+
+    man news.eselect
+
+## Choosing the right profile
+
 Choose and install correct profile:
 
     eselect profile list
@@ -280,7 +334,7 @@ Update World
 
 ---
 
-Setup the correct timezone:
+## Setup the correct timezone and locale:
 
     echo "Europe/Moscow" > /etc/timezone
     emerge --config sys-libs/timezone-data
@@ -342,6 +396,10 @@ Edit /etc/fstab and setup correct filesystem:
 
 ## 1. Configuring the Linux kernel manually
 
+https://wiki.gentoo.org/wiki/Handbook:AMD64/Installation/Kernel
+
+https://wiki.gentoo.org/wiki/Kernel/Gentoo_Kernel_Configuration_Guide
+
 Package distributed alongside the Linux kernel that contains firmware binary blobs
 
     emerge sys-kernel/linux-firmware
@@ -352,9 +410,18 @@ If **All ebuilds that satisfy "sys-kernel/linux-firmware" have been masked** run
 
 ---
 
-Consider installing
+It is vital to know the system when a kernel is configured manually. Most
+information can be gathered by emerging **sys-apps/pciutils** which contains
+the **lspci** command:
 
     emerge sys-apps/pciutils
+    
+Inside the chroot, it is safe to ignore any pcilib warnings (like pcilib:
+cannot open /sys/bus/pci/devices) that lspci might throw out.
+
+Another source of system information is to run **lsmod** to see what kernel
+modules the installation CD uses as it might provide a nice hint on what to
+enable.
 
 ---
 
@@ -486,6 +553,12 @@ Optionally:
        
 ## Install GRUB2
 
+???
+
+https://wiki.gentoo.org/wiki/Full_Disk_Encryption_From_Scratch_Simplified
+
+https://wiki.gentoo.org/wiki/Handbook:AMD64/Installation/Bootloader
+
     echo "sys-boot/grub:2 device-mapper" >> /etc/portage/package.use/sys-boot
     emerge -av grub
     
@@ -604,7 +677,9 @@ lvmetad. Falling back to internal scanning."
     hostname="user_name"
 
 
-## Net settings
+## Networking settings
+    
+https://wiki.gentoo.org/wiki/Handbook:AMD64/Installation/System
 
     emerge net-misc/dhcpcd net-misc/netifrc
     
@@ -621,9 +696,20 @@ Add to /etc/conf.d/net:
 
 Add symlink to enable network at boot:
 
+    cd /etc/init.d
+
     ln -s net.lo net.eno1
     
     rc-update add net.eno1 default
+
+## Install wireless networking tools
+
+If the system will be connecting to wireless networks, install the
+net-wireless/iw package for Open or WEP networks and/or the
+net-wireless/wpa_supplicant package for WPA or WPA2 networks. iw is also a
+useful basic diagnostic tool for scanning wireless networks.
+
+    emerge --ask net-wireless/iw net-wireless/wpa_supplicant
 
 ## 17.	HOST
  
@@ -652,9 +738,11 @@ setup
     emerge --ask app-admin/sysklogd
     rc-update add sysklogd default
 
-Утилита файловой системы ext4
+Утилита файловой системы ext4, fat
 
-    emerge --ask sys-fs/e2fsprogs
+    emerge --ask sys-fs/e2fsprogs sys-fs/dosfstools 
+
+Для NTFS https://wiki.gentoo.org/wiki/NTFS
 
 ## 21. Выход и размонтирование
 
@@ -712,12 +800,9 @@ Start the sshd daemon with:
 ## File indexing
 
     emerge --ask sys-apps/mlocate
+    
+## also
 
-## Optional: Install wireless networking tools
+Gentoolkit is a suite of tools to ease the administration of a Gentoo system, and Portage in particular.
 
-If the system will be connecting to wireless networks, install the
-net-wireless/iw package for Open or WEP networks and/or the
-net-wireless/wpa_supplicant package for WPA or WPA2 networks. iw is also a
-useful basic diagnostic tool for scanning wireless networks.
-
-    emerge --ask net-wireless/iw net-wireless/wpa_supplicant
+    emerge --ask app-portage/gentoolkit
