@@ -1,5 +1,6 @@
 %% Gentoo
 [Чек-лист_установки_gentoo_linux](gentoo_installation_checklist.md) - gentoo installation
+[gentoo_x org_dwm](gentoo_xorg_dwm.md)
 [gentoo_x org_xfce](gentoo_xorg_xfce.md)
 
 
