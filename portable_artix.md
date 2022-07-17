@@ -289,8 +289,6 @@ sed -i "s/-j2/-j$(nproc)/;/^#MAKEFLAGS/s/^#//" /etc/makepkg.conf
     sudo pacman -S --noconfirm lxappearance arc-gtk-theme python-qdarkstyle papirus-folders-nordic
     sudo pacman -S --noconfirm okular breeze-icons
     
-    sudo pacman -S --noconfirm emacs-nativecomp aspell aspell-en aspell-ru
-    
 ##### python
 
     sudo pacman -S --noconfirm ipython python-pip python-black flake8 stylua jupyterlab
@@ -309,10 +307,10 @@ sed -i "s/-j2/-j$(nproc)/;/^#MAKEFLAGS/s/^#//" /etc/makepkg.conf
     gpg --auto-key-locate nodefault,wkd --locate-keys torbrowser@torproject.org
     paru -S tor-browser obfs4proxy-bin 
     
-##### fonts
+##### Fonts
 
     paru -S ttf-ms-fonts ttf-cmu-serif ttf-cmu-sans-serif ttf-cmu-bright ttf-cmu-concrete
-    paru -S ttf-cmu-typewriter nerd-fonts-hack nerd-fonts-overpass ttf-sazanami-hanazono ttf-paratype ttf-dejavu
+    paru -S ttf-cmu-typewriter nerd-fonts-hack ttf-sazanami-hanazono ttf-paratype ttf-dejavu
 
 ##### lf
 
