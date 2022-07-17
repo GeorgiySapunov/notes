@@ -1,6 +1,7 @@
 %% Gentoo
 [gentoo installation checklist](gentoo/gentoo_installation_checklist.md) - gentoo installation
 [gentoo_apps](gentoo/gentoo_apps)
+[gentoo_kernel_upgrade](gentoo/gentoo_kernel_upgrade.md)
 
 %% drafts
 [gentoo_x org_dwm](gentoo/gentoo_xorg_dwm.md)

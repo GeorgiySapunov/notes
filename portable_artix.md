@@ -289,6 +289,8 @@ sed -i "s/-j2/-j$(nproc)/;/^#MAKEFLAGS/s/^#//" /etc/makepkg.conf
     sudo pacman -S --noconfirm lxappearance arc-gtk-theme python-qdarkstyle papirus-folders-nordic
     sudo pacman -S --noconfirm okular breeze-icons
     
+    sudo pacman -S --noconfirm emacs-nativecomp aspell aspell-en aspell-ru
+    
 ##### python
 
     sudo pacman -S --noconfirm ipython python-pip python-black flake8 stylua jupyterlab
@@ -298,7 +300,7 @@ sed -i "s/-j2/-j$(nproc)/;/^#MAKEFLAGS/s/^#//" /etc/makepkg.conf
 
     paru -S zsh-fast-syntax-highlighting-git task-spooler simple-mtpfs urlview 
     
-    paru -S brave-bin sc-im-git telegram-desktop latex-mk write-good htop-vim tldr++
+    paru -S brave-bin sc-im-git telegram-desktop latex-mk write-good htop-vim tldr++ exa
     paru -S anki cozy-audiobooks
     
     paru -S betterlockscreen xidlehook
@@ -310,7 +312,7 @@ sed -i "s/-j2/-j$(nproc)/;/^#MAKEFLAGS/s/^#//" /etc/makepkg.conf
 ##### fonts
 
     paru -S ttf-ms-fonts ttf-cmu-serif ttf-cmu-sans-serif ttf-cmu-bright ttf-cmu-concrete
-    paru -S ttf-cmu-typewriter nerd-fonts-hack ttf-sazanami-hanazono ttf-paratype ttf-dejavu
+    paru -S ttf-cmu-typewriter nerd-fonts-hack nerd-fonts-overpass ttf-sazanami-hanazono ttf-paratype ttf-dejavu
 
 ##### lf
 
