@@ -137,7 +137,7 @@
     EDITOR=vim visudo
 
     %wheel ALL=(ALL) ALL
-    %wheel ALL=(ALL) NOPASSWD: /usr/bin/shutdown,/usr/bin/reboot,/usr/bin/systemctl suspend,/usr/bin/wifi-menu,/usr/bin/mount,/usr/bin/umount,/usr/bin/pacman -Syu,/usr/bin/pacman -Syyu,/usr/bin/pacman -Syyu --noconfirm,/usr/bin/loadkeys,/usr/bin/paru,/usr/bin/pacman -Syyuw --noconfirm
+    %wheel ALL=(ALL:ALL) NOPASSWD: /usr/bin/shutdown,/usr/bin/reboot,/usr/bin/systemctl suspend,/usr/bin/wifi-menu,/usr/bin/mount,/usr/bin/umount,/usr/bin/pacman -Syu,/usr/bin/pacman -Syyu,/usr/bin/pacman -Syyu --noconfirm,/usr/bin/loadkeys,/usr/bin/paru,/usr/bin/pacman -Syyuw --noconfirm
 
 ### Video drivers and xorg
 
@@ -450,8 +450,8 @@ sed -i "s/-j2/-j$(nproc)/;/^#MAKEFLAGS/s/^#//" /etc/makepkg.conf
     xwallpaper                       feh (wallpaper setting) → sway output configuration, see man 5 sway-output (or oguri, which supports animated wallpapers)
     unclutter                        unclutter (hiding cursor after some time) → seat <name> hide_cursor <timeout>
     xdotool                          xdotool → wtype, wlrctl, swaymsg seat <seat> cursor …, ydotool
-    xcape 
-    st
+    xcape (remaps)                   keyd, KMonad.
+    st                               Alacritty
     sxiv
     zathura zathura-pdf-mupdf zathura-djvu
     pdfpc

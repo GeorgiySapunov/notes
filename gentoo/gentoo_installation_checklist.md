@@ -287,13 +287,13 @@ News items were created to provide a communication medium to push critical
 messages to users via the Gentoo ebuild repository. To manage them, use **eselect
 news**. The **eselect** application is a Gentoo-specific utility that allows for a
 common management interface for system administration. In this case, **eselect** is
-asked to use its *news* module.
+asked to use its ```news``` module.
 
 For the *news* module, three operations are most used:
 
-* With *list* an overview of the available news items is displayed.
-* With *read* the news items can be read.
-* With *purge* news items can be removed once they have been read and will not be reread anymore.
+* With ```list``` an overview of the available news items is displayed.
+* With ```read``` the news items can be read.
+* With ```purge``` news items can be removed once they have been read and will not be reread anymore.
 
         eselect news list
         eselect news read
@@ -411,7 +411,7 @@ If **All ebuilds that satisfy "sys-kernel/linux-firmware" have been masked** run
 ---
 
 It is vital to know the system when a kernel is configured manually. Most
-information can be gathered by emerging **sys-apps/pciutils** which contains
+information can be gathered by emerging ```sys-apps/pciutils``` which contains
 the **lspci** command:
 
     emerge sys-apps/pciutils
@@ -453,9 +453,9 @@ AES-NI support in the kernel:
 
 When using a LUKS passphrase, double check that the kernel configuration has a
 usable framebuffer configuration or else ensure text-only GRUB with text-only
-payload and no **gfxterm**. Otherwise the LUKS passphrase prompt may not be
+payload and no ```gfxterm```. Otherwise the LUKS passphrase prompt may not be
 visible. Consult the graphic driver's setup. It may also be necessary to fix
-Kernel's **keymap** if the passphrase contains special characters.
+Kernel's ```keymap``` if the passphrase contains special characters.
 
 ---
 
@@ -534,9 +534,9 @@ AES-NI support in the kernel:
 
 When using a LUKS passphrase, double check that the kernel configuration has a
 usable framebuffer configuration or else ensure text-only GRUB with text-only
-payload and no **gfxterm**. Otherwise the LUKS passphrase prompt may not be
+payload and no ```gfxterm```. Otherwise the LUKS passphrase prompt may not be
 visible. Consult the graphic driver's setup. It may also be necessary to fix
-Kernel's **keymap** if the passphrase contains special characters.
+Kernel's ```keymap``` if the passphrase contains special characters.
 
 ---
 
@@ -569,17 +569,17 @@ https://wiki.gentoo.org/wiki/Handbook:AMD64/Installation/Bootloader
 **Note for UEFI users:**
 running the above command will output the enabled
 GRUB_PLATFORMS values before emerging. When using UEFI capable systems, users
-will need to ensure **_GRUB_PLATFORMS="efi-64"_** is enabled (as it is the case by
-default). If that is not the case for the setup, **_GRUB_PLATFORMS="efi-64"_** will
+will need to ensure ```GRUB_PLATFORMS="efi-64"``` is enabled (as it is the case by
+default). If that is not the case for the setup, ```GRUB_PLATFORMS="efi-64"``` will
 need to be added to the /etc/portage/make.conf file *before* emerging GRUB2 so
 that the package will be built with EFI functionality:
     
     echo 'GRUB_PLATFORMS="efi-64"' >> /etc/portage/make.conf
     emerge --ask sys-boot/grub
     
-If GRUB2 was somehow emerged without enabling **_GRUB_PLATFORMS="efi-64"_**, the line
+If GRUB2 was somehow emerged without enabling ```GRUB_PLATFORMS="efi-64"```, the line
 (as shown above) can be added to make.conf and then dependencies for the world
-package set can be re-calculated by passing the --update --newuse_ options to
+package set can be re-calculated by passing the ```--update --newuse``` options to
 **emerge**: 
     
     emerge --ask --update --newuse --verbose sys-boot/grub
@@ -632,7 +632,7 @@ configuration file:
 **_Note:_**
 When using a LUKS passphrase and there is no visible prompt after loading the
 initramfs, try typing the passphrase. If this continues loading try GRUB
-without **gfxterm**/ in text-only mode. Depending on the BIOS it might help to boot
+without ```gfxterm```/ in text-only mode. Depending on the BIOS it might help to boot
 legacy first to check if there's a prompt at all.
 
 ---
