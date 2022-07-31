@@ -172,6 +172,7 @@
     pacman -S --noconfirm gnome-keyring
     
     pacman -S --noconfirm zsh tmux
+    pacman -S --noconfirm zsh-completions zoxide
     
     pacman -S --noconfirm pulsemixer pamixer
     pacman -S --noconfirm dosfstools exfat-utils ntfs-3g
@@ -296,7 +297,7 @@ sed -i "s/-j2/-j$(nproc)/;/^#MAKEFLAGS/s/^#//" /etc/makepkg.conf
     
 ##### paru
 
-    paru -S zsh-fast-syntax-highlighting-git task-spooler simple-mtpfs urlview 
+    paru -S task-spooler simple-mtpfs urlview
     
     paru -S brave-bin sc-im-git telegram-desktop latex-mk write-good htop-vim tldr++ exa
     paru -S anki cozy-audiobooks
