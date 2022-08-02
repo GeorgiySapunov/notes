@@ -282,7 +282,7 @@ sed -i "s/-j2/-j$(nproc)/;/^#MAKEFLAGS/s/^#//" /etc/makepkg.conf
 
 ##### pacman
 
-    sudo pacman -S --noconfirm fcitx-im fcitx-configtool fcitx-mozc
+    sudo pacman -S --noconfirm ibus
     
     sudo pacman -S --noconfirm libbluray libaacs
     sudo pacman -S --noconfirm tmate syncthing rsync neofetch
@@ -313,10 +313,15 @@ sed -i "s/-j2/-j$(nproc)/;/^#MAKEFLAGS/s/^#//" /etc/makepkg.conf
     paru -S ttf-ms-fonts ttf-cmu-serif ttf-cmu-sans-serif ttf-cmu-bright ttf-cmu-concrete
     paru -S ttf-cmu-typewriter nerd-fonts-hack ttf-sazanami-hanazono ttf-paratype ttf-dejavu
 
-##### lf
+##### lf with ueberzug
 
     paru -S lf atool perl-file-mimeinfo
     sudo pacman -S --noconfirm ueberzug ffmpegthumbnailer bat
+
+##### lf with kitty
+
+    paru -S lf atool perl-file-mimeinfo
+    sudo pacman -S --noconfirm ffmpegthumbnailer bat
     
 ##### neomutt
 
@@ -459,7 +464,9 @@ sed -i "s/-j2/-j$(nproc)/;/^#MAKEFLAGS/s/^#//" /etc/makepkg.conf
     fcitx-im fcitx-configtool fcitx-mozc
     lxappearance arc-gtk-theme python-qdarkstyle papirus-folders-nordic
     okular
-    ueberzug
+    ueberzug                         kitty (https://github.com/gokcehan/lf/issues/437
+                                            https://gist.github.com/Provessor/e4ee757e6c424083ca3c6441fe6ab9ac
+                                            https://github.com/gokcehan/lf/wiki/Previews)
     ffmpegthumbnailer
     dmenu                            dmenu → wmenu, bemenu, fuzzel, gmenu, wldash
                                      bemenu: To use the same color scheme used in dmenu, use bemenu-run -p "" --tb "#285577" --hb "#285577" --tf "#eeeeee" --hf "#eeeeee" --nf "#bbbbbb"
