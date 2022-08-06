@@ -347,6 +347,10 @@ sed -i "s/-j2/-j$(nproc)/;/^#MAKEFLAGS/s/^#//" /etc/makepkg.conf
     sudo pacman -S --noconfirm transmission-cli
     paru -S tremc
 
+### Virtualbox
+
+    sudo pacman -S virtualbox virtualbox-host-modules-artix
+
 ### Neovim
 
     :LspInstallInfo
@@ -440,7 +444,7 @@ sed -i "s/-j2/-j$(nproc)/;/^#MAKEFLAGS/s/^#//" /etc/makepkg.conf
     xorg-xbacklight                  xbacklight (backlight management) → light / brightnessctl
     xorg-xprop
     xorg-xdpyinfo
-    arandr                           arandr (GUI to configure outputs) → wdisplays
+
                                      xrandr → swaymsg output …, wlr-randr
     xf86-input-libinput
     libinput 
@@ -457,7 +461,7 @@ sed -i "s/-j2/-j$(nproc)/;/^#MAKEFLAGS/s/^#//" /etc/makepkg.conf
     unclutter                        unclutter (hiding cursor after some time) → seat <name> hide_cursor <timeout>
     xdotool                          xdotool → wtype, wlrctl, swaymsg seat <seat> cursor …, ydotool
     xcape (remaps)                   keyd, KMonad.
-    st                               Alacritty
+    st                               Alacritty, kitty
     sxiv
     zathura zathura-pdf-mupdf zathura-djvu
     pdfpc
