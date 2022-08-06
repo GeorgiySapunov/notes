@@ -1,12 +1,12 @@
 # Gentoo installation checklist
 
     lsblk -f
-    
+
 ## Full_Disk_Encryption
 
 https://wiki.gentoo.org/wiki/Full_Disk_Encryption_From_Scratch_Simplified
 
-### Create partitions   
+### Create partitions
 
 To create GRUB BIOS, issue the following command:
 
@@ -72,7 +72,7 @@ Open encrypted device:
 Crypt physical volume group:
 
     lvm pvcreate /dev/mapper/lvm
-    
+
 Create volume group vg0:
 
     vgcreate vg0 /dev/mapper/lvm
@@ -101,7 +101,7 @@ Create mount point for permanent Gentoo:
 Mount the root filesystem from the encrypted LVM partition:
 
     mount /dev/mapper/vg0-root /mnt/gentoo
-    
+
 And switch into /mnt/gentoo:
 
     cd /mnt/gentoo
@@ -121,7 +121,7 @@ If you are making changes to the home partition (like adding a user) in the chro
 Download the stage3 [desktop profile | openrc] to /mnt/gentoo from Gentoo mirrors.
 
     links https://www.gentoo.org/downloads/mirrors/
-    
+
 or use wget, e.g.
 
     wget http://linux.rz.ruhr-uni-bochum.de/download/gentoo-mirror/releases/amd64/autobuilds/current-stage3-amd64/stage3-amd64-20170706.tar.xz
@@ -130,7 +130,11 @@ Extract the downloaded archive
 
     tar xpvf stage3-*.tar.xz --xattrs-include='*.*' --numeric-owner
     ? or
+
+    --- this one
     tar xvJpf stage3-*.tar.xz --xattrs --numeric-owner
+    ---
+
     tar xvjpf stage3-*.tar.bz2 --xattrs --numeric-owner
 
 ### Configuring compile options
@@ -172,8 +176,8 @@ https://wiki.gentoo.org/wiki/Safe_CFLAGS
 
 ---
 
-??? 
-    
+???
+
     CHOST="x86_64-pc-linux-gnu"
 
 ---
@@ -191,7 +195,7 @@ https://wiki.gentoo.org/wiki/Safe_CFLAGS
     USE="-systemd -gnome -kde -dvd -dvdr -cdr harfbuzz"
     # kde
     USE="-systemd -gnome -dvd -dvdr -cdr harfbuzz"
-    
+
 ---
 
 Probably also
@@ -199,7 +203,7 @@ Probably also
     ACCEPT_LICENSE="*"
 
 ---
-    
+
 
 ### Choose mirrors
 
@@ -219,13 +223,16 @@ Copy DNS info:
 Mount all required filesystems into chroot:
 
     mount --types proc /proc /mnt/gentoo/proc
+
     mount --rbind /sys /mnt/gentoo/sys
     mount --make-rslave /mnt/gentoo/sys
+
     mount --rbind /dev /mnt/gentoo/dev
     mount --make-rslave /mnt/gentoo/dev
+
     mount --bind /run /mnt/gentoo/run
     mount --make-slave /mnt/gentoo/run
-    
+
 Mount shm filesystem:
 
     test -L /dev/shm && rm /dev/shm && mkdir /dev/shm
@@ -236,14 +243,14 @@ Enter chroot:
 
     chroot /mnt/gentoo /bin/bash
     source /etc/profile
-    
+
 And run:
 
     export PS1="(chroot) $PS1"
 
 Mounting the boot partition:
 
-    mount /dev/sda2 /boot
+    mount /dev/sdX2 /boot
 
 Synchronize ebuild repository:
 
@@ -262,11 +269,11 @@ Synchronize ebuild repository:
 Увидев эти ошибки, я прервал операцию, нажав Ctrl + C, и сделал следующее:
 
     mkdir /usr/portage
-    mkdir -p /usr/portage/metadata/ 
+    mkdir -p /usr/portage/metadata/
     nano -w /usr/portage/metadata/layout.conf
 
-    /usr/portage/metadata/layout.conf 
-    
+    /usr/portage/metadata/layout.conf
+
 и там написать
 
     masters = gentoo
@@ -340,7 +347,7 @@ Update World
     emerge --config sys-libs/timezone-data
 
 Install Vim
-    
+
     emerge vim
 
 Configure locales:
@@ -356,15 +363,15 @@ Configure locales:
 Set default locale:
 
     eselect locale list
-    
+
 select en_US.UTF-8 locale:
-    
+
     eselect locale set X
-    
+
 Update the environment:
 
     env-update && source /etc/profile
-    
+
 ## Configure fstab
 
 For consistent setup of the required partition, use the UUID identifier.
@@ -374,14 +381,14 @@ Run **blkid** and see partition IDs:
     blkid
 
 *example:*
-    
+
     /dev/sdb1: UUID="4F20-B9DB" TYPE="vfat" PARTLABEL="grub" PARTUUID="70b1627b-57e7-4559-877a-355184f0ab9d"
     /dev/sdb2: UUID="DB1D-89C5" TYPE="vfat" PARTLABEL="boot" PARTUUID="b2a61809-4c19-4685-8875-e7fdf645eec5"
     /dev/sdb3: UUID="6a7a642a-3262-4f87-9540-bcd53969343b" TYPE="crypto_LUKS" PARTLABEL="lvm" PARTUUID="be8e6694-b39c-4d2f-9f42-7ca455fdd64f"
     /dev/mapper/lvm: UUID="HL32bg-ZjrZ-RBo9-PcFM-DmaQ-QbrC-9HkNMk" TYPE="LVM2_member"
     /dev/mapper/vg0-root: UUID="6bedbbd8-cea9-4734-9c49-8e985c61c120" TYPE="ext4"
     /dev/mapper/vg0-home: UUID="5d6ff087-50ce-400f-91c4-e3378be23c00" TYPE="ext4"
-    
+
 Edit /etc/fstab and setup correct filesystem:
 
 *example:*
@@ -405,7 +412,7 @@ Package distributed alongside the Linux kernel that contains firmware binary blo
     emerge sys-kernel/linux-firmware
 
 If **All ebuilds that satisfy "sys-kernel/linux-firmware" have been masked** run:
-    
+
     echo "sys-kernel/linux-firmware @BINARY-REDISTRIBUTABLE" | tee -a /etc/portage/package.license
 
 ---
@@ -415,7 +422,7 @@ information can be gathered by emerging ```sys-apps/pciutils``` which contains
 the **lspci** command:
 
     emerge sys-apps/pciutils
-    
+
 Inside the chroot, it is safe to ignore any pcilib warnings (like pcilib:
 cannot open /sys/bus/pci/devices) that lspci might throw out.
 
@@ -429,13 +436,34 @@ Install kernel and cryptsetup
 
     emerge sys-kernel/gentoo-sources
     emerge sys-fs/cryptsetup
-    
+
+for intel also:
+
+    emerge sys-firmware/intel-microcode
+
+---
+
+The only way to load this microcode into the CPU is through the
+kernel, so the necessary kernel options must be enabled. Depending on
+the make of the CPU installed on the system, choose AMD or Intel
+microcode loading support (it does not hurt to choose both):
+
+    KERNEL Configuring a kernel to support microcode loading
+
+    Processor type and features --->
+   [*] CPU microcode loading support
+   [*]   Intel microcode loading support
+   [*]   AMD microcode loading support
+
+---
+
+
 cd to kernel directory and make menuconfig
 
     cd /usr/src/linux- <- TAB
 
     make menuconfig
-    
+
 ---
 
 Modern processors, like Intel Core or AMD Ryzen, support AES-NI instruction
@@ -443,7 +471,7 @@ set. AES-NI significantly improves encryption/decryption performance. To enable
 AES-NI support in the kernel:
 
     KERNEL AES-NI cipher algorithm
-    
+
     --- Cryptographic API
        <*>   AES cipher algorithms (AES-NI)
 
@@ -462,24 +490,53 @@ Kernel's ```keymap``` if the passphrase contains special characters.
 Optionally:
 
     KERNEL SHA-256 with NI instructions
-    
+
     --- Cryptographic API
        <*>   SHA1 digest algorithm (SSSE3/AVX/AVX2/SHA-NI)
-    │ │  
-       <*>   SHA256 digest algorithm (SSSE3/AVX/AVX2/SHA-NI) 
-       
+    │ │
+       <*>   SHA256 digest algorithm (SSSE3/AVX/AVX2/SHA-NI)
+
 ---
+
+Also correct every command with -j{threads}:
+
+    make -j1 && make modules_install -j1 && make install -j1
+
+It will give you kernel binary image file:
+
+    Kernel: arch/x86/boot/bzImage is ready (#1)
+
+    cp arch/x86/boot/bzImage /boot/vmlinuz-linux(Something)
 
 ## 2. Configuring the Linux kernel with genkernel
 
 Package distributed alongside the Linux kernel that contains firmware binary blobs
 
     emerge sys-kernel/linux-firmware
-    
+
 If **All ebuilds that satisfy "sys-kernel/linux-firmware" have been masked** run:
-    
+
     echo "sys-kernel/linux-firmware @BINARY-REDISTRIBUTABLE" | tee -a /etc/portage/package.license
-    
+
+for intel also:
+
+    emerge sys-firmware/intel-microcode
+
+---
+
+The only way to load this microcode into the CPU is through the
+kernel, so the necessary kernel options must be enabled. Depending on
+the make of the CPU installed on the system, choose AMD or Intel
+microcode loading support (it does not hurt to choose both):
+
+    KERNEL Configuring a kernel to support microcode loading
+
+    Processor type and features --->
+   [*] CPU microcode loading support
+   [*]   Intel microcode loading support
+   [*]   AMD microcode loading support
+
+---
 ---
 
 Consider installing
@@ -487,12 +544,12 @@ Consider installing
     emerge sys-apps/pciutils
 
 ---
-    
+
 Install kernel, genkernel, and cryptsetup packages:
 
     emerge sys-kernel/gentoo-sources
     emerge sys-kernel/genkernel
-    
+
 ---
 
 If **All ebuilds that satisfy "sys-kernel/linux-firmware" have been masked** run:
@@ -503,13 +560,13 @@ If **All ebuilds that satisfy "sys-kernel/linux-firmware" have been masked** run
     emerge sys-kernel/genkernel
 
 ---
-    
+
     emerge sys-fs/cryptsetup
 
 Build genkernel:
 
     genkernel --luks --lvm --no-zfs all
-    
+
 ---
 
 If **ERROR:** kernel source directory "usr/src/linux" was not found!
@@ -524,7 +581,7 @@ set. AES-NI significantly improves encryption/decryption performance. To enable
 AES-NI support in the kernel:
 
     KERNEL AES-NI cipher algorithm
-    
+
     --- Cryptographic API
        <*>   AES cipher algorithms (AES-NI)
 
@@ -543,14 +600,14 @@ Kernel's ```keymap``` if the passphrase contains special characters.
 Optionally:
 
     KERNEL SHA-256 with NI instructions
-    
+
     --- Cryptographic API
        <*>   SHA1 digest algorithm (SSSE3/AVX/AVX2/SHA-NI)
-    │ │  
-       <*>   SHA256 digest algorithm (SSSE3/AVX/AVX2/SHA-NI) 
-       
+    │ │
+       <*>   SHA256 digest algorithm (SSSE3/AVX/AVX2/SHA-NI)
+
 ---
-       
+
 ## Install GRUB2
 
 ???
@@ -561,9 +618,9 @@ https://wiki.gentoo.org/wiki/Handbook:AMD64/Installation/Bootloader
 
     echo "sys-boot/grub:2 device-mapper" >> /etc/portage/package.use/sys-boot
     emerge -av grub
-    
-    ??? emerge --ask sys-boot/efibootmgr 
-   
+
+    ???    emerge --ask sys-boot/efibootmgr
+
 ---
 
 **Note for UEFI users:**
@@ -573,19 +630,19 @@ will need to ensure ```GRUB_PLATFORMS="efi-64"``` is enabled (as it is the case 
 default). If that is not the case for the setup, ```GRUB_PLATFORMS="efi-64"``` will
 need to be added to the /etc/portage/make.conf file *before* emerging GRUB2 so
 that the package will be built with EFI functionality:
-    
+
     echo 'GRUB_PLATFORMS="efi-64"' >> /etc/portage/make.conf
     emerge --ask sys-boot/grub
-    
+
 If GRUB2 was somehow emerged without enabling ```GRUB_PLATFORMS="efi-64"```, the line
 (as shown above) can be added to make.conf and then dependencies for the world
 package set can be re-calculated by passing the ```--update --newuse``` options to
-**emerge**: 
-    
+**emerge**:
+
     emerge --ask --update --newuse --verbose sys-boot/grub
 
 ---
-    
+
 ---
 
 **FILE** /etc/default/grub
@@ -599,11 +656,11 @@ Don't forget to change "(REPLACE ME WITH sdb3 UUID from above)" to the actual va
 Mount boot:
 
     mount /boot
-    
+
 Install GRUB with EFI:
 
     grub-install --target=x86_64-efi --efi-directory=/boot
-    
+
 ---
 
 **_Note:_** Upon receiving the message "Could not prepare Boot variable: Read-only file system", try running:
@@ -618,7 +675,7 @@ Install GRUB with EFI:
 
     mkdir -p /boot/efi/efi/boot
     cp /boot/efi/efi/gentoo/grubx64.efi /boot/efi/efi/boot/bootx64.efi
-    
+
 ---
 
 Make sure that /etc/default/grub is configured correctly. Especially with UEFI
@@ -626,7 +683,7 @@ GRUB and kernel might use different framebuffer drivers. Generate GRUB
 configuration file:
 
     grub-mkconfig -o /boot/grub/grub.cfg
-    
+
 ---
 
 **_Note:_**
@@ -659,7 +716,7 @@ lvmetad. Falling back to internal scanning."
     emerge --ask app-admin/sudo
 
     nano -w /etc/sudoers
-    
+
 Ищем строчку wheel ALL=(ALL:ALL) ALL - раскомментируем
 
 Если нам потом кажут фигу, дописываем под root
@@ -670,7 +727,7 @@ lvmetad. Falling back to internal scanning."
 
     rm /stage3-* (добить Tab)
 
-## 15. Имя машины 
+## 15. Имя машины
 
     nano -w /etc/conf.d/hostname
 
@@ -678,14 +735,14 @@ lvmetad. Falling back to internal scanning."
 
 
 ## Networking settings
-    
+
 https://wiki.gentoo.org/wiki/Handbook:AMD64/Installation/System
 
     emerge net-misc/dhcpcd net-misc/netifrc
-    
+
     rc-update add dhcpcd default
     rc-service dhcpcd start
-    
+
     ifconfig
 
 Lets assume interfaces names are eno1 and ln.
@@ -699,7 +756,7 @@ Add symlink to enable network at boot:
     cd /etc/init.d
 
     ln -s net.lo net.eno1
-    
+
     rc-update add net.eno1 default
 
 ## Install wireless networking tools
@@ -712,7 +769,7 @@ useful basic diagnostic tool for scanning wireless networks.
     emerge --ask net-wireless/iw net-wireless/wpa_supplicant
 
 ## 17.	HOST
- 
+
     vim /etc/hosts
 
 setup
@@ -740,7 +797,7 @@ setup
 
 Утилита файловой системы ext4, fat
 
-    emerge --ask sys-fs/e2fsprogs sys-fs/dosfstools 
+    emerge --ask sys-fs/e2fsprogs sys-fs/dosfstools
 
 Для NTFS https://wiki.gentoo.org/wiki/NTFS
 
@@ -772,26 +829,26 @@ setup
     ln -s net.lo net.eno1
     rm /etc/init.d/net.eth0
     rc-update add net.eno1 default
-    rc-update del net.eth0 
+    rc-update del net.eth0
 
 ## 26.	INPUT_DEVICES
 
 Для поддержки тачпада нужен synaptics - это у кого ноут
 
-    /etc/portage/make.conf	
+    /etc/portage/make.conf
 
     INPUT_DEVICES="evdev synaptics"
-    
+
 ## OpenSSH
 
 Add the OpenSSH daemon to the default runlevel:
 
     rc-update add sshd default
-    
+
 Start the sshd daemon with:
 
     rc-service sshd start
-    
+
 ## Cron
 
     emerge --ask sys-process/cronie
@@ -800,7 +857,7 @@ Start the sshd daemon with:
 ## File indexing
 
     emerge --ask sys-apps/mlocate
-    
+
 ## also
 
 Gentoolkit is a suite of tools to ease the administration of a Gentoo system, and Portage in particular.

@@ -3,6 +3,8 @@
 [gentoo_apps](gentoo/gentoo_apps)
 [gentoo_kernel_upgrade](gentoo/gentoo_kernel_upgrade.md)
 
+[gentoo_kernel_setup](gentoo/gentoo_kernel_setup.md)
+
 %% drafts
 [gentoo_x org_dwm](gentoo/gentoo_xorg_dwm.md)
 [gentoo_x org_xfce](gentoo/gentoo_xorg_xfce.md)
