@@ -348,7 +348,7 @@ Update World
 
 Install Vim
 
-    emerge vim
+    emerge app-editors/vim
 
 Configure locales:
 
@@ -500,7 +500,8 @@ Optionally:
 
 Also correct every command with -j{threads}:
 
-    make -j1 && make modules_install -j1 && make install -j1
+    make -j1 && make modules_install -j1
+    make install -j1
 
 It will give you kernel binary image file:
 
@@ -711,11 +712,13 @@ lvmetad. Falling back to internal scanning."
     useradd -m -G users,wheel,audio,video -s /bin/bash {user_name}
     passwd {user_name}
 
-## 24. Ставим sudo
+## 24. Ставим sudo или doas
+
+sudo:
 
     emerge --ask app-admin/sudo
 
-    nano -w /etc/sudoers
+    vim -w /etc/sudoers
 
 Ищем строчку wheel ALL=(ALL:ALL) ALL - раскомментируем
 
@@ -723,18 +726,30 @@ lvmetad. Falling back to internal scanning."
 
     user ALL=(ALL:ALL) ALL
 
+doas:
+
+    emerge --ask app-admin/doas
+    
+Allow all users in the wheel group to execute any command as root
+
+    echo "permit :wheel" >> /etc/doas.conf
+
+Allow wheel users to use the reboot command without a password
+
+    echo "permit nopass :wheel cmd reboot" >> /etc/doas.conf
+
 ## 25. Почистим малость
 
     rm /stage3-* (добить Tab)
 
 ## 15. Имя машины
 
-    nano -w /etc/conf.d/hostname
+    vim /etc/conf.d/hostname
 
     hostname="user_name"
 
 
-## Networking settings
+## ?? Networking settings
 
 https://wiki.gentoo.org/wiki/Handbook:AMD64/Installation/System
 
@@ -745,7 +760,8 @@ https://wiki.gentoo.org/wiki/Handbook:AMD64/Installation/System
 
     ifconfig
 
-Lets assume interfaces names are eno1 and ln.
+Lets assume interfaces names are eno1 and lo.
+(enp0s3 and lo)
 
 Add to /etc/conf.d/net:
 
@@ -759,7 +775,7 @@ Add symlink to enable network at boot:
 
     rc-update add net.eno1 default
 
-## Install wireless networking tools
+## ?? Install wireless networking tools
 
 If the system will be connecting to wireless networks, install the
 net-wireless/iw package for Open or WEP networks and/or the
@@ -839,27 +855,28 @@ setup
 
     INPUT_DEVICES="evdev synaptics"
 
-## OpenSSH
-
-Add the OpenSSH daemon to the default runlevel:
-
-    rc-update add sshd default
-
-Start the sshd daemon with:
-
-    rc-service sshd start
-
-## Cron
-
-    emerge --ask sys-process/cronie
-    rc-update add cronie default
-
-## File indexing
-
-    emerge --ask sys-apps/mlocate
-
 ## also
 
 Gentoolkit is a suite of tools to ease the administration of a Gentoo system, and Portage in particular.
 
     emerge --ask app-portage/gentoolkit
+
+## Final world file:
+
+app-admin/doas
+app-admin/sysklogd
+app-editors/vim
+app-portage/gentoolkit
+net-misc/dhcpcd
+net-misc/netifrc
+net-wireless/iw
+net-wireless/wpa_supplicant
+sys-apps/pciutils
+sys-boot/efibootmgr
+sys-boot/grub
+sys-firmware/intel-microcode
+sys-fs/cryptsetup
+sys-fs/dosfstools
+sys-kernel/genkernel
+sys-kernel/gentoo-sources
+sys-kernel/linux-firmware

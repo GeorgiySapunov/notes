@@ -480,4 +480,3 @@ sed -i "s/-j2/-j$(nproc)/;/^#MAKEFLAGS/s/^#//" /etc/makepkg.conf
     Use the output command to configure outputs instead of xrandr
     Use the output command to configure your wallpaper instead of feh
     Use the input command to configure input devices
-
