@@ -198,6 +198,7 @@ FILE /etc/portage/make.conf
     emerge --ask sys-process/htop
     emerge --ask app-misc/anki
     emerge --ask app-crypt/gnupg
+    emerge --ask app-admin/pass
     emerge --ask app-crypt/pinentry
     emerge --ask net-p2p/transmission
     emerge --ask net-p2p/tremc
@@ -324,12 +325,19 @@ FILE /etc/portage/make.conf
 
 ## wayland switch
 
-    maim                             scrot (screenshot) → grim + slurp (or grimshot, which wraps around both).
-    xclip                            xclip / xsel (clipboard copy/paste) → wl-clipboard, wl-clipboard-rs, wayclip
-    xwallpaper                       feh (wallpaper setting) → sway output configuration, see man 5 sway-output (or oguri, which supports animated wallpapers)
-    unclutter                        unclutter (hiding cursor after some time) → seat <name> hide_cursor <timeout>
-    xdotool                          xdotool → wtype, wlrctl, swaymsg seat <seat> cursor …, ydotool
-    ?? xcape (remaps)                   keyd, KMonad.
-    sxhkd                            sxhkd (an X daemon that reacts to input events by executing commands), shkd (a simple hotkey daemon for the Linux console. ) → swhkd
-    dmenu                            dmenu → wmenu, bemenu, fuzzel, gmenu, wldash
-    pamixer --> paclt
+    wofipassmenu
+    https://github.com/ovlach/wofipassmenu
+    https://github.com/tasmo/passwmenu
+
+    swhkd
+    https://github.com/waycrate/swhkd
+
+    emerge --ask gui-apps/waybar
+    emerge --ask gui-apps/wl-clipboard
+    emerge --ask gui-apps/grim
+    emerge --ask gui-apps/swaylock
+    emerge --ask gui-apps/swaylock-effects
+    emerge --ask gui-apps/wlogout
+    emerge --ask gui-apps/wf-recorder
+    emerge --ask gui-apps/wofi
+    emerge --ask gnome-base/gdm
