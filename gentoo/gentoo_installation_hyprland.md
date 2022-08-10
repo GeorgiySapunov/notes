@@ -1,8 +1,21 @@
+## virtualbox guest
+
+    emerge --ask app-emulation/virtualbox-guest-additions
+    rc-update add virtualbox-guest-additions default
+    
+    gpasswd -a <user> vboxguest
+    gpasswd -a <user> vboxsf
+    
+    you cat mount  shared folders with:
+        mount -t  vboxsf <shared_folder_name> <mount_point>
+    
 ## USE flags
 
 FILE etc/portage/make.conf
 
-    USE="-systemd -gnome -kde -dvd -dvdr -cdr wayland policykit dbus udev networkmanager bluetooth sound-server screencast ffmpeg aacs pdf djvu ibus wifi"
+    USE="-systemd -gnome -kde -dvd -dvdr -cdr -ios -ipod -aqua -emacs -xemacs \
+        cjk wayland xwayland X tray policykit dbus udev networkmanager bluetooth \
+        sound-server screencast ffmpeg aacs pdf djvu ibus wifi elogind"
 
     emerge --verbose --update --deep --newuse @world
     
@@ -10,7 +23,9 @@ FILE etc/portage/make.conf
 
 FILE etc/portage/make.conf
 
-    USE="wayland"
+    USE="wayland xwayland"
+    
+    emerge --ask x11-base/xwayland
     
 ## OpenSSH
 
@@ -116,9 +131,9 @@ FILE ~/.config/sway/config
 
 ## tor
 
-    emerge --ask net-vpn/tor
-    emerge --ask net-proxy/torsocks
-    emerge --ask net-proxy/obfs4proxy
+    emerge --ask net-vpn/tor \
+        net-proxy/torsocks \
+        net-proxy/obfs4proxy
     
     rc-service tor start
     rc-update add tor default
@@ -140,8 +155,9 @@ FILE ~/.config/sway/config
 
 ## zsh
 
-    emerge --ask app-shells/zsh
-    emerge --ask app-shells/gentoo-zsh-completions
+    emerge --ask app-shells/zsh \
+        app-shells/gentoo-zsh-completions
+    
     chsh -s /bin/zsh
     
 ## zoxide
@@ -162,13 +178,13 @@ FILE /etc/portage/make.conf
 
     USE="ffmpeg"
     
-    emerge --ask media-video/ffmpeg
-    emerge --ask media-video/mpv
-    emerge --ask media-video/mediainfo
-    emerge --ask media-video/ffmpegthumbnailer
-    emerge --ask net-misc/yt-dlp
-    emerge --ask media-sound/mpd
-    emerge --ask media-sound/ncmpcpp
+    emerge --ask media-video/ffmpeg \
+        media-video/mpv \
+        media-video/mediainfo \
+        media-video/ffmpegthumbnailer \
+        net-misc/yt-dlp \
+        media-sound/mpd \
+        media-sound/ncmpcpp
     
     rc-service mpd start 
     rc-update add mpd default
@@ -176,37 +192,37 @@ FILE /etc/portage/make.conf
 
 ## also
 
-    emerge --ask gnome-base/gnome-keyring
-    emerge --ask net-news/newsboat
-    emerge --ask media-gfx/sxiv
-    emerge --ask app-office/calcurse
-    emerge --ask media-gfx/gimp
-    emerge --ask media-gfx/inkscape
-    emerge --ask media-gfx/blender
-    emerge --ask app-office/libreoffice
-    emerge --ask x11-misc/pcmanfm 
-    emerge --ask app-shells/fzf
-    emerge --ask app-admin/testdisk
-    emerge --ask sys-apps/moreutils
-    emerge --ask app-editors/neovim
-    emerge --ask sys-fs/ncdu
-    emerge --ask sys-apps/ripgrep
-    emerge --ask app-i18n/ibus ibus-libpinyin
-    emerge --ask app-misc/neofetch
-    emerge --ask kde-apps/okular
-    emerge --ask net-im/telegram-desktop
-    emerge --ask sys-process/htop
-    emerge --ask app-misc/anki
-    emerge --ask app-crypt/gnupg
-    emerge --ask app-admin/pass
-    emerge --ask app-crypt/pinentry
-    emerge --ask net-p2p/transmission
-    emerge --ask net-p2p/tremc
-    emerge --ask net-misc/wget
-    emerge --ask net-analyzer/bmon
-    emerge --ask media-sound/pulsemixer
-    emerge --ask app-misc/tmux
-    emerge --ask sys-apps/mlocate
+    emerge --ask gnome-base/gnome-keyring \
+        net-news/newsboat \
+        media-gfx/sxiv \
+        app-office/calcurse \
+        media-gfx/gimp \
+        media-gfx/inkscape \
+        media-gfx/blender \
+        app-office/libreoffice \
+        x11-misc/pcmanfm  \
+        app-shells/fzf \
+        app-admin/testdisk \
+        sys-apps/moreutils \
+        app-editors/neovim \
+        sys-fs/ncdu \
+        sys-apps/ripgrep \
+        app-i18n/ibus ibus-libpinyin \
+        app-misc/neofetch \
+        kde-apps/okular \
+        net-im/telegram-desktop \
+        sys-process/htop \
+        app-misc/anki \
+        app-crypt/gnupg \
+        app-admin/pass \
+        app-crypt/pinentry \
+        net-p2p/transmission \
+        net-p2p/tremc \
+        net-misc/wget \
+        net-analyzer/bmon \
+        media-sound/pulsemixer \
+        app-misc/tmux \
+        sys-apps/mlocate
 
 ## blueray
 
@@ -222,20 +238,20 @@ FILE /etc/portage/make.conf
     
 ## file-manager
 
-    emerge --ask app-misc/ranger
-    emerge --ask app-arch/atool
-    emerge --ask dev-perl/File-MimeInfo
-    emerge --ask sys-apps/bat
+    emerge --ask app-misc/ranger \
+        app-arch/atool \
+        dev-perl/File-MimeInfo \
+        sys-apps/bat
 
 ## mutt
 
-    emerge --ask mail-client/neomutt
-    emerge --ask net-mail/isync
-    emerge --ask mail-mta/msmtp
-    emerge --ask www-client/lynx
-    emerge --ask net-mail/notmuch
-    emerge --ask app-misc/abook
-    emerge --ask mail-client/mutt-wizard
+    emerge --ask mail-client/neomutt \
+        net-mail/isync \
+        mail-mta/msmtp \
+        www-client/lynx \
+        net-mail/notmuch \
+        app-misc/abook \
+        mail-client/mutt-wizard
     
 ## android
 
@@ -247,45 +263,45 @@ FILE /etc/portage/make.conf
 
     USE="pdf djvu"
     
-    emerge --ask app-text/zathura
-    emerge --ask app-text/zathura-meta
-    emerge --ask app-misc/pdfpc
+    emerge --ask app-text/zathura \
+        app-text/zathura-meta \
+        app-misc/pdfpc
 
 ## fonts
 
     emerge --ask media-libs/fontconfig
     
-    emerge --ask media-fonts/noto
-    emerge --ask media-fonts/noto-emoji
-    emerge --ask media-fonts/symbola
-    emerge --ask media-fonts/mikachan-font-ttf
-    emerge --ask media-fonts/fonts-meta
-    emerge --ask media-fonts/corefonts
-    emerge --ask media-fonts/fontawesome
-    emerge --ask media-fonts/liberation-fonts
+    emerge --ask media-fonts/noto \
+        media-fonts/noto-emoji \
+        media-fonts/symbola \
+        media-fonts/mikachan-font-ttf \
+        media-fonts/fonts-meta \
+        media-fonts/corefonts \
+        media-fonts/fontawesome \
+        media-fonts/liberation-fonts
 
 ## gtk
 
-    emerge --ask lxde-base/lxappearance 
-    emerge --ask x11-libs/gtk+
-    emerge --ask gui-libs/gtk
+    emerge --ask lxde-base/lxappearance  \
+        x11-libs/gtk+ \
+        gui-libs/gtk
 
 ## python
 
-    emerge --ask dev-python/ipython
-    emerge --ask dev-python/black
-    emerge --ask dev-python/flake8
-    emerge --ask sci-libs/tensorflow
-    emerge --ask sci-libs/scikit-learn
-    emerge --ask dev-python/pandas
-    emerge --ask dev-python/matplotlib
+    emerge --ask dev-python/ipython \
+        dev-python/black \
+        dev-python/flake8 \
+        sci-libs/tensorflow \
+        sci-libs/scikit-learn \
+        dev-python/pandas \
+        dev-python/matplotlib
 
 ## latex
 
-    emerge --ask app-text/texlive
-    emerge --ask dev-texlive/texlive-langcyrillic
-    emerge --ask dev-tex/biber
-    emerge --ask dev-tex/latexmk
+    emerge --ask app-text/texlive \
+        dev-texlive/texlive-langcyrillic \
+        dev-tex/biber \
+        dev-tex/latexmk
 
 ## ? stylua
 
@@ -332,12 +348,19 @@ FILE /etc/portage/make.conf
     swhkd
     https://github.com/waycrate/swhkd
 
-    emerge --ask gui-apps/waybar
-    emerge --ask gui-apps/wl-clipboard
-    emerge --ask gui-apps/grim
-    emerge --ask gui-apps/swaylock
-    emerge --ask gui-apps/swaylock-effects
-    emerge --ask gui-apps/wlogout
-    emerge --ask gui-apps/wf-recorder
-    emerge --ask gui-apps/wofi
-    emerge --ask gnome-base/gdm
+    emerge --ask gui-apps/waybar \
+        gui-apps/wl-clipboard \
+        gui-apps/grim \
+        gui-apps/swaylock \
+        gui-apps/swaylock-effects \
+        gui-apps/wlogout \
+        gui-apps/wf-recorder \
+        gui-apps/wofi \
+        gnome-base/gdm
+    
+    
+    emerge --ask gui-wm/sway 
+    
+vim etc/portage/make.conf
+
+    use="X"
