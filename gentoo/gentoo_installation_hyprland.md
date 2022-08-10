@@ -14,11 +14,14 @@
 FILE etc/portage/make.conf
 
     USE="-systemd -gnome -kde -dvd -dvdr -cdr -ios -ipod -aqua -emacs -xemacs \
-        cjk wayland xwayland X tray policykit dbus udev networkmanager bluetooth \
-        sound-server screencast ffmpeg aacs pdf djvu ibus wifi elogind"
+    cjk wayland xwayland X tray policykit dbus udev networkmanager bluetooth \
+    sound-server screencast alsa ffmpeg aacs pdf djvu ibus wifi elogind ncurses \
+    cups text gtk"
+
+    ?? USE="unicode"
 
     emerge --verbose --update --deep --newuse @world
-    
+
 ## Waland
 
 FILE etc/portage/make.conf
@@ -48,7 +51,7 @@ vim etc/portage/make.conf
 
     use="policykit"
 
-    emerge -ask sys-auth/polkit-qt
+    ?? emerge -ask sys-auth/polkit-qt
 
 ## d-bus
 
@@ -78,12 +81,22 @@ net-misc/networkmanager automatically:
 
 FILE /etc/portage/make.conf
     
-    USE="networkmanager"
+    USE="networkmanager ncurses"
+
+    emerge --ask net-misc/networkmanager
     
     gpasswd -a (user name) plugdev
+
+---
+
+NetworkManager uses an internal DHCP client implementation since
+version 1.20. There is no explicit need for an external DHCP client.
+The ```dhclient``` and ```dhcpcd``` USE flags enable alternative implementations.
     
     for x in /etc/runlevels/default/net.* ; do rc-update del $(basename $x) default ; rc-service --ifstarted $(basename $x) stop; done
     rc-update del dhcpcd default
+
+---
     
     rc-service NetworkManager start
     rc-update add NetworkManager default
@@ -104,6 +117,10 @@ FILE /etc/portage/make.conf
 
 ## Cups
 
+FILE /etc/portage/make.conf
+
+    USE="cups text"
+
     emerge --ask net-print/cups
 
     rc-service cupsd start
@@ -113,7 +130,7 @@ FILE /etc/portage/make.conf
 
 FILE /etc/portage/make.conf
 
-    USE="sound-server screencast"
+    USE="sound-server screencast alsa"
     
     emerge --ask media-video/pipewire
     
@@ -282,9 +299,17 @@ FILE /etc/portage/make.conf
 
 ## gtk
 
+FILE etc/portage/make.conf
+
+    USE="gtk"
+
     emerge --ask lxde-base/lxappearance  \
         x11-libs/gtk+ \
         gui-libs/gtk
+
+## qt5ct
+
+    emerge --ask x11-misc/qt5ct
 
 ## python
 
