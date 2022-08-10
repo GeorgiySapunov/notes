@@ -83,7 +83,7 @@
     pacman -S --noconfirm networkmanager networkmanager-runit grub efibootmgr cryptsetup
     pacman -S --noconfirm polkit polkit-qt5
 
-    pacman -S --noconfirm bluez bluez-utils bluez-runit cups cups-runit git pipewire pipewire-pulse man-db 
+    pacman -S --noconfirm bluez bluez-utils bluez-runit cups cups-runit git pipewire pipewire-pulse man-db
     pacman -S --noconfirm wget openssh openssh-runit cronie cronie-runit tor torsocks tor-runit artix-keyring artix-archlinux-support
 
     pacman-key --populate archlinux
@@ -97,7 +97,7 @@
     ln -s /etc/runit/sv/cronie/ /etc/runit/runsvdir/default/
     ln -s /etc/runit/sv/tor/ /etc/runit/runsvdir/default/
     ln -s /etc/runit/sv/ntpd/ /etc/runit/runsvdir/default/
-    
+
     ln -s /etc/runit/sv/bumblebeed /etc/runit/runsvdir/default
     (
     sudo ln -s /etc/runit/sv/bumblebeed /run/runit/service/bumblebeed
@@ -144,16 +144,16 @@
     pacman -S --noconfirm mesa
     pacman -S --noconfirm xf86-video-intel xf86-video-nouveau
     pacman -S --noconfirm xf86-video-amdgpu xf86-video-ati xf86-video-vesa
-    pacman -S --noconfirm xorg-server xorg-xwininfo xorg-xinit xorg-xbacklight xorg-xprop xorg-xdpyinfo arandr 
-    pacman -S --noconfirm xf86-input-libinput libinput 
-    
+    pacman -S --noconfirm xorg-server xorg-xwininfo xorg-xinit xorg-xbacklight xorg-xprop xorg-xdpyinfo arandr
+    pacman -S --noconfirm xf86-input-libinput libinput
+
     Proprietary nvidia driver instead of nouveu:
     pacman -S --noconfirm nvidia lib32-nvidia-utils cuda vulkan-tools
-    
+
     pacman -S --noconfirm nvidia-prime
     or
     pacman -S --noconfirm bumblebe
-    
+
     %%exit
     %%umount -a
 
@@ -170,25 +170,25 @@
     pacman -S --noconfirm rsm
     pacman -S --noconfirm artix-live-base
     pacman -S --noconfirm gnome-keyring
-    
+
     pacman -S --noconfirm zsh tmux
     pacman -S --noconfirm zsh-completions zoxide
-    
+
     pacman -S --noconfirm pulsemixer pamixer
     pacman -S --noconfirm dosfstools exfat-utils ntfs-3g
-    
+
 ##### dwm
 
     pacman -S --noconfirm libnotify dunst
-    pacman -S --noconfirm maim xclip 
-    pacman -S --noconfirm xwallpaper unclutter xdotool xcape bmon 
-    
+    pacman -S --noconfirm maim xclip
+    pacman -S --noconfirm xwallpaper unclutter xdotool xcape bmon
+
     pacman -S --noconfirm ffmpeg mpd mpv mpc ncmpcpp newsboat sxiv calcurse
     pacman -S --noconfirm zathura zathura-pdf-mupdf zathura-djvu pdfpc
-    
-    pacman -S --noconfirm gimp inkscape blender libreoffice nano pcmanfm 
+
+    pacman -S --noconfirm gimp inkscape blender libreoffice nano pcmanfm
     pacman -S --noconfirm texlive-most texlive-lang biber
-    
+
     pacman -S --noconfirm mediainfo fzf sxhkd
     pacman -S --noconfirm testdisk yt-dlp moreutils
 
@@ -283,31 +283,31 @@ sed -i "s/-j2/-j$(nproc)/;/^#MAKEFLAGS/s/^#//" /etc/makepkg.conf
 ##### pacman
 
     sudo pacman -S --noconfirm ibus
-    
+
     sudo pacman -S --noconfirm libbluray libaacs
     sudo pacman -S --noconfirm tmate syncthing rsync neofetch
-    
+
     sudo pacman -S --noconfirm lxappearance qt5ct arc-gtk-theme python-qdarkstyle papirus-folders-nordic
     sudo pacman -S --noconfirm okular breeze-icons
-    
+
 ##### python
 
     sudo pacman -S --noconfirm ipython python-pip python-black flake8 stylua jupyterlab
     sudo pacman -S --noconfirm python-tensorflow python-scikit-learn python-pandas python-numpy python-matplotlib
-    
+
 ##### paru
 
     paru -S task-spooler simple-mtpfs urlview
-    
+
     paru -S brave-bin sc-im-git telegram-desktop latex-mk write-good htop-vim tldr++ exa
     paru -S anki cozy-audiobooks
-    
+
     paru -S betterlockscreen xidlehook
     betterlockscreen -u ~/.local/share/wallpaper.jpg
 
     gpg --auto-key-locate nodefault,wkd --locate-keys torbrowser@torproject.org
-    paru -S tor-browser obfs4proxy-bin 
-    
+    paru -S tor-browser obfs4proxy-bin
+
 ##### Fonts
 
     paru -S ttf-ms-fonts ttf-cmu-serif ttf-cmu-sans-serif ttf-cmu-bright ttf-cmu-concrete
@@ -322,20 +322,20 @@ sed -i "s/-j2/-j$(nproc)/;/^#MAKEFLAGS/s/^#//" /etc/makepkg.conf
 
     paru -S lf atool perl-file-mimeinfo
     sudo pacman -S --noconfirm ffmpegthumbnailer bat
-    
+
 ##### neomutt
 
     sudo pacman -S --noconfirm neomutt isync msmtp lynx notmuch
-    paru -S abook 
+    paru -S abook
     paru -S mutt-wizard-git
-    
+
 ### Pam-gnupg
 
     paru -S pam-gnupg
-    
+
     echo UPDATESTARTUPTTY | gpg-connect-agent
     shh-add
-    
+
     add keygrips to .config/pam-gnupg
     for gpg:
     gpg -K --with-keygrip
@@ -359,9 +359,9 @@ sed -i "s/-j2/-j$(nproc)/;/^#MAKEFLAGS/s/^#//" /etc/makepkg.conf
     3. texlab
     4. jsonls
     5. bashls
-    
+
     :DIInstall python
-    
+
     :DIInstall <debugger> installs <debugger>.
     :DIUninstall <debugger> uninstalls <debugger>.
     :DIList lists installed debuggers.
@@ -447,8 +447,8 @@ sed -i "s/-j2/-j$(nproc)/;/^#MAKEFLAGS/s/^#//" /etc/makepkg.conf
 
                                      xrandr → swaymsg output …, wlr-randr
     xf86-input-libinput
-    libinput 
-    
+    libinput
+
     libnotify
     dunst                            dunst (notification daemon) → dunst (supports wayland) / mako / fnott / swaync
     betterlockscreen
@@ -475,7 +475,7 @@ sed -i "s/-j2/-j$(nproc)/;/^#MAKEFLAGS/s/^#//" /etc/makepkg.conf
     dmenu                            dmenu → wmenu, bemenu, fuzzel, gmenu, wldash
                                      bemenu: To use the same color scheme used in dmenu, use bemenu-run -p "" --tb "#285577" --hb "#285577" --tf "#eeeeee" --hf "#eeeeee" --nf "#bbbbbb"
     sxhkd                            sxhkd (an X daemon that reacts to input events by executing commands), shkd (a simple hotkey daemon for the Linux console. ) → swhkd
-    
+
     To emulate xset dpms force off, use swayidle timeout 600 'swaymsg "output * dpms off"' resume 'swaymsg "output * dpms on"' then run pkill -USR1 swayidle to trigger timeout immediately.
     Use the output command to configure outputs instead of xrandr
     Use the output command to configure your wallpaper instead of feh

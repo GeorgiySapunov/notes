@@ -729,7 +729,7 @@ sudo:
 doas:
 
     emerge --ask app-admin/doas
-    
+
 Allow all users in the wheel group to execute any command as root
 
     echo "permit :wheel" >> /etc/doas.conf
@@ -863,20 +863,22 @@ Gentoolkit is a suite of tools to ease the administration of a Gentoo system, an
 
 ## Final world file:
 
-app-admin/doas
-app-admin/sysklogd
-app-editors/vim
-app-portage/gentoolkit
-net-misc/dhcpcd
-net-misc/netifrc
-net-wireless/iw
-net-wireless/wpa_supplicant
-sys-apps/pciutils
-sys-boot/efibootmgr
-sys-boot/grub
-sys-firmware/intel-microcode
-sys-fs/cryptsetup
-sys-fs/dosfstools
-sys-kernel/genkernel
-sys-kernel/gentoo-sources
-sys-kernel/linux-firmware
+FILE var/lib/portage/world
+
+    app-admin/doas
+    app-admin/sysklogd
+    app-editors/vim
+    app-portage/gentoolkit
+    net-misc/dhcpcd
+    net-misc/netifrc
+    net-wireless/iw
+    net-wireless/wpa_supplicant
+    sys-apps/pciutils
+    sys-boot/efibootmgr
+    sys-boot/grub
+    sys-firmware/intel-microcode
+    sys-fs/cryptsetup
+    sys-fs/dosfstools
+    sys-kernel/genkernel
+    sys-kernel/gentoo-sources
+    sys-kernel/linux-firmware

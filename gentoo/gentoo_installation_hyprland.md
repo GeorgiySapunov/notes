@@ -2,13 +2,13 @@
 
     emerge --ask app-emulation/virtualbox-guest-additions
     rc-update add virtualbox-guest-additions default
-    
+
     gpasswd -a <user> vboxguest
     gpasswd -a <user> vboxsf
-    
+
     you cat mount  shared folders with:
         mount -t  vboxsf <shared_folder_name> <mount_point>
-    
+
 ## USE flags
 
 FILE etc/portage/make.conf
@@ -27,9 +27,9 @@ FILE etc/portage/make.conf
 FILE etc/portage/make.conf
 
     USE="wayland xwayland"
-    
+
     emerge --ask x11-base/xwayland
-    
+
 ## OpenSSH
 
 Add the OpenSSH daemon to the default runlevel:
@@ -42,7 +42,7 @@ Add the OpenSSH daemon to the default runlevel:
     emerge --ask sys-process/cronie
     rc-update add cronie default
 
-## 
+##
 
 Enabling this USE flag will pull in sys-auth/polkit automatically
 (default for desktop profiles):
@@ -65,12 +65,12 @@ Adding this USE flag value to the USE flag list (default in all Linux
 profiles) will pull in the virtual/udev package automatically:
 
 FILE /etc/portage/make.conf
-    
+
     USE="udev"
 
     rc-update add udev sysinit
 
-## eselect-repository 
+## eselect-repository
 
     emerge --ask app-eselect/eselect-repository
 
@@ -80,11 +80,11 @@ Enabling this USE flag will make those packages pull in
 net-misc/networkmanager automatically:
 
 FILE /etc/portage/make.conf
-    
+
     USE="networkmanager ncurses"
 
     emerge --ask net-misc/networkmanager
-    
+
     gpasswd -a (user name) plugdev
 
 ---
@@ -92,12 +92,12 @@ FILE /etc/portage/make.conf
 NetworkManager uses an internal DHCP client implementation since
 version 1.20. There is no explicit need for an external DHCP client.
 The ```dhclient``` and ```dhcpcd``` USE flags enable alternative implementations.
-    
+
     for x in /etc/runlevels/default/net.* ; do rc-update del $(basename $x) default ; rc-service --ifstarted $(basename $x) stop; done
     rc-update del dhcpcd default
 
 ---
-    
+
     rc-service NetworkManager start
     rc-update add NetworkManager default
 
@@ -111,7 +111,7 @@ FILE /etc/portage/make.conf
     USE="bluetooth"
 
     emerge --ask --noreplace net-wireless/bluez
-    
+
     rc-service bluetooth start
     rc-update add bluetooth default
 
@@ -131,19 +131,19 @@ FILE /etc/portage/make.conf
 FILE /etc/portage/make.conf
 
     USE="sound-server screencast alsa"
-    
+
     emerge --ask media-video/pipewire
-    
+
 Starting PipeWire with various non-systemd setups
 
 FILE ~/.config/sway/config
-    
+
     exec gentoo-pipewire-launcher
 
 ## git
 
     emerge --ask dev-vcs/git
-    
+
     ? lazygit
 
 ## tor
@@ -151,22 +151,29 @@ FILE ~/.config/sway/config
     emerge --ask net-vpn/tor \
         net-proxy/torsocks \
         net-proxy/obfs4proxy
-    
+
     rc-service tor start
     rc-update add tor default
-    
+
     eselect repository enable torbrowser
     emerge --ask www-client/torbrowser-launcher
 
 ## brave
 
     eselect repository enable brave-overlay
+
     emerge --ask brave-bin
+
+## librewolf
+
+    eselect repository add librewolf git https://gitlab.com/librewolf-community/browser/gentoo.git
+    emaint -r librewolf sync
+    emerge --ask www-client/librewolf
 
 ## npd
 
     emerge net-misc/ntp
-    
+
     rc-service ntpd start
     rc-update add ntpd default
 
@@ -174,9 +181,9 @@ FILE ~/.config/sway/config
 
     emerge --ask app-shells/zsh \
         app-shells/gentoo-zsh-completions
-    
+
     chsh -s /bin/zsh
-    
+
 ## zoxide
 
     eselect repository enable guru
@@ -186,7 +193,7 @@ FILE ~/.config/sway/config
 ## dunst
 
     emerge --ask --verbose x11-misc/dunst
-    
+
     ?? libnotify
 
 ## ffmpeg, mpd, mpv
@@ -194,7 +201,7 @@ FILE ~/.config/sway/config
 FILE /etc/portage/make.conf
 
     USE="ffmpeg"
-    
+
     emerge --ask media-video/ffmpeg \
         media-video/mpv \
         media-video/mediainfo \
@@ -202,10 +209,9 @@ FILE /etc/portage/make.conf
         net-misc/yt-dlp \
         media-sound/mpd \
         media-sound/ncmpcpp
-    
-    rc-service mpd start 
-    rc-update add mpd default
 
+    rc-service mpd start
+    rc-update add mpd default
 
 ## also
 
@@ -250,9 +256,9 @@ FILE /etc/portage/make.conf
     emerge --ask media-libs/libbluray
 
     https://wiki.archlinux.org/title/Blu-ray
-    
+
     ~/.config/aacs/KEYDB.cfg
-    
+
 ## file-manager
 
     emerge --ask app-misc/ranger \
@@ -269,17 +275,17 @@ FILE /etc/portage/make.conf
         net-mail/notmuch \
         app-misc/abook \
         mail-client/mutt-wizard
-    
+
 ## android
 
     emerge --ask sys-fs/simple-mtpfs
-    
+
 ## zathura, pdfpc
 
 FILE /etc/portage/make.conf
 
     USE="pdf djvu"
-    
+
     emerge --ask app-text/zathura \
         app-text/zathura-meta \
         app-misc/pdfpc
@@ -287,7 +293,7 @@ FILE /etc/portage/make.conf
 ## fonts
 
     emerge --ask media-libs/fontconfig
-    
+
     emerge --ask media-fonts/noto \
         media-fonts/noto-emoji \
         media-fonts/symbola \
@@ -345,7 +351,7 @@ FILE etc/portage/make.conf
 
     echo UPDATESTARTUPTTY | gpg-connect-agent
     shh-add
-    
+
     add keygrips to .config/pam-gnupg
     for gpg:
     gpg -K --with-keygrip
@@ -382,10 +388,10 @@ FILE etc/portage/make.conf
         gui-apps/wf-recorder \
         gui-apps/wofi \
         gnome-base/gdm
-    
-    
-    emerge --ask gui-wm/sway 
-    
+
+
+    emerge --ask gui-wm/sway
+
 vim etc/portage/make.conf
 
     use="X"

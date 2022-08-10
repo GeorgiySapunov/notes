@@ -12,13 +12,13 @@ With dispatch-conf, users are able to merge updates to their configuration
 files while keeping track of all changes.
 
     sudo dispatch-conf
-    
+
 ## Gentoolkit
 
 Suite of tools to ease the administration of a Gentoo system, and Portage in particular (includes equery and eclean-dist)
 
     emerge --ask app-portage/gentoolkit
-    
+
 ## Equery
 
 View information about Portage packages.
@@ -26,20 +26,20 @@ View information about Portage packages.
 List all installed packages.
 
     equery list '*'
-    
+
 List all packages that depend on a given package
 
     equery d package_name
-    
+
 ## eclean-dist
 
 Clean the source files directory by passing the distfiles argument:
 
     sudo eclean-dist -d
-    
+
     -d, --destructive only keep the minimum for a reinstallation
     -p, --pretend only display what would be cleaned
-  
+
 ## Emerge
 
 Gentoo Linux package manager utility.
@@ -48,40 +48,40 @@ More information: <https://wiki.gentoo.org/wiki/Portage#emerge>.
 Synchronize all packages
 
     emerge --sync
-    
+
 Update all packages, including dependencies
 
     emerge -uDNav @world
-    
+
 Resume a failed updated, skipping the failing package
-    
+
     emerge --resume --skipfirst
-    
+
 Install a new package, with confirmation
-    
+
     emerge -av package_name
-    
+
 Remove a package, with confirmation
-    
+
     emerge -Cav package_name
-    
+
 Remove orphaned packages (that were installed only as dependencies)
-    
+
     emerge -avc
-    
+
 Search the package database for a keyword
-    
+
     emerge -S keyword
-    
+
 Delete a package with dependencies left (be careful, it's better to deselect
 and depclean after)
-    
+
     emerge --unmerge --ask package_name
-    
+
 Delete a package if no other package depends on it
 
     emerge --ask --verbose --depclean package_name
-    
+
 Clean unused dependencies
 
     emerge --ask --verbose --depclean
