@@ -37,58 +37,96 @@ Clean the source files directory by passing the distfiles argument:
 
     sudo eclean-dist -d
 
-    -d, --destructive only keep the minimum for a reinstallation
-    -p, --pretend only display what would be cleaned
+* ```--destructive, -d``` Only keep the minimum for a reinstallation
+* ```--pretend, -p``` Only display what would be cleaned
 
 ## Emerge
 
-Gentoo Linux package manager utility.
-More information: <https://wiki.gentoo.org/wiki/Portage#emerge>.
+Gentoo Linux package manager utility. More information:
+* <https://wiki.gentoo.org/wiki/Portage#emerge>,
+* <https://wiki.gentoo.org/wiki/Full_manpages/emerge>.
 
 Synchronize all packages
 
     emerge --sync
+    
+* ```--sync``` Updates repositories, for which auto-sync, sync-type and
+  sync-uri attributes are set in repos.conf.
 
 Update all packages, including dependencies
 
     emerge -uDNav @world
+    
+* ```--update, -u``` Updates packages to the best version available, which may
+  not always be the highest version number due to masking for testing and
+  development.
+* ```--deep, -D``` This flag forces emerge to consider the entire dependency
+  tree of packages, instead of checking only the immediate dependencies of the
+  packages.
+* ```--newuse, -N``` Tells emerge to include installed packages where USE flags
+  have changed since compilation. 
+* ```--ask, -a```
+* ```--verbose, -v``` Tell emerge to run in verbose mode. 
 
 Resume a failed updated, skipping the failing package
 
     emerge --resume --skipfirst
+    
+* ```--resume, -r``` Resumes the most recent merge list that has been aborted
+  due to an error.
+* ```--skipfirst``` This option is only valid when used with ```--resume```. It
+  removes the first package in the resume list.
 
 Install a new package, with confirmation
 
     emerge -av package_name
 
-Remove a package, with confirmation
+Delete a package with dependencies left (be careful, it's better to deselect
+and depclean after)
 
     emerge -Cav package_name
+    
+* ```--unmerge, -C``` WARNING: This action can remove important packages!
+  Removes all matching packages following a counter governed by CLEAN_DELAY. 
 
 Remove orphaned packages (that were installed only as dependencies)
 
     emerge -avc
+    
+* ```--depclean, -c``` Cleans the system by removing packages that are not
+  associated with explicitly merged packages.
+
+Delete a package if no other package depends on it
+
+    emerge -avc package_name
 
 Search the package database for a keyword
 
     emerge -S keyword
 
-Delete a package with dependencies left (be careful, it's better to deselect
-and depclean after)
-
-    emerge --unmerge --ask package_name
-
-Delete a package if no other package depends on it
-
-    emerge --ask --verbose --depclean package_name
-
-Clean unused dependencies
-
-    emerge --ask --verbose --depclean
-
 Remove package from world (don't delete the package)
 
     emerge --ask --deselect package_name
+
+### Mental Outlaw
+
+* ```--search, -s``` Searches for matches of the supplied string in the ebuild
+  repository.
+* ```--searchdesc, -S``` Matches the search string against the description
+  field as well as the package name.
+* ```--prune, -P``` Removes all but the highest installed version of a package
+  from your system. Use ```--prune``` together with --verbose to show reverse
+  dependencies or with ```--nodeps``` to ignore all dependencies. WARNING: This
+  action can remove packages from your world file! Check the emerge output of
+  the next ```--depclean``` run carefully! Use ```--depclean``` to avoid this
+  issue.
+
+    emerge --autounmask-continue package_name
+    
+* ```--autounmask``` Automatically unmask packages and generate package.use
+  settings as necessary to satisfy dependencies.
+* ```--autounmask-continue``` Automatically apply autounmask changes to
+  configuration files, and continue to execute the specified command.
 
 ## glsa-check
 

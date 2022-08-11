@@ -14,9 +14,9 @@
 FILE etc/portage/make.conf
 
     USE="-systemd -gnome -kde -dvd -dvdr -cdr -ios -ipod -aqua -emacs -xemacs \
-    cjk wayland xwayland X tray policykit dbus udev networkmanager bluetooth \
-    sound-server screencast alsa ffmpeg aacs pdf djvu ibus wifi elogind ncurses \
-    cups text gtk"
+    crypt cjk wayland xwayland X tray policykit dbus udev networkmanager \
+    bluetooth sound-server screencast alsa ffmpeg aacs pdf djvu ibus wifi \
+    elogind ncurses cups text gtk python widgets gui"
 
     ?? USE="unicode"
 
@@ -155,7 +155,17 @@ FILE ~/.config/sway/config
     rc-service tor start
     rc-update add tor default
 
-    eselect repository enable torbrowser
+FILE /etc/portage/make.conf
+
+    ACCEPT_KEYWORDS="~amd64"
+    USE="python widgets gui"
+
+
+    python for app-crypt/gpgme
+    widgets for dev-python/PyQt5
+
+    eselect repository enable guru
+    emerge --sync guru
     emerge --ask www-client/torbrowser-launcher
 
 ## brave
@@ -168,6 +178,7 @@ FILE ~/.config/sway/config
 
     eselect repository add librewolf git https://gitlab.com/librewolf-community/browser/gentoo.git
     emaint -r librewolf sync
+    ? (emerge --sync librewolf)
     emerge --ask www-client/librewolf
 
 ## npd
