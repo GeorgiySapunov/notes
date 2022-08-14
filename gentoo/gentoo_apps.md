@@ -49,14 +49,14 @@ Gentoo Linux package manager utility. More information:
 Synchronize all packages
 
     emerge --sync
-    
+
 * ```--sync``` Updates repositories, for which auto-sync, sync-type and
   sync-uri attributes are set in repos.conf.
 
 Update all packages, including dependencies
 
     emerge -uDNav @world
-    
+
 * ```--update, -u``` Updates packages to the best version available, which may
   not always be the highest version number due to masking for testing and
   development.
@@ -64,14 +64,14 @@ Update all packages, including dependencies
   tree of packages, instead of checking only the immediate dependencies of the
   packages.
 * ```--newuse, -N``` Tells emerge to include installed packages where USE flags
-  have changed since compilation. 
+  have changed since compilation.
 * ```--ask, -a```
-* ```--verbose, -v``` Tell emerge to run in verbose mode. 
+* ```--verbose, -v``` Tell emerge to run in verbose mode.
 
 Resume a failed updated, skipping the failing package
 
     emerge --resume --skipfirst
-    
+
 * ```--resume, -r``` Resumes the most recent merge list that has been aborted
   due to an error.
 * ```--skipfirst``` This option is only valid when used with ```--resume```. It
@@ -85,14 +85,14 @@ Delete a package with dependencies left (be careful, it's better to deselect
 and depclean after)
 
     emerge -Cav package_name
-    
+
 * ```--unmerge, -C``` WARNING: This action can remove important packages!
-  Removes all matching packages following a counter governed by CLEAN_DELAY. 
+  Removes all matching packages following a counter governed by CLEAN_DELAY.
 
 Remove orphaned packages (that were installed only as dependencies)
 
     emerge -avc
-    
+
 * ```--depclean, -c``` Cleans the system by removing packages that are not
   associated with explicitly merged packages.
 
@@ -122,7 +122,7 @@ Remove package from world (don't delete the package)
   issue.
 
     emerge --autounmask-continue package_name
-    
+
 * ```--autounmask``` Automatically unmask packages and generate package.use
   settings as necessary to satisfy dependencies.
 * ```--autounmask-continue``` Automatically apply autounmask changes to

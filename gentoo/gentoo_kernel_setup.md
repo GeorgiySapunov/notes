@@ -29,7 +29,8 @@
         (15) CPU kernel log buffer size contribution (13 => 8 KB, 17 => 128KB)
         (12) Temporary per-CPU printk log buffer size (12 => 4KB, 13 => 8KB)
         # Turn initramfs off if you going to build drivers directly to the kernel.
-        # Keep it turned on if you need to add modules to the kernel (e.g. Nvidia)
+        # Keep it turned on if you need to add modules to the kernel (e.g.
+        # Nvidia, microcode for Intel and AMD processors)
         [ ] Initial RAM filesystem and RAM disk (initramfs/initrd) support
         # If you keep previous setting turned on you can turn off support for
         # unrelevant types of compression.
@@ -45,6 +46,8 @@
 ## Processor type and features
 
     Processor type and features --->
+        # ? To enable support for systems with more than one CPU
+        [*] Symmetric multi-processing support
         # research
         # Don't need it in x64 system:
         [ ] Enable MPS table
@@ -58,7 +61,7 @@
             (X) Opteron/Athlon64/Hammer/K8
         # Set maximum number of CPUs to number of CPU threads:
         (number_of_threads) Maximum number of CPUs
-        # ? Consider
+        # ? Consider (probably enable)
         [ ] Multi-core scheduler support
         # Left it turn on for old CPUs (before sandy-bridge)
         [ ] Reroute for broken boot IRQs
@@ -89,6 +92,10 @@
         (1) MTRR cleanup spare reg num (0-7)
         # This makes system more secure but affects performance:
         [*] Memory Protection Keys
+        # If EFI enabled in BIOS
+        [*] EFI runtime service support
+        [*]     EFI stub support
+        [?]         EFI mixed-mode support
         # Can be disabled as long as you're not going to be downloading different
         # kernels. Keep it on if you going to switch kernels frequently. Also allow
         # booting from recovery kernel:
@@ -102,13 +109,15 @@
 
 ## Power management and ACPI options
 
-        Power management and ACPI options --->
-            [ ] Power Management Debug Support
-            # ? Consider this for laptops:
-            CPU frequency scaling --->
-                <M> 'powersave' governor
-            # For intel:
-            [*] Cpuidle Driver for Intel Processors
+    Power management and ACPI options --->
+        [*] Suspend to  RAM and standby
+        [*] Hibernation (aka 'suspend to disk')
+        [ ] Power Management Debug Support
+        # Consider this for laptops:
+        CPU frequency scaling --->
+            Default CPUFreq governor (ondemand) --->
+        # For intel:
+        [*] Cpuidle Driver for Intel Processors
 
 ## Enable loadable module support
 
@@ -133,15 +142,19 @@
         # Could speed up boot time:
         SCSI device support --->
             [*] Asynchronous SCSI scanning
-        # ? Consider
-        [ ] Multiple devices driver support (RAID and LVM)
+        # For encryption and external hard drives
+        [*] Multiple devices driver support (RAID and LVM)
+            <*> Device mapper support
         # Mac drivers
         [ ] Macintosh device drivers
         # Consider
         Network device support --->
+            # Set your wifi and ethernet drivers (for wifi probably as modules)
+            [*] Ethernet driver support -->
+            [*] Wireless LAN --->
             < > Network console logging support
         Input device support --->
-            # Turn off PS/2 support:
+            # ?? Turn off PS/2 support:
             Mice --->
                 < > PS/2 mouse
             # Consider

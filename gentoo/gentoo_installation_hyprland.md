@@ -13,6 +13,8 @@
 
 FILE etc/portage/make.conf
 
+    bloat?
+    
     USE="-systemd -gnome -kde -dvd -dvdr -cdr -ios -ipod -aqua -emacs -xemacs \
     crypt cjk wayland xwayland X tray policykit dbus udev networkmanager \
     bluetooth sound-server screencast alsa ffmpeg aacs pdf djvu ibus wifi \
@@ -21,12 +23,32 @@ FILE etc/portage/make.conf
     ?? USE="unicode"
 
     emerge --verbose --update --deep --newuse @world
+    
+clean:
+
+    ??? sys-power/suspend crypt
+    ?? app-text/texlive cjk
+    ?? app-text/texlive-core cjk
+    ?? app-text/texlive-core cjk
+    ?? media-fonts/noto cjk
+    ?? gui-wm/sway tray
+    ?? gui-apps/waybar tray
+    ?? gui-apps/waybar mpd
+    ?? app-text/zathura-meta pdf djvu
+    ?? alsa
+    ?? mediaa-libs/hurfbuzz
+    ?? pam
+    ?? harfbuzz
+
+    USE="-systemd -gnome -kde -dvd -dvdr -cdr -ios -ipod -aqua -emacs -xemacs \
+    cjk wayland xwayland X tray policykit dbus udev networkmanager bluetooth \
+    sound-server screencast alsa aacs mpd djvu ibus wifi elogind cups gui"
 
 ## Waland
 
 FILE etc/portage/make.conf
 
-    USE="wayland xwayland"
+    USE="wayland xwayland
 
     emerge --ask x11-base/xwayland
 
@@ -59,6 +81,12 @@ FILE etc/portage/make.conf
 
     USE="dbus"
 
+## elogind
+
+elogind should be configured to start at boot time:
+
+    rc-update add elogind boot
+
 ## ? Udev
 
 Adding this USE flag value to the USE flag list (default in all Linux
@@ -81,7 +109,7 @@ net-misc/networkmanager automatically:
 
 FILE /etc/portage/make.conf
 
-    USE="networkmanager ncurses"
+    USE="networkmanager"
 
     emerge --ask net-misc/networkmanager
 
@@ -119,7 +147,7 @@ FILE /etc/portage/make.conf
 
 FILE /etc/portage/make.conf
 
-    USE="cups text"
+    USE="cups"
 
     emerge --ask net-print/cups
 
@@ -155,18 +183,18 @@ FILE ~/.config/sway/config
     rc-service tor start
     rc-update add tor default
 
-FILE /etc/portage/make.conf
+    ??
+        FILE /etc/portage/make.conf
 
-    ACCEPT_KEYWORDS="~amd64"
-    USE="python widgets gui"
+            ACCEPT_KEYWORDS="~amd64"
+            USE="gui"
 
+            app-crypt/gpgme python
+            dev-python/PyQt5 widgets
 
-    python for app-crypt/gpgme
-    widgets for dev-python/PyQt5
-
-    eselect repository enable guru
-    emerge --sync guru
-    emerge --ask www-client/torbrowser-launcher
+            eselect repository enable guru
+            emerge --sync guru
+            emerge --ask www-client/torbrowser-launcher
 
 ## brave
 
@@ -239,9 +267,10 @@ FILE /etc/portage/make.conf
         app-admin/testdisk \
         sys-apps/moreutils \
         app-editors/neovim \
-        sys-fs/ncdu \
+        sys-fs/ncdu \                  #  zig
         sys-apps/ripgrep \
-        app-i18n/ibus ibus-libpinyin \
+        app-i18n/ibus 
+        app-i18n/ibus-libpinyin \
         app-misc/neofetch \
         kde-apps/okular \
         net-im/telegram-desktop \
@@ -256,7 +285,8 @@ FILE /etc/portage/make.conf
         net-analyzer/bmon \
         media-sound/pulsemixer \
         app-misc/tmux \
-        sys-apps/mlocate
+        sys-apps/mlocate \
+        x11-terms/kitty
 
 ## blueray
 
@@ -398,7 +428,6 @@ FILE etc/portage/make.conf
         gui-apps/wlogout \
         gui-apps/wf-recorder \
         gui-apps/wofi \
-        gnome-base/gdm
 
 
     emerge --ask gui-wm/sway
@@ -406,3 +435,15 @@ FILE etc/portage/make.conf
 vim etc/portage/make.conf
 
     use="X"
+
+## gdm
+
+    emerge -a gnome-base/gdm
+    emerge -an gui-libs/display-manager-init
+
+FILE /etc/conf.d/display-manager
+
+    DISPLAYMANAGER="gdm"
+
+    rc-update add display-manager default
+    rc-service display-manager start
