@@ -354,8 +354,10 @@ FILE etc/portage/make.conf
         x11-libs/gtk+ \
         gui-libs/gtk
 
-## qt5ct
+## gtk2 or qt5ct for qt
 
+    emerge --ask dev-qt/qtstyleplugins
+    or
     emerge --ask x11-misc/qt5ct
 
 ## python
@@ -429,9 +431,6 @@ FILE etc/portage/make.conf
         gui-apps/wf-recorder \
         gui-apps/wofi \
 
-
-    emerge --ask gui-wm/sway
-
 vim etc/portage/make.conf
 
     use="X"
@@ -447,3 +446,31 @@ FILE /etc/conf.d/display-manager
 
     rc-update add display-manager default
     rc-service display-manager start
+
+## sway
+
+    emerge --ask gui-wm/sway \
+        gui-libs/xdg-desktop-portal-wlr
+
+
+## hyprland
+
+emerge -avn gui-libs/wlroots
+
+emerge -avn gdb \
+    dev-util/ninja \
+    sys-devel/gcc \
+    dev-util/cmake \
+    x11-libs/libxcb
+    x11-base/xcb-proto
+    x11-libs/xcb-util \
+    x11-libs/xcb-util-keysyms \
+    x11-libs/libXfixes \
+    x11-libs/libX11 \
+    x11-libs/libXcomposite \
+    x11-apps/xinput \
+    x11-libs/libXrender \
+    x11-libs/pixman \
+    dev-libs/wayland-protocols \
+    x11-libs/cairo \
+    x11-libs/pango
