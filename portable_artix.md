@@ -351,6 +351,14 @@ sed -i "s/-j2/-j$(nproc)/;/^#MAKEFLAGS/s/^#//" /etc/makepkg.conf
 
     sudo pacman -S virtualbox virtualbox-host-modules-artix
 
+### Gramps
+
+    sudo pacman -S gramps python-pyicu osm-gps-map
+
+### hyprland
+
+   paru -S hyprland waybar wofi wl-clipboard
+
 ### Neovim
 
     :LspInstallInfo
@@ -480,3 +488,36 @@ sed -i "s/-j2/-j$(nproc)/;/^#MAKEFLAGS/s/^#//" /etc/makepkg.conf
     Use the output command to configure outputs instead of xrandr
     Use the output command to configure your wallpaper instead of feh
     Use the input command to configure input devices
+
+### waybar
+
+        "custom/sb-news": {
+        "signal": 6,
+        "interval": "once",
+        "exec": "sb-news",
+        "max-length": 5,
+        "format": " {}",
+        "on-click": "setsid \"$TERMINAL\" -e newsboat",
+        "on-click-middle": "setsid -f newsup >/dev/null exit",
+        "on-right-click": ""
+    },
+    "custom/sb-mailbox": {
+        "signal": 12,
+        "interval": "once",
+        "exec": "sb-mailbox",
+        "max-length": 5,
+        "format": " {}",
+        "on-click": "setsid -f \"$TERMINAL\" -e neomutt",
+        "on-click-middle": "setsid -f mw -Y >/dev/null",
+        "on-right-click": ""
+    },
+    "custom/sb-torrent": {
+        "signal": 7,
+        "interval": "once",
+        "exec": "sb-torrent",
+        "max-length": 10,
+        "format": " {}",
+        "on-click": "setsid -f \"$TERMINAL\" -e tremc",
+        "on-click-middle": "td-toggle",
+        "on-right-click": ""
+    },

@@ -31,6 +31,7 @@
         app-shells/gentoo-zsh-completions \
         app-shells/zoxide \
         app-shells/fzf \
+        sys-apps/exa \
         \
         media-video/ffmpeg \
         media-video/mpv \
@@ -77,7 +78,7 @@
         x11-terms/kitty \
         media-libs/libbluray \
         \
-        app-misc/ranger \
+        app-misc/lf \
         app-arch/atool \
         dev-perl/File-MimeInfo \
         sys-apps/bat \

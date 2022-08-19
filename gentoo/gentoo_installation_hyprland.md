@@ -220,6 +220,7 @@ FILE ~/.config/sway/config
 
     emerge --ask app-shells/zsh \
         app-shells/gentoo-zsh-completions
+    emerge --ask sys-apps/exa
 
     chsh -s /bin/zsh
 
@@ -302,7 +303,7 @@ FILE /etc/portage/make.conf
 
 ## file-manager
 
-    emerge --ask app-misc/ranger \
+    emerge --ask app-misc/lf \
         app-arch/atool \
         dev-perl/File-MimeInfo \
         sys-apps/bat
