@@ -455,6 +455,14 @@ microcode loading support (it does not hurt to choose both):
    [*]   Intel microcode loading support
    [*]   AMD microcode loading support
 
+For intel:
+
+    Device Drivers  --->
+      Generic Driver Options  --->
+        Firmware Loader  --->
+          -*-   Firmware loading facility
+          (intel-ucode/06-3c-03) Build named firmware blobs into the kernel binary
+          (/lib/firmware) Firmware blobs root directory (NEW)
 ---
 
 
@@ -537,6 +545,14 @@ microcode loading support (it does not hurt to choose both):
    [*]   Intel microcode loading support
    [*]   AMD microcode loading support
 
+For intel:
+
+    Device Drivers  --->
+      Generic Driver Options  --->
+        Firmware Loader  --->
+          -*-   Firmware loading facility
+          (intel-ucode/06-3c-03) Build named firmware blobs into the kernel binary
+          (/lib/firmware) Firmware blobs root directory (NEW)
 ---
 ---
 

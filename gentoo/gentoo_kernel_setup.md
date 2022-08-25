@@ -31,7 +31,7 @@
         # Turn initramfs off if you going to build drivers directly to the kernel.
         # Keep it turned on if you need to add modules to the kernel (e.g.
         # Nvidia, microcode for Intel and AMD processors)
-        [ ] Initial RAM filesystem and RAM disk (initramfs/initrd) support
+        [X] Initial RAM filesystem and RAM disk (initramfs/initrd) support
         # If you keep previous setting turned on you can turn off support for
         # unrelevant types of compression.
         [X] Initial RAM filesystem and RAM disk (initramfs/initrd) support
@@ -134,6 +134,34 @@
 
     Device Drivers --->
         < > PCCard (PCMCIA/CardBus) support
+        # Enabling Microcode Loading Support
+        # For INTEL:
+        # user $  iucode_tool -S
+        #    iucode_tool: system has processor(s) with signature 0x000306c3
+        # To find the appropriate filename use:
+        # user $  iucode_tool -S -l /lib/firmware/intel-ucode/*
+        #    iucode_tool: system has processor(s) with signature 0x000306c3
+        #    [...]
+        #    microcode bundle 49: /lib/firmware/intel-ucode/06-3c-03
+        #    [...]
+        #    selected microcodes:
+        #      049/001: sig 0x000306c3, pf_mask 0x32, 2017-01-27, rev 0x0022, size 22528
+        # The signature is found in microcode bundle 49, so the filename
+        # to use is /lib/firmware/intel-ucode/06-3c-03.
+        Generic Driver Options --->
+            Firmware Loader --->
+                -*- Firmware loading facility
+                  (intel-ucode/06-3c-03) Build named firmware blobs into the kernel binary
+                  (/lib/firmware) Firmware blobs root directory (NEW)
+        # For AMD:
+        # consult https://wiki.gentoo.org/wiki/AMD_microcode
+        # user $  grep -F -m 1 "cpu family" /proc/cpuinfo
+        #    cpu family      : 22
+        Generic Driver Options --->
+            Firmware Loader --->
+                -*- Firmware loading facility
+                  (amd-ucode/microcode_amd_fam16h.bin) Build named firmware blobs into the kernel binary
+                  (/lib/firmware) Firmware blobs root directory (NEW)
         #
         Block devices --->
             (0) Number of loop devices to pre-create at init time
