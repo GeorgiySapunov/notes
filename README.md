@@ -25,6 +25,7 @@
 # Statistics
 
 [проверка статистических гипотез](statistical_hypothesis_testing.md)  
+[reinforcement learning](reinforcement_learning.md)
 
 # Key bindings
 
