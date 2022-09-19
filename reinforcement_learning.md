@@ -115,7 +115,7 @@ $$ V \left( s_{k} \right) = \mathbb{E} \left( r_{k} + \gamma V \left( s_{k+1}
 
 $$ V^{new} \left( s_{k} \right) = V^{old} \left( s_{k} \right) + \alpha \left(
 \overbrace{ \underbrace{ r_{k} + \gamma V^{old} \left( s_{k+1} \right)
-}_{\text{TD target estimate} R_{\Sigma}} - V^{old} \left( s_{k} \right)
+}_{\text{TD target estimate } R_{\Sigma}} - V^{old} \left( s_{k} \right)
 }^{\text{TD Error}} \right) $$
 
 ## Temporal difference learning: TD(N)
@@ -134,5 +134,119 @@ $$ R_{\Sigma}^{n} = r_{k} + \gamma r_{k+1} + \gamma^{2} r_{k+2} + \dots +
 
 ## Temporal difference learning: TD-$\lambda$
 
+$$ R_{\Sigma}^{\lambda} = \left( 1 - \lambda \right) \sum_{k=1}^{\infty}
+\lambda^{n-1} R_{\Sigma}^{n} $$
+
+$$ V^{new} \left( s_{k} \right) = V^{old} \left( s_{k} \right) + \alpha \left(
+R_{\Sigma}^{\lambda} - V^{old} \left( s_{k} \right) \right) $$
+
+$$ R_{\Sigma}^{n} = r_{k} + \gamma r_{k+1} + \gamma^{2} r_{k+2} + \dots +
+\gamma^{n} r_{k+n} + \gamma^{n+1} V \left( s_{k+n+1} \right) = \sum_{j=0}^{n}
+\gamma^{j} r_{k+j} + \gamma^{n+1} V \left( s_{k+n+1} \right) $$
+
+## Q-learning
+
+$$ Q^{new} \left( s_{k}, a_{k} \right) = Q^{old} \left( s_{k}, a_{k} \right) +
+\alpha \left( r_{k} + \gamma \underline{\max_{a}} Q \left( s_{k+1}, a \right) -
+Q^{old} \left( s_{k}, a_{k} \right) \right) $$
+
+Off policy TD(0) learning of the Quality function Q. ($a_{k}$ and $r_{k}$ could
+be not optimal)
+
+## SARSA: State -- action -- reward -- state -- action
+
+$$ Q^{new} \left( s_{k}, a_{k} \right) = Q^{old} \left( s_{k}, a_{k} \right) +
+\alpha \left( r_{k} + \gamma Q^{old} \left( s_{k+1}, a_{k+1} \right) -
+Q^{old} \left( s_{k}, a_{k} \right) \right) $$
+
+$$ R_{\Sigma}^{n} = r_{k} + \gamma r_{k+1} + \gamma^{2} r_{k+2} + \dots +
+\gamma^{n} r_{k+n} + \gamma^{n+1} Q \left( s_{k+n+1}, a_{k+n+1} \right) = \\
+\sum_{j=0}^{n} \gamma^{j} r_{k+j} + \gamma^{n+1} Q \left( s_{k+n+1}, a_{k+n+1}
+\right) $$
+
+$$ Q^{new} \left( s_{k}, a_{k} \right) = Q^{old} \left( s_{k}, a_{k} \right) +
+\alpha \left( R_{\Sigma}^{n} - Q^{old} \left( s_{k}, a_{k} \right) \right) $$
+
+On policy TD learning of the Quality function Q.
+
+---
+
+Q learning: 
+- better/faster learning;
+- can learn from imitation and experience replay
+
+SARSA:
+- ofter safer;
+- better total reward while learning
+
+---
+
+# Optimal nonlinear control
+
+$$ \frac{d}{dt} x = f \left( x \left( t \right), u \left( t \right), t \right)
+dt $$
+
+The goal is to design control $u \left( t \right)$ to follow a state $x \left(
+t \right)$ to minimize a cost $J$
+
+$x \left( t_{0} \right) \rightarrow x \left( t_{t} \right) \rightarrow x \left(
+t_{f} \right)$
+
+$t_{f}$ -- time final
+
+$$ J \left( x \left( t \right), u \left( t \right), t_{0}, t_{f} \right) = Q
+\left( x \left( t_{f} \right), t_{f} \right) + \int_{t}^{t_{f}} \mathcal{L}
+\left( x \left( \tau \right), u \left( \tau \right) \right) d \tau $$
+
+$$ V \left( x \left( t_{0} \right), t_{0}, t_{f} \right) = \min_{u(t)} J \left(
+x \left( t \right), u \left( t \right), t_{0}, t_{f} \right) $$
+
+---
+
+Hamilton -- Jacobi -- Bellman (HJB) equation:
+
+$$ - \frac{\partial V}{\partial t} = \min_{u(t)} \left( \left( \frac{\partial
+V}{\partial x} \right)^{T} f \left( x \left( t \right), u \left( t \right)
+\right) + \mathcal{L} \left( x \left( t \right), u \left( t \right) \right)
+\right) $$
+
+---
+
+Bellman optimality:
+
+$$ V \left( x \left( t_{0} \right), t_{0}, t_{f} \right) = V \left( x \left(
+t_{0} \right), t_{0}, t \right) + V \left( x \left( t \right), t,
+t_{f} \right) $$
+
+## Deriving HJB equation
+
+$$ \frac{d}{dt} V \left( x \left( t \right), t, t_{f} \right) = \frac{\partial
+V}{\partial t} + \left( \frac{\partial V}{\partial x}^{T} \right) \frac{dx}{dt}
+= \\
+\min_{u_{t}} \int_{t}^{t_{f}} \mathcal{L} \left( x \left( \tau \right), u
+\left( \tau \right) \right) d \tau + Q \left( x \left( t_{f} \right), t_{f}
+\right) = \\
+\min_{u(t)} \underbrace{\left[ \frac{d}{dt} \int_{t}^{t_{f}}
+\mathcal{L} \left( x \left( \tau \right), u \left( \tau \right) \right) d \tau
+\right]}_{- \mathcal{L} \left( x \left( t \right), u \left( t \right) \right)}
+$$
+
+$$ \Rightarrow - \frac{\partial V}{\partial t} = \min_{u(t)} \left( \left(
+\frac{\partial V}{\partial x} \right)^{T} f \left( x \left( t \right), u \left(
+t \right) \right) + \mathcal{L} \left( x \left( t \right), u \left( t \right)
+\right) \right) $$
+
+## Discrete-time HJB
+
+$$ x_{k+1} = F \left( x_{k}, u_{k} \right) $$
+
+$$ J \left( x_{0}, \left\{ u \right\}_{k=0}^{n}, n \right) = \int_{k=0}^{n}
+\mathcal{L} \left( x_{k}, u_{k} \right) + Q \left( x \left( t_{f} \right),
+t_{f} \right) $$
+
+$$ V \left( x_{0}, n \right) = \min_{\left\{ u \right\}_{k=0}^{n}} J \left(
+x_{0}, \left\{ u \right\}_{k=0}^{n}, n \right)  $$
+
+## Statement of Bellman optimality
 
 

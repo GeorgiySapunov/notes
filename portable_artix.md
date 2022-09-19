@@ -195,7 +195,7 @@
 ##### neovim
 
     pacman -S --noconfirm neovim
-    pacman -S --noconfirm lazygit ncdu ripgrep
+    pacman -S --noconfirm lazygit ncdu ripgrep luarocks
 
 #### Fonts
 

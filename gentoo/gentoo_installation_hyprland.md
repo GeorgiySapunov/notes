@@ -268,6 +268,7 @@ FILE /etc/portage/make.conf
         app-admin/testdisk \
         sys-apps/moreutils \
         app-editors/neovim \
+        dev-lua/luarocks \
         sys-fs/ncdu \                  #  zig
         sys-apps/ripgrep \
         app-i18n/ibus 

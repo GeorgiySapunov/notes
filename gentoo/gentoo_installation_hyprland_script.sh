@@ -54,6 +54,7 @@
         app-admin/testdisk \
         sys-apps/moreutils \
         app-editors/neovim \
+        dev-lua/luarocks \
         sys-fs/ncdu \
         sys-apps/ripgrep \
         app-i18n/ibus \
