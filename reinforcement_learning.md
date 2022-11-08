@@ -69,7 +69,7 @@ $$ V \left( s \right) = \max_{a} \sum_{s'} P \left( s' | s, a \right) \left( R
 $$ \pi \left( s, a \right) = \arg \max_{a} \sum_{s'} P \left( s' | s, a \right)
 \left( R \left( s', s, a \right) + \gamma V \left( s' \right) \right) $$
 
-### Pilicy iteration
+### Policy iteration
 
 $$ V_{\pi} \left( s \right) = \mathbb{E} \left( R \left( s', s, \pi \left( s
 \right) \right) + \gamma V_{\pi} \left( s' \right) \right) = \sum_{s'} P \left(
@@ -89,7 +89,7 @@ $$ V \left( s \right) = \max_{a} Q \left( s, a \right) $$
 
 $$ \pi \left( s, a \right) = \arg \max_{a} Q \left( s, a \right) $$
 
-## Monte-Carlo learning
+## Monte -- Carlo learning
 
 $$ R_{\Sigma} = \sum_{k=1}^{n} \gamma^{k} r_{k} $$
 
@@ -132,7 +132,7 @@ $$ R_{\Sigma}^{n} = r_{k} + \gamma r_{k+1} + \gamma^{2} r_{k+2} + \dots +
 \gamma^{n} r_{k+n} + \gamma^{n+1} V \left( s_{k+n+1} \right) = \sum_{j=0}^{n}
 \gamma^{j} r_{k+j} + \gamma^{n+1} V \left( s_{k+n+1} \right) $$
 
-## Temporal difference learning: TD-$\lambda$
+## Temporal difference learning: TD -- $\lambda$
 
 $$ R_{\Sigma}^{\lambda} = \left( 1 - \lambda \right) \sum_{k=1}^{\infty}
 \lambda^{n-1} R_{\Sigma}^{n} $$
@@ -144,7 +144,7 @@ $$ R_{\Sigma}^{n} = r_{k} + \gamma r_{k+1} + \gamma^{2} r_{k+2} + \dots +
 \gamma^{n} r_{k+n} + \gamma^{n+1} V \left( s_{k+n+1} \right) = \sum_{j=0}^{n}
 \gamma^{j} r_{k+j} + \gamma^{n+1} V \left( s_{k+n+1} \right) $$
 
-## Q-learning
+## Q -- learning
 
 $$ Q^{new} \left( s_{k}, a_{k} \right) = Q^{old} \left( s_{k}, a_{k} \right) +
 \alpha \left( r_{k} + \gamma \underline{\max_{a}} Q \left( s_{k+1}, a \right) -
@@ -236,7 +236,7 @@ $$ \Rightarrow - \frac{\partial V}{\partial t} = \min_{u(t)} \left( \left(
 t \right) \right) + \mathcal{L} \left( x \left( t \right), u \left( t \right)
 \right) \right) $$
 
-## Discrete-time HJB
+## Discrete -- time HJB
 
 $$ x_{k+1} = F \left( x_{k}, u_{k} \right) $$
 
@@ -250,3 +250,106 @@ x_{0}, \left\{ u \right\}_{k=0}^{n}, n \right)  $$
 ## Statement of Bellman optimality
 
 
+$$ V \left( x_{0}, n \right) = V \left( x_{0}, k \right) + V \left( x_{k}, n-k
+\right), \quad \forall k \in \left( 0, n \right) $$
+
+## Descrete -- time HJB equation
+
+$$ V \left( x_{k}, n \right) = \min_{u_{k}} \left( \mathcal{L} \left( x_{k},
+u_{k}\right) + \underbrace{ V \left( x_{k+1}, n-1 \right)}_{\text{such that }
+x_{k+1} = F \left( X_{k}, u_{k} \right)} \right) = \\
+\min_{u_{k}} \left( \mathcal{L} \left( x_{k}, u_{k} \right) + V
+\left( F \left( x_{k}, u_{k} \right), n-1 \right) \right) $$
+
+$$ V \left( x \right) = \min_{u} \left( \mathcal{L} \left( x, u \right) + V
+\left( F \left( x, u \right) \right) \right) $$
+
+$$ \pi \left( x \right) = \argmin_{u} \left( \mathcal{L} \left( x, u \right) +
+V \left( F \left( x, u \right) \right) \right) $$
+
+## Deep Reinforcement learning
+
+$\theta$ -- parameters
+
+$$ \pi_{\theta} \left( s, a \right) \implies Q^{new} = Q^{old} + \alpha
+\nabla_{\theta} R_{\Sigma, \theta} $$
+
+## Policy gradient optimization
+
+$$ R_{\Sigma, \theta} = \sum_{s \in \cal S}\mu_{\theta} \left( s \right)
+\sum_{a \in \cal A} \pi_{\theta} \left( s, a \right) Q \left( s, a \right) $$
+
+$\mu_{\theta} (s)$ -- expected future distribution or probability of finding
+yourself in a state $s$ at long times giving policy $\theta$
+
+$\pi_{\theta} (s,a)$ -- probability of taking action $a$ at state $s$
+
+$Q(s,a)$ -- quality of state action
+
+$R_{\Sigma, \theta}$ -- cumulative future reward
+
+$$ \nabla_{\theta} R_{\Sigma, \theta} = \sum_{s \in \cal S}\mu_{\theta} \left(
+s \right) \sum_{a \in \cal A} \pi_{\theta} \left( s, a \right) Q \left( s, a
+\right) \nabla_{\theta} = \\
+\sum_{s \in \cal S}\mu_{\theta} \left( s \right) \sum_{a \in \cal A}
+\pi_{\theta} \left( s, a \right) Q \left( s, a \right) \frac{\nabla_{\theta}
+\pi_{\theta} \left( s, a \right)}{\pi_{\theta} \left( s, a \right)} = \\
+\sum_{s \in \cal S}\mu_{\theta} \left( s \right) \sum_{a \in \cal A}
+\pi_{\theta} \left( s, a \right) Q \left( s, a \right) \nabla_{\theta}
+\log{\pi_{\theta} \left( s, a \right)} = \\
+\mathbb{E} \left( Q \left( s, a \right) \nabla_{\theta} \log{\pi_{\theta}
+\left( s, a \right)} \right) $$
+
+$$ Q^{new} = Q^{old} + \alpha \nabla_{\theta} R_{\Sigma, \theta} $$
+
+## Deep Q -- learning
+
+$$ Q^{new} (s_{k}, a_{k}) = Q^{old} (s_{k}, a_{k}) + \alpha \left( r_{k} +
+\gamma \max_{a} Q \left( s_{k+1}, a \right) - Q^{old} \left( s_{k}, a_{k}
+\right) \right) $$
+
+$Q (s, a) \approx Q (s, a, \theta)$ -- parameterize Q function with neural
+network
+
+$$ \mathcal{L} = \mathbb{E} \left[ \left( r_{k} + \gamma \max_{a} Q \left(
+s_{k+1} a_{k+1}, \theta \right) - Q \left( s_{k}, a_{k}, \theta \right)
+\right)^2 \right] $$
+
+$\mathcal{L}$ -- loss function
+
+## Advantage Network
+
+$$ Q(s, a, \theta) - V(s, \theta_{1}) + A(s, a, \theta_{2}) $$
+
+deep dueling Q Network (DDQN)
+
+## Actor -- Critic Network
+
+##### Actor: Policy Based:
+
+$\pi (s, a) = \approx \pi (s, a, \theta)$
+
+##### Critic: Value Based:
+
+$V(s_{k}) = \mathbb{E} \left( r_{k} + \gamma V \left( s_{k+1} \right) \right)$
+
+##### Use TD signal from critic to update policy parameters
+
+$Q_{k+1} = Q_{k} + \alpha \left( r_{k} + \gamma V \left( s_{k+1} \right) - V
+\left( s_{k} \right) \right)$
+
+## Advantage Actor -- Critic Network
+
+##### Actor: Deep Policy Network:
+
+$\pi (s, a) = \approx \pi (s, a, \theta)$
+
+##### Critic: Deep Dueling Q Network:
+
+$Q(s_{k}, a_{k}, \theta_2)$
+
+##### Update
+
+$Q_{k+1} = Q_{k} + \alpha \nabla_{\theta} \left( \left( \log \pi \left( s_{k},
+a_{k}, \theta \right) Q \left( s_{k}, a_{k}, \theta_{2} \right) \right)
+\right)$

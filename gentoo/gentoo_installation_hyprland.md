@@ -160,7 +160,7 @@ FILE /etc/portage/make.conf
 
     USE="sound-server screencast alsa"
 
-    emerge --ask media-video/pipewire
+    emerge --ask media-video/wireplumber
 
 Starting PipeWire with various non-systemd setups
 

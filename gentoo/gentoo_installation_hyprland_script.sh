@@ -15,7 +15,7 @@
         net-misc/networkmanager \
         net-wireless/bluez \
         net-print/cups \
-        media-video/pipewire \
+        media-video/wireplumber \
         dev-vcs/git \
         \
         net-vpn/tor \

@@ -83,7 +83,7 @@
     pacman -S --noconfirm networkmanager networkmanager-runit grub efibootmgr cryptsetup
     pacman -S --noconfirm polkit polkit-qt5
 
-    pacman -S --noconfirm bluez bluez-utils bluez-runit cups cups-runit git pipewire pipewire-pulse man-db
+    pacman -S --noconfirm bluez bluez-utils bluez-runit cups cups-runit git wireplumber pipewire-pulse man-db
     pacman -S --noconfirm wget openssh openssh-runit cronie cronie-runit tor torsocks tor-runit artix-keyring artix-archlinux-support
 
     pacman-key --populate archlinux
@@ -232,10 +232,6 @@
     sudo nvim /etc/paru.conf
 
 ## Luke's settings
-### Installing \`libxft-bgra\` to enable color emoji in suckless software without crashes
-
-    paru -S libxft-bgra
-
 ### Synchronizing system time
 
     sudo pacman -S ntp ntp-runit
