@@ -223,6 +223,7 @@ FILE ~/.config/sway/config
     emerge --ask sys-apps/exa
 
     chsh -s /bin/zsh
+    sh <(curl -s https://raw.githubusercontent.com/zap-zsh/zap/master/install.sh)
 
 ## zoxide
 
