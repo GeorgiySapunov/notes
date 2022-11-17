@@ -175,7 +175,7 @@
     pacman -S --noconfirm zsh-completions zoxide
     sh <(curl -s https://raw.githubusercontent.com/zap-zsh/zap/master/install.sh)
 
-    pacman -S --noconfirm pulsemixer pamixer
+    pacman -S --noconfirm pulsemixer
     pacman -S --noconfirm dosfstools exfat-utils ntfs-3g
 
 ##### dwm
