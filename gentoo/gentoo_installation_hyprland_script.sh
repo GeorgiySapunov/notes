@@ -100,6 +100,7 @@
         \
         media-libs/fontconfig \
         media-fonts/noto \
+        media-fonts/noto-ckj \
         media-fonts/noto-emoji \
         media-fonts/symbola \
         media-fonts/mikachan-font-ttf \

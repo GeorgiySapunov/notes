@@ -339,6 +339,7 @@ FILE /etc/portage/make.conf
     emerge --ask media-libs/fontconfig
 
     emerge --ask media-fonts/noto \
+        media-fonts/noto-cjk \
         media-fonts/noto-emoji \
         media-fonts/symbola \
         media-fonts/mikachan-font-ttf \

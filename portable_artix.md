@@ -200,7 +200,7 @@
 
 #### Fonts
 
-    pacman -S --noconfirm noto-fonts-emoji noto-fonts ttf-liberation ttf-font-awesome ttf-joypixels
+    pacman -S --noconfirm noto-fonts-emoji noto-fonts noto-fonts-cjk ttf-liberation ttf-font-awesome ttf-joypixels
     pacman -S --noconfirm libertinus-font adobe-source-han-sans-cn-fonts adobe-source-han-sans-jp-fonts
     pacman -S --noconfirm adobe-source-han-serif-cn-fonts adobe-source-han-serif-jp-fonts
     pacman -S --noconfirm ttf-opensans ttf-arphic-ukai ttf-arphic-uming ttf-baekmuk ttf-hannom
