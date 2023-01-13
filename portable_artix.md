@@ -236,7 +236,7 @@
 ### Synchronizing system time
 
     sudo pacman -S ntp ntp-runit
-    sudo ntpdate 0.us.pool.ntp.org
+    sudo ntpd -q -g
 
 ### Use all cores for compilation.
 
