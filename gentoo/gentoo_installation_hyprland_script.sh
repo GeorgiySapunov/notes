@@ -70,7 +70,7 @@
         app-crypt/pinentry \
         \
         net-p2p/transmission \
-        net-p2p/tremc \
+        net-p2p/stig \
         net-misc/wget \
         net-analyzer/bmon \
         media-sound/pulsemixer \

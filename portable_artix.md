@@ -342,7 +342,7 @@ sed -i "s/-j2/-j$(nproc)/;/^#MAKEFLAGS/s/^#//" /etc/makepkg.conf
 ### Torrent
 
     sudo pacman -S --noconfirm transmission-cli
-    paru -S tremc
+    paru -S stig
 
 ### Virtualbox
 
