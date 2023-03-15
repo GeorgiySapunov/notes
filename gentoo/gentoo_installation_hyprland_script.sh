@@ -52,6 +52,7 @@
         x11-misc/pcmanfm  \
         x11-misc/dunst \
         app-admin/testdisk \
+        app-admin/stow \
         sys-apps/moreutils \
         app-editors/neovim \
         dev-lua/luarocks \

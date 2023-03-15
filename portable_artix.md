@@ -282,7 +282,7 @@ sed -i "s/-j2/-j$(nproc)/;/^#MAKEFLAGS/s/^#//" /etc/makepkg.conf
     sudo pacman -S --noconfirm ibus
 
     sudo pacman -S --noconfirm libbluray libaacs
-    sudo pacman -S --noconfirm tmate syncthing rsync neofetch
+    sudo pacman -S --noconfirm tmate syncthing rsync neofetch stow
 
     sudo pacman -S --noconfirm lxappearance qt5-styleplugins arc-gtk-theme python-qdarkstyle papirus-folders-nordic
     sudo pacman -S --noconfirm okular breeze-icons

@@ -267,6 +267,7 @@ FILE /etc/portage/make.conf
         x11-misc/pcmanfm  \
         app-shells/fzf \
         app-admin/testdisk \
+        app-admin/stow \
         sys-apps/moreutils \
         app-editors/neovim \
         dev-lua/luarocks \

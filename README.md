@@ -21,6 +21,7 @@
 [git](commands/git.md) - git commands  
 [python](commands/python.md) - python commands  
 [gpg](commands/gpg.md) - gpg and pass commands  
+[security](commands/security.md) - rkhunter security monitoring, apparmor, firejail
 
 # Statistics
 
