@@ -180,9 +180,18 @@
 
 ##### dwm
 
-    pacman -S --noconfirm libnotify dunst
+###### xorg
+
     pacman -S --noconfirm maim xclip
-    pacman -S --noconfirm xwallpaper unclutter xdotool xcape bmon
+    pacman -S --noconfirm xwallpaper unclutter xdotool xcape
+    pacman -S --noconfirm libnotify
+
+###### other
+
+    pacman -S --noconfirm bmon
+    pacman -S --noconfirm dunst
+
+##### programs
 
     pacman -S --noconfirm ffmpeg mpd mpv mpc ncmpcpp newsboat sxiv calcurse
     pacman -S --noconfirm zathura zathura-pdf-mupdf zathura-djvu pdfpc
