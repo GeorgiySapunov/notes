@@ -20,8 +20,14 @@
 [vim](commands/vim.md)  - vim commands  
 [git](commands/git.md) - git commands  
 [python](commands/python.md) - python commands  
-[gpg](commands/gpg.md) - gpg and pass commands  
+[gpg](commands/gpg.md) - gpg commands  
+[pass](commands/pass.md) - pass commands  
 [security](commands/security.md) - rkhunter security monitoring, apparmor, firejail
+
+# Johenews
+
+[gpg_johenews](johenews/gpg_johenews.md)]
+[pass_johenews](johenews/pass_johenews.md)
 
 # Statistics
 
