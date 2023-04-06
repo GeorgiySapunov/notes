@@ -14,6 +14,7 @@
 # Artix
 
 [portable artix](portable_artix.md) - artix installation  
+[portable artix hyprland](portable_artix_hyprland.md) - artix hyprland installation  
 
 # Also
 
