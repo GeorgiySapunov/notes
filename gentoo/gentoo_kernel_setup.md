@@ -42,6 +42,11 @@
         [ ] Support initial ramdisk/ramfs compressed using LZ0
         [ ] Support initial ramdisk/ramfs compressed using LZ4
         [X] Support initial ramdisk/ramfs compressed using ZSTD
+        # udev
+        General setup  --->
+            [*] Configure standard kernel features (expert users)  --->
+            [ ] Enable deprecated sysfs features to support old userspace tools
+            [*] Enable signalfd() system call
 
 ## Processor type and features
 
@@ -129,6 +134,15 @@
 
     --- Enable the block layer --->
         [ ] Block layer debugging information in debugfs
+    # udev
+    Enable the block layer  --->
+        [*] Block layer SG support v4
+
+## Networking support
+
+    # udev
+    Networking options  --->
+        <*> Unix domain sockets
 
 ## Device Drivers
 
@@ -153,6 +167,10 @@
                 -*- Firmware loading facility
                   (intel-ucode/06-3c-03) Build named firmware blobs into the kernel binary
                   (/lib/firmware) Firmware blobs root directory (NEW)
+            # udev
+            ()  path to uevent helper
+            [*] Maintain a devtmpfs filesystem to mount at /dev
+        < > ATA/ATAPI/MFM/RLL support (DEPRECATED)  --->
         # For AMD:
         # consult https://wiki.gentoo.org/wiki/AMD_microcode
         # user $  grep -F -m 1 "cpu family" /proc/cpuinfo
@@ -212,6 +230,13 @@
         [ ] Miscellaneous filesystems
         # Consider if you don't have NAS drive:
         [ ] Network File Systems
+        # udev
+        [*] Inotify support for userspace
+        Pseudo filesystems --->
+            [*] /proc file system support
+            [*] sysfs file system support
+            # efibootmgr
+            <*> EFI Variable filesystem
 
 ## Cryptographic API
 

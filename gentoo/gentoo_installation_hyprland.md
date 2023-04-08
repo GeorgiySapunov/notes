@@ -13,7 +13,7 @@
 
 FILE etc/portage/make.conf
 
-    bloat?
+?bloat
     
     USE="-systemd -gnome -kde -dvd -dvdr -cdr -ios -ipod -aqua -emacs -xemacs \
     crypt cjk wayland xwayland X tray policykit dbus udev networkmanager \
@@ -87,7 +87,7 @@ elogind should be configured to start at boot time:
 
     rc-update add elogind boot
 
-## ? Udev
+## Udev
 
 Adding this USE flag value to the USE flag list (default in all Linux
 profiles) will pull in the virtual/udev package automatically:
@@ -97,6 +97,26 @@ FILE /etc/portage/make.conf
     USE="udev"
 
     rc-update add udev sysinit
+
+General setup  --->
+    [*] Configure standard kernel features (expert users)  --->
+        [ ] Enable deprecated sysfs features to support old userspace tools
+        [*] Enable signalfd() system call
+Enable the block layer  --->
+    [*] Block layer SG support v4
+Networking support  --->
+    Networking options  --->
+        <*> Unix domain sockets
+Device Drivers  --->
+    Generic Driver Options  --->
+        ()  path to uevent helper
+        [*] Maintain a devtmpfs filesystem to mount at /dev
+    < > ATA/ATAPI/MFM/RLL support (DEPRECATED)  --->
+File systems  --->
+    [*] Inotify support for userspace
+    Pseudo filesystems --->
+        [*] /proc file system support
+        [*] sysfs file system support
 
 ## eselect-repository
 
@@ -161,6 +181,7 @@ FILE /etc/portage/make.conf
     USE="sound-server screencast alsa"
 
     emerge --ask media-video/wireplumber
+    emerge --ask media-video/pipewire
 
 Starting PipeWire with various non-systemd setups
 
@@ -172,7 +193,8 @@ FILE ~/.config/sway/config
 
     emerge --ask dev-vcs/git
 
-    ? lazygit
+    eselect repository enable guru
+    emerge --ask dev-vcs/lazygit
 
 ## tor
 
@@ -209,12 +231,17 @@ FILE ~/.config/sway/config
     ? (emerge --sync librewolf)
     emerge --ask www-client/librewolf
 
-## npd
+<!-- ## npd -->
+<!---->
+<!--     emerge net-misc/ntp -->
+<!---->
+<!--     rc-service ntpd start -->
+<!--     rc-update add ntpd default -->
 
-    emerge net-misc/ntp
+## chrony
 
-    rc-service ntpd start
-    rc-update add ntpd default
+    emerge --ask net-misc/chrony
+    rc-update add chronyd default
 
 ## zsh
 
@@ -223,7 +250,8 @@ FILE ~/.config/sway/config
     emerge --ask sys-apps/exa
 
     chsh -s /bin/zsh
-    sh <(curl -s https://raw.githubusercontent.com/zap-zsh/zap/master/install.sh)
+    zsh <(curl -s https://raw.githubusercontent.com/zap-zsh/zap/master/install.zsh)
+
 
 ## zoxide
 
@@ -257,6 +285,9 @@ FILE /etc/portage/make.conf
 ## also
 
     emerge --ask gnome-base/gnome-keyring \
+        media-libs/mesa \
+        sys-apps/man-db \
+        net-misc/rsync \
         net-news/newsboat \
         media-gfx/sxiv \
         app-office/calcurse \
@@ -418,6 +449,41 @@ FILE etc/portage/make.conf
 
     */15 * * * * ~/.local/bin/cron/newsup
 
+## hyprland
+
+    eselect repository enable guru
+    eselect repository enable fem-overlay
+    eselect repository enable wayland-desktop
+    emaint sync -r guru
+    emaint sync -r fem-overlay
+    emaint sync -r wayland-desktop
+
+    emerge --ask media-sound/playerctl \
+    gui-wm/hyprland \
+    gui-apps/wl-clipboard \
+    gui-apps/grim \
+    x11-misc/rofi \
+    x11-misc/rofi-pass \
+    gui-apps/wf-recorder \
+    gui-apps/wlogout \
+    gui-libs/xdg-desktop-portal-hyprland \
+    xfce-base/tumbler \
+    gui-apps/wtype \
+    x11-misc/colord \
+    media-gfx/imagemagick \
+    gui-apps/swaylock-effects \
+    gui-apps/waybar \
+    media-sound/pavucontrol \
+    media-gfx/viewnior \
+    media-libs/noise-suppression-for-voice
+
+
+?? rofi-emoji gt5-wayland gt6-wayland sc-im urlview write-good
+    
+---
+
+
+?????
 ## wayland switch
 
     wofipassmenu

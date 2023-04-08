@@ -246,7 +246,7 @@ Enter chroot:
 
 And run:
 
-    export PS1="(chroot) $PS1"
+    export PS1="(chroot) ${PS1}"
 
 Mounting the boot partition:
 
@@ -341,6 +341,11 @@ Update World
 
 ---
 
+## CPU_FLAGS_*
+
+    emerge --ask app-portage/cpuid2cpuflags
+    echo "*/* $(cpuid2cpuflags)" > /etc/portage/package.use/00cpu-flags
+
 ## Setup the correct timezone and locale:
 
     echo "Europe/Moscow" > /etc/timezone
@@ -348,7 +353,7 @@ Update World
 
 Install Vim
 
-    emerge app-editors/vim
+    emerge app-editors/vim app-editors/neovim
 
 Configure locales:
 
@@ -370,7 +375,7 @@ select en_US.UTF-8 locale:
 
 Update the environment:
 
-    env-update && source /etc/profile
+    env-update && source /etc/profile && export PS1="(chroot) ${PS1}"
 
 ## Configure fstab
 
@@ -400,6 +405,18 @@ Edit /etc/fstab and setup correct filesystem:
     UUID=5d6ff087-50ce-400f-91c4-e3378be23c00       /home           ext4            defaults        0 1
     # tmps
     tmpfs                                           /tmp            tmpfs           size=4G         0 0
+
+## LVM
+
+**FILE** /etc/portage/package.use
+
+    # Enable support for the LVM daemon and related tools
+    sys-fs/lvm2 lvm
+
+---
+    emerge sys-fs/lvm2
+    rc-update add lvm default
+---
 
 ## 1. Configuring the Linux kernel manually
 
@@ -634,9 +651,13 @@ https://wiki.gentoo.org/wiki/Full_Disk_Encryption_From_Scratch_Simplified
 https://wiki.gentoo.org/wiki/Handbook:AMD64/Installation/Bootloader
 
     echo "sys-boot/grub:2 device-mapper" >> /etc/portage/package.use/sys-boot
-    emerge -av grub
+    emerge -av sys-boot/grub
 
-    ???    emerge --ask sys-boot/efibootmgr
+File systems  --->
+    Pseudo filesystems  --->
+       <*> EFI Variable filesystem
+
+    emerge --ask sys-boot/efibootmgr
 
 ---
 
@@ -676,7 +697,7 @@ Mount boot:
 
 Install GRUB with EFI:
 
-    grub-install --target=x86_64-efi --efi-directory=/boot
+    grub-install --target=x86_64-efi --efi-directory=/boot --removable
 
 ---
 
@@ -721,8 +742,6 @@ After the install is complete, add the LVM service to boot. If this is not
 done, at the very least grub-mkconfig will throw "WARNING: Failed to connect to
 lvmetad. Falling back to internal scanning."
 
-    rc-update add lvm default
-
 ## 23. Создаём пользователя
 
     useradd -m -G users,wheel,audio,video -s /bin/bash {user_name}
@@ -734,7 +753,7 @@ sudo:
 
     emerge --ask app-admin/sudo
 
-    vim -w /etc/sudoers
+    vim -w /etc/sudoerenv-update && source /etc/profile && export PS1="(chroot) ${PS1}"
 
 Ищем строчку wheel ALL=(ALL:ALL) ALL - раскомментируем
 
@@ -879,6 +898,7 @@ Gentoolkit is a suite of tools to ease the administration of a Gentoo system, an
 
 ## Final world file:
 
+?
 FILE var/lib/portage/world
 
     app-admin/doas

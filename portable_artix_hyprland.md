@@ -69,7 +69,7 @@ Open encrypted device:
 
 ##### Create LVM structure for partition mapping (/root, /swap and /home):
 
-Crypt physical volume group:
+Crypt physical volume group (to activate: vgchange -ay vg0):
 
     lvm pvcreate /dev/mapper/lvm
 
@@ -94,7 +94,7 @@ Build ext4 filesystem on each logical volume:
 
 ### Artix installation
 
-Create mount point for permanent Gentoo:
+Create mount point:
 
     mkdir /mnt
 
@@ -145,7 +145,7 @@ If you are making changes to the home partition (like adding a user) in the chro
 
     echo hostname='portable' >> /etc/conf.d/hostname
 
-    pacman -S --noconfirm networkmanager networkmanager-openrc grub efibootmgr cryptsetup \
+    pacman -S --noconfirm networkmanager networkmanager-openrc grub efibootmgr cryptsetup lvm2 \
     polkit polkit-qt5 \
     bluez bluez-utils bluez-openrc cups cups-openrc git wireplumber pipewire-pulse man-db \
     wget openssh openssh-openrc cronie cronie-openrc tor torsocks tor-openrc artix-keyring
@@ -178,9 +178,7 @@ If you are making changes to the home partition (like adding a user) in the chro
 ### Mkinitcpio
 
     vim /etc/mkinitcpio.conf
-    add encrypt after block in line ^HOOKS:
-
-    echo $(grep ^HOOKS /etc/mkinitcpio.conf | grep encrypt) || HOOKS=$(grep ^HOOKS /etc/mkinitcpio.conf) ; HOOKS2=$(echo $HOOKS | sed "s/block/block encrypt/g") ; sed -i "s/$(echo $HOOKS)/$(echo $HOOKS2)/g" /etc/mkinitcpio.conf
+    add encrypt lvm2 after block in line ^HOOKS
 
     mkinitcpio -p linux
 
@@ -190,7 +188,9 @@ If you are making changes to the home partition (like adding a user) in the chro
     
     add:
 
-    GRUB_CMDLINE_LINUX="dolvm crypt_root=UUID=(REPLACE ME WITH sdX3 UUID from blkid)"
+?    <!-- GRUB_CMDLINE_LINUX="dolvm crypt_root=UUID=(REPLACE ME WITH sdX3 UUID from blkid)" -->
+
+    GRUB_CMDLINE_LINUX_DEFAULT="loglevel=3 quiet cryptdevice=UUID=(REPLACE ME WITH sdX3 UUID from blkid):lvm root=/dev/mapper/vg0-root"
 
     grub-install --target=i386-pc --boot-directory=/boot /dev/sdX
     grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=GRUB --removable --recheck
