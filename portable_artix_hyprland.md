@@ -147,7 +147,8 @@ If you are making changes to the home partition (like adding a user) in the chro
 
     pacman -S --noconfirm networkmanager networkmanager-openrc grub efibootmgr cryptsetup lvm2 \
     polkit polkit-qt5 \
-    bluez bluez-utils bluez-openrc cups cups-openrc git wireplumber pipewire-pulse man-db \
+    bluez bluez-utils bluez-openrc cups cups-openrc git wireplumber wireplumber-openrc \
+    pipewire-pulse pipewire-pulse-openrc pipewire pipewier-openrc man-db \
     wget openssh openssh-openrc cronie cronie-openrc tor torsocks tor-openrc artix-keyring
 
     vim /etc/pacman.d/mirrorlist-arch
@@ -164,6 +165,9 @@ If you are making changes to the home partition (like adding a user) in the chro
     rc-update add NetworkManager default
     rc-update add tor default
     rc-update add ntpd default
+    rc-update add wireplumber default
+    rc-update add pipewire default
+    rc-update add pipewire-pulse default
 
     rc-service sshd start
     rc-service cronie start
@@ -172,6 +176,9 @@ If you are making changes to the home partition (like adding a user) in the chro
     rc-service NetworkManager start
     rc-service tor start
     rc-service ntpd start
+    rc-service wireplumber start
+    rc-service pipewire start
+    rc-service pipewire-pulse start
 
     passwd
 
@@ -238,7 +245,7 @@ If you are making changes to the home partition (like adding a user) in the chro
     pacman -S --noconfirm zsh tmux zsh-completions zoxide
     zsh <(curl -s https://raw.githubusercontent.com/zap-zsh/zap/master/install.zsh)
 
-    pacman -S --noconfirm pulsemixer dosfstools exfat-utils ntfs-3g
+    pacman -S --noconfirm pulsemixer dosfstools exfat-utils ntfs-3g kitty
 
 
     pacman -S --noconfirm bmon dunst
