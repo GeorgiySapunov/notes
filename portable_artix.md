@@ -163,7 +163,7 @@
 
     pacman -S --noconfirm reflector
 
-    reflector -c Russia -c China -c Switzerland -c France -a 12 --sort rate --save /etc/pacman.d/mirrorlist-arch
+    reflector -c Russia -c China -c Japan -c Switzerland -c France -a 12 --sort rate --save /etc/pacman.d/mirrorlist-arch
      curl https://gitea.artixlinux.org/packagesA/artix-mirrorlist/raw/branch/master/trunk/mirrorlist -o /etc/pacman.d/mirrorlist
 
     %% rms: Runit service manager

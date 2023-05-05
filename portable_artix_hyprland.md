@@ -104,7 +104,7 @@ Mount the root filesystem from the encrypted LVM partition:
 
 And switch into /mnt/gentoo:
 
-    cd /mnt/gentoo
+    cd /mnt
 
 ---
 **Note:**
@@ -147,8 +147,8 @@ If you are making changes to the home partition (like adding a user) in the chro
 
     pacman -S --noconfirm networkmanager networkmanager-openrc grub efibootmgr cryptsetup lvm2 \
     polkit polkit-qt5 \
-    bluez bluez-utils bluez-openrc cups cups-openrc git wireplumber wireplumber-openrc \
-    pipewire-pulse pipewire-pulse-openrc pipewire pipewier-openrc man-db \
+    bluez bluez-utils bluez-openrc cups cups-openrc git wireplumber \
+    pipewire-pulse pipewire artix-pipewire-loader man-db \
     wget openssh openssh-openrc cronie cronie-openrc tor torsocks tor-openrc artix-keyring
 
     vim /etc/pacman.d/mirrorlist-arch
@@ -164,10 +164,7 @@ If you are making changes to the home partition (like adding a user) in the chro
     rc-update add bluetoothd default
     rc-update add NetworkManager default
     rc-update add tor default
-    rc-update add ntpd default
-    rc-update add wireplumber default
-    rc-update add pipewire default
-    rc-update add pipewire-pulse default
+    rc-update add cronie default
 
     rc-service sshd start
     rc-service cronie start
@@ -175,10 +172,7 @@ If you are making changes to the home partition (like adding a user) in the chro
     rc-service bluetoothd start
     rc-service NetworkManager start
     rc-service tor start
-    rc-service ntpd start
-    rc-service wireplumber start
-    rc-service pipewire start
-    rc-service pipewire-pulse start
+    rc-service cronie start
 
     passwd
 
@@ -288,10 +282,10 @@ If you are making changes to the home partition (like adding a user) in the chro
     sudo nvim /etc/paru.conf
 
 ## Luke's settings
-### Synchronizing system time
-
-    sudo pacman -S ntp ntp-openrc
-    sudo ntpd -q -g
+<!-- ### Synchronizing system time -->
+<!---->
+<!--     sudo pacman -S ntp ntp-openrc -->
+<!--     sudo ntpd -q -g -->
 
 ### Use all cores for compilation.
 
@@ -305,9 +299,11 @@ sed -i "s/-j2/-j$(nproc)/;/^#MAKEFLAGS/s/^#//" /etc/makepkg.conf
 ## Personal
 ### Packages
 
+    zsh <(curl -s https://raw.githubusercontent.com/zap-zsh/zap/master/install.zsh)
+
 ##### pacman
 
-    sudo pacman -S --noconfirm ibus \
+    sudo pacman -S --noconfirm fcitx5-gtk fcitx5-qt fcitx5 fcitx5-configtool \
     libbluray libaacs \
     tmate syncthing neofetch stow \
     okular
@@ -323,7 +319,7 @@ sed -i "s/-j2/-j$(nproc)/;/^#MAKEFLAGS/s/^#//" /etc/makepkg.conf
 
 ##### paru
 
-    paru -S simple-mtpfs urlview \
+    paru -S --noconfirm simple-mtpfs urlview \
     brave-bin sc-im-git telegram-desktop latex-mk write-good htop-vim tldr++ exa \
     anki cozy-audiobooks
 
@@ -385,7 +381,7 @@ sed -i "s/-j2/-j$(nproc)/;/^#MAKEFLAGS/s/^#//" /etc/makepkg.conf
     wl-clipboard wf-recorder wlogout grimblast-git hyprpicker-git hyprpaper-git \
     xdg-desktop-portal-hyprland-git ffmpegthumbnailer tumbler wtype colord      \
     imagemagick swaylock-effects qt5-wayland qt6-wayland ripgrep rofi-pass  \
-    waybar-hyprland-no-systemd
+    waybar-hyprland-no-systemd brightnessctl
 
     paru -S pavucontrol lf zsh neovim viewnior noise-suppression-for-voice
 

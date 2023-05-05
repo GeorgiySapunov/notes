@@ -475,7 +475,8 @@ FILE etc/portage/make.conf
     gui-apps/waybar \
     media-sound/pavucontrol \
     media-gfx/viewnior \
-    media-libs/noise-suppression-for-voice
+    media-libs/noise-suppression-for-voice \
+    app-misc/brightnessctl \
 
 
 ?? rofi-emoji gt5-wayland gt6-wayland sc-im urlview write-good
@@ -501,6 +502,7 @@ FILE etc/portage/make.conf
         gui-apps/wlogout \
         gui-apps/wf-recorder \
         gui-apps/wofi \
+        app-misc/brightnessctl \
 
 vim etc/portage/make.conf
 
