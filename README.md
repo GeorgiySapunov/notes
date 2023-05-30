@@ -16,6 +16,10 @@
 [portable artix](portable_artix.md) - artix installation  
 [portable artix hyprland](portable_artix_hyprland.md) - artix hyprland installation  
 
+# Arch
+
+[arch gnome](arch_gnome.md) - arch gnome installation  
+
 # Also
 
 [vim](commands/vim.md)  - vim commands  
