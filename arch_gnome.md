@@ -1,3 +1,97 @@
+# archinstall
+
+### disk layout
+
+    fat32:
+    start: 1MiB
+    end: 512MiB
+    mount: /boot
+
+    btrfs
+    start: 513MiB
+    end: 100%
+    set subvolumes
+    add:
+    !no compression
+
+    @
+    /
+
+    @home
+    /home
+
+    @var_log
+    /var/log
+
+    @snapshots
+    /.snapshots
+
+    @images
+    /var/lib/libvirt/images
+    nodatacow
+
+confirm and exit
+
+## additional packages
+
+    intel-ucode cups cups-pdf distobox flatpak firefox firewalld git
+    inotify-tools nano noto-fonts print-manager reflectior tlp ttf-croscore
+    ttf-dejavu ttf-ibm-plex ttf-jetbrains-mono ttf-liberation vim
+
+/etc/fstab change to:
+
+    rw,noatime,compress=zstd,subvol=
+
+then:
+
+    btrfs filesystem defragment -r -v -czstd /
+
+    systemctl enable avahi-daemon
+    systemctl enable bluetooth
+    systemctl enable cups
+    systemctl enable firewalld
+    systemctl enable tlp
+    systemctl mask systemd-rfkill.socket
+    systemctl mask systemd-rfkill.service
+    systemctl enable upower
+
+etc/xdg/reflector/reflector.conf change to:
+
+    --country China
+
+    systemctl enable reflector.timer
+
+reboot
+
+    paru -S ttf-ms-fonts
+    paru -S snapper-support
+
+    sudo umount /.snapshots/
+    sudo rm -r /.snapshots
+    sudo snapper -c root create-config /
+    sudo btrfs subvolume list /
+    sudo btrfs subvolume delete /.snapshots
+    sudo btfrs subvolume list /
+    sudo mkdir /.snapshots
+    sudo mount -av
+    sudo snapper ls
+    sudo grub-mkconfig -o /boot/grub/grub.cfg
+    sudo systemctl enable --now grub-btrfsd
+    sudo systemctl status grub-btrfsd
+
+reboot
+
+# trim
+
+    sudo cryptsetup status cryptlvm
+    sudo fstrim -v /
+    sudo cryptsetup refresh --allow-discards cryptlvm
+    sudo systemctl start fstrim.service
+    sudo systemctl status fstrim.service
+    sudo systemctl status fstrim.timer
+
+----
+
 # sudo su:
 
     echo en_US.UTF-8 UTF-8 >> /etc/locale.gen

@@ -378,7 +378,7 @@ sed -i "s/-j2/-j$(nproc)/;/^#MAKEFLAGS/s/^#//" /etc/makepkg.conf
     paru -S playerctl
 
     paru -S hyprland-git polkit-gnome dunst grimblast rofi rofi-emoji rofi-pass \
-    wl-clipboard wf-recorder wlogout grimblast-git hyprpicker-git hyprpaper-git \
+    wl-clipboard wf-recorder wlogout hyprpicker-git hyprpaper-git \
     xdg-desktop-portal-hyprland-git ffmpegthumbnailer tumbler wtype colord      \
     imagemagick swaylock-effects qt5-wayland qt6-wayland ripgrep rofi-pass  \
     waybar-hyprland-no-systemd brightnessctl
