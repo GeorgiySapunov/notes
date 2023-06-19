@@ -34,11 +34,13 @@ confirm and exit
 
 ## additional packages
 
-    intel-ucode cups cups-pdf distobox flatpak firefox firewalld git
+    intel-ucode cups cups-pdf distrobox flatpak firefox firewalld git
     inotify-tools nano noto-fonts print-manager reflectior tlp ttf-croscore
     ttf-dejavu ttf-ibm-plex ttf-jetbrains-mono ttf-liberation vim
 
-/etc/fstab change to:
+---
+
+/etc/fstab change btrfs to:
 
     rw,noatime,compress=zstd,subvol=
 
@@ -62,6 +64,14 @@ etc/xdg/reflector/reflector.conf change to:
     systemctl enable reflector.timer
 
 reboot
+
+### Paru
+
+    mkdir /home/georgiy/git
+    cd /home/georgiy/git
+    git clone https://aur.archlinux.org/paru.git
+    cd paru
+    makepkg -si
 
     paru -S ttf-ms-fonts
     paru -S snapper-support
@@ -126,13 +136,6 @@ reboot
 
     pacman -S --noconfirm neovim \
     lazygit ncdu ripgrep luarocks
-
-### Paru
-
-     cd /home/georgiy/git
-     git clone https://aur.archlinux.org/paru.git
-     cd paru
-     makepkg -si
 
 ### Make configs (see "Should be done")
 
