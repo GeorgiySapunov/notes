@@ -34,9 +34,9 @@ confirm and exit
 
 ## additional packages
 
-    intel-ucode cups cups-pdf distrobox flatpak firefox firewalld git
-    inotify-tools nano noto-fonts print-manager reflectior tlp ttf-croscore
-    ttf-dejavu ttf-ibm-plex ttf-jetbrains-mono ttf-liberation vim
+    intel-ucode cups cups-pdf flatpak firefox firewalld git sof-firmware
+    inotify-tools neovim vim noto-fonts print-manager reflector tlp ttf-croscore
+    ttf-dejavu ttf-ibm-plex ttf-jetbrains-mono ttf-liberation networkmanager-openvpn gnome-browser-connector
 
 ---
 
@@ -119,17 +119,17 @@ reboot
 
 # systemctl:
     
-    openssh
-    cronie
-    tor
-    cups
+    <!-- openssh -->
+    systemctl enable cronie.service
+    systemctl enable tor.service
+    systemctl enable cups.service
 
 # pacman
 
     pacman -S reflector rsync
 
     pacman -S ffmpeg mpv zathura zathura-pdf-mupdf zathura-djvu gimp inkscape \
-    blender libreoffice nano texlive-most texlive-lang biber fzf testdisk \
+    blender libreoffice nano texlive texlive-lang biber fzf testdisk \
     yt-dlp moreutils
 
 ##### neovim
