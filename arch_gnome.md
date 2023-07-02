@@ -34,9 +34,10 @@ confirm and exit
 
 ## additional packages
 
-    intel-ucode cups cups-pdf flatpak firefox firewalld git sof-firmware
-    inotify-tools neovim vim noto-fonts print-manager reflector tlp ttf-croscore
-    ttf-dejavu ttf-ibm-plex ttf-jetbrains-mono ttf-liberation networkmanager-openvpn gnome-browser-connector
+    intel-ucode cups cups-pdf flatpak firewalld git sof-firmware
+    neovim vim vi noto-fonts print-manager reflector ttf-liberation ttf-font-awesome
+    ttf-joypixels ttf-hack-nerd networkmanager-openvpn gnome-browser-connector man-db
+    wget openssh cronie tor torsocks
 
 ---
 
@@ -48,22 +49,30 @@ then:
 
     btrfs filesystem defragment -r -v -czstd /
 
-    systemctl enable avahi-daemon
+    <!-- systemctl enable avahi-daemon -->
     systemctl enable bluetooth
     systemctl enable cups
     systemctl enable firewalld
-    systemctl enable tlp
-    systemctl mask systemd-rfkill.socket
-    systemctl mask systemd-rfkill.service
-    systemctl enable upower
+    <!-- systemctl enable tlp -->
+    <!-- systemctl mask systemd-rfkill.socket -->
+    <!-- systemctl mask systemd-rfkill.service -->
+    <!-- systemctl enable upower -->
+    systemctl enable cronie.service
+    systemctl enable tor.service
 
 etc/xdg/reflector/reflector.conf change to:
 
-    --country China
+    --country China,Russia
 
     systemctl enable reflector.timer
 
 reboot
+
+### gsconnect
+
+    sudo firewall-cmd --zone=public --permanent --add-port=1714-1764/TCP
+    sudo firewall-cmd --zone=public --permanent --add-port=1714-1764/UDP
+    sudo systemctl restart firewalld.service
 
 ### Paru
 
@@ -115,22 +124,12 @@ reboot
 
     locale-gen
 
-    pacman -S git cups bluez man-db wget openssh cronie tor torsocks
-
-# systemctl:
-    
-    <!-- openssh -->
-    systemctl enable cronie.service
-    systemctl enable tor.service
-    systemctl enable cups.service
-
 # pacman
 
-    pacman -S reflector rsync
-
-    pacman -S ffmpeg mpv zathura zathura-pdf-mupdf zathura-djvu gimp inkscape \
+    pacman -S rsync ffmpeg mpv zathura zathura-pdf-mupdf zathura-djvu gimp inkscape \
     blender libreoffice nano texlive texlive-lang biber fzf testdisk \
-    yt-dlp moreutils
+    yt-dlp moreutils wl-clipboard sof-firmware \
+    zsh tmux zsh-completions zoxide libbluray libaacs tmate neofetch stow
 
 ##### neovim
 
@@ -150,9 +149,6 @@ reboot
 
     zsh <(curl -s https://raw.githubusercontent.com/zap-zsh/zap/master/install.zsh)
 
-    sudo pacman -S libbluray libaacs
-    sudo pacman -S tmate neofetch stow
-
 # python
 
     sudo pacman -S --noconfirm ipython python-pip jupyterlab \
@@ -163,8 +159,11 @@ reboot
     gpg --auto-key-locate nodefault,wkd --locate-keys torbrowser@torproject.org
     paru -S tor-browser obfs4proxy-bin
 
-    sudo pacman -S --noconfirm transmission-cli transmission-gtk
-
 ### Gramps
 
     sudo pacman -S gramps python-pyicu osm-gps-map
+
+##### lf with kitty
+
+    paru -S lf atool perl-file-mimeinfo
+    sudo pacman -S --noconfirm ffmpegthumbnailer bat
