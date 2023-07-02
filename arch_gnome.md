@@ -37,7 +37,7 @@ confirm and exit
     intel-ucode cups cups-pdf flatpak firewalld git sof-firmware
     neovim vim vi noto-fonts print-manager reflector ttf-liberation ttf-font-awesome
     ttf-joypixels ttf-hack-nerd networkmanager-openvpn gnome-browser-connector man-db
-    wget openssh cronie tor torsocks
+    wget openssh cronie tor torsocks power-profiles-daemon inotify-tools
 
 ---
 
@@ -90,7 +90,7 @@ reboot
     sudo snapper -c root create-config /
     sudo btrfs subvolume list /
     sudo btrfs subvolume delete /.snapshots
-    sudo btfrs subvolume list /
+    sudo btrfs subvolume list /
     sudo mkdir /.snapshots
     sudo mount -av
     sudo snapper ls
@@ -128,7 +128,7 @@ reboot
 
     pacman -S rsync ffmpeg mpv zathura zathura-pdf-mupdf zathura-djvu gimp inkscape \
     blender libreoffice nano texlive texlive-lang biber fzf testdisk \
-    yt-dlp moreutils wl-clipboard sof-firmware \
+    yt-dlp moreutils wl-clipboard \
     zsh tmux zsh-completions zoxide libbluray libaacs tmate neofetch stow
 
 ##### neovim
