@@ -70,8 +70,8 @@ reboot
 
 ### gsconnect
 
-    sudo firewall-cmd --zone=public --permanent --add-port=1714-1764/TCP
-    sudo firewall-cmd --zone=public --permanent --add-port=1714-1764/UDP
+    sudo firewall-cmd --zone=public --permanent --add-port=1714-1764/tcp
+    sudo firewall-cmd --zone=public --permanent --add-port=1714-1764/udp
     sudo systemctl restart firewalld.service
 
 ### Paru
