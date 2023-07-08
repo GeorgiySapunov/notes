@@ -16,6 +16,22 @@ sudo cat /var/log/rkhunter.log | grep -A5 "\[ Warning \]"
 
 ### apparmor
 
+
+```zsh
+systemctl enable apparmor.service
+systemctl start apparmor.service
+```
+
+Put lsm=landlock,lockdown,yama,integrity,apparmor,bpf to GRUB_CMDLINE_LINUX_DEFAULT= in /etc/default/grub
+
+    GRUB_CMDLINE_LINUX_DEFAULT="loglevel=3 quiet lsm=landlock,lockdown,yama,integrity,apparmor,bpf"
+
+In order to use the apparmor integration with firejail, install the apparmor package and run as root: 
+
+```zsh
+sudo apparmor_parser -r /etc/apparmor.d/firejail-default
+```
+
 ### firejail
 
 ```zsh

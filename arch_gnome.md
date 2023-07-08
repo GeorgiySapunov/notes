@@ -167,3 +167,10 @@ reboot
 
     paru -S lf atool perl-file-mimeinfo
     sudo pacman -S --noconfirm ffmpegthumbnailer bat
+
+#### fonts
+
+    sudo pacman -S --noconfirm adobe-source-han-sans-cn-fonts \
+    adobe-source-han-sans-jp-fonts adobe-source-han-serif-cn-fonts \
+    adobe-source-han-serif-jp-fonts
+
