@@ -49,7 +49,7 @@ then:
 
     btrfs filesystem defragment -r -v -czstd /
 
-    <!-- systemctl enable avahi-daemon -->
+    systemctl enable avahi-daemon
     systemctl enable bluetooth
     systemctl enable cups
     systemctl enable firewalld
@@ -68,10 +68,36 @@ etc/xdg/reflector/reflector.conf change to:
 
 reboot
 
+    echo “options snd-hda-intel model=auto” | sudo tee /etc/modprobe.d/alsa-fix.conf
+
 ### gsconnect
 
     sudo firewall-cmd --zone=public --permanent --add-port=1714-1764/tcp
     sudo firewall-cmd --zone=public --permanent --add-port=1714-1764/udp
+    sudo systemctl restart firewalld.service
+
+    ???
+    sudo firewall-cmd --permanent --zone=public --add-service=kdeconnect
+    sudo systemctl restart firewalld.service
+    ????
+
+    sudo pacman -S sshfs
+
+add to ~/.ssh/config:
+
+    Host 192.168.*.*
+      HostKeyAlgorithms +ssh-rsa
+
+https://github.com/GSConnect/gnome-shell-extension-gsconnect/issues/1610
+https://github.com/GSConnect/gnome-shell-extension-gsconnect/issues/1647
+
+ctrl + l
+    storage/emulated/0
+
+
+### avahi-daemon (for cups)
+
+    sudo firewall-cmd --zone=public --permanent --add-port=5353/udp
     sudo systemctl restart firewalld.service
 
 ### Paru
@@ -174,3 +200,16 @@ reboot
     adobe-source-han-sans-jp-fonts adobe-source-han-serif-cn-fonts \
     adobe-source-han-serif-jp-fonts
 
+####
+
+    sudo pacman -S geary aspell
+
+#### lutris
+
+    sudo pacman -S --needed lib32-mesa vulkan-intel lib32-vulkan-intel vulkan-icd-loader lib32-vulkan-icd-loader
+
+#### emacs
+
+    paru emacs
+
+    paru pyright python-black python-debugpy
