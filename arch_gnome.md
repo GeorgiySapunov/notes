@@ -68,18 +68,14 @@ etc/xdg/reflector/reflector.conf change to:
 
 reboot
 
-    echo “options snd-hda-intel model=auto” | sudo tee /etc/modprobe.d/alsa-fix.conf
-
 ### gsconnect
 
-    sudo firewall-cmd --zone=public --permanent --add-port=1714-1764/tcp
-    sudo firewall-cmd --zone=public --permanent --add-port=1714-1764/udp
+    <!-- sudo firewall-cmd --zone=public --permanent --add-port=1714-1764/tcp -->
+    <!-- sudo firewall-cmd --zone=public --permanent --add-port=1714-1764/udp -->
     sudo systemctl restart firewalld.service
 
-    ???
     sudo firewall-cmd --permanent --zone=public --add-service=kdeconnect
     sudo systemctl restart firewalld.service
-    ????
 
     sudo pacman -S sshfs
 
@@ -97,7 +93,8 @@ ctrl + l
 
 ### avahi-daemon (for cups)
 
-    sudo firewall-cmd --zone=public --permanent --add-port=5353/udp
+    <!-- sudo firewall-cmd --zone=public --permanent --add-port=5353/udp -->
+    sudo firewall-cmd --permanent --add-service=ipp-client
     sudo systemctl restart firewalld.service
 
 ### Paru
@@ -155,7 +152,7 @@ reboot
     pacman -S rsync ffmpeg mpv zathura zathura-pdf-mupdf zathura-djvu gimp inkscape \
     blender libreoffice nano texlive texlive-lang biber fzf testdisk \
     yt-dlp moreutils wl-clipboard \
-    zsh tmux zsh-completions zoxide libbluray libaacs tmate neofetch stow
+    zsh tmux zsh-completions zoxide libbluray libaacs tmate neofetch stow btop
 
 ##### neovim
 
@@ -180,7 +177,7 @@ reboot
     sudo pacman -S --noconfirm ipython python-pip jupyterlab \
     python-tensorflow python-scikit-learn python-pandas python-numpy python-matplotlib
 
-    paru -S brave-bin telegram-desktop latex-mk write-good htop-vim tldr++ exa anki
+    paru -S brave-bin telegram-desktop latex-mk write-good tldr++ exa anki
 
     gpg --auto-key-locate nodefault,wkd --locate-keys torbrowser@torproject.org
     paru -S tor-browser obfs4proxy-bin
@@ -210,6 +207,6 @@ reboot
 
 #### emacs
 
-    paru emacs
+    sudo pacman -S emacs pyright python-black python-debugpy ripgrep fd
 
-    paru pyright python-black python-debugpy
+    systemctl --user enable emacs.service

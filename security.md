@@ -16,6 +16,9 @@ sudo cat /var/log/rkhunter.log | grep -A5 "\[ Warning \]"
 
 ### apparmor
 
+https://wiki.archlinux.org/title/AppArmor
+https://www.youtube.com/watch?v=-3W2f_JL3yw
+
 ### firejail
 
 ```zsh
