@@ -1,5 +1,12 @@
 # archinstall
-  setfont ter-128n
+
+    setfont ter-128n
+    iwctl
+      device list
+      station wlan0 scan
+      station wlan0 get-networks
+      station wlan0 connect "mywifi"
+
 ### disk layout
 
     fat32:
