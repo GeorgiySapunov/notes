@@ -1,0 +1,2893 @@
+#+title: LangChain 1.0.x: c нуля до продакшн LLM-приложений
+
+* Первые шаги – вызываем модель ChatGPT через API
+** Переменные окружения для хранения секретных ключей и настроек
+Файл .env должен быть в списке .gitignore, чтобы ключи не попали в общий доступ.
+
+#+begin_src zsh
+OPENAI_API_KEY=sk-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX # ключ доступа
+OPENAI_API_BASE=https://api.proxyapi.ru/openai/v1 # при использовании прокси
+OPENAI_API_MODEL=gpt-4o # ID модели
+#API_KEY=sk-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+#+end_src
+
+#+begin_src python
+import os
+from dotenv import load_dotenv
+from openai import OpenAI
+
+load_dotenv()
+
+client = OpenAI(
+    api_key=os.getenv("OPENAI_API_KEY"),
+    # Если используете прокси, задайте свой базовый URL
+    base_url=os.getenv("OPENAI_API_BASE", "https://api.openai.com/v1"),
+)
+#+end_src
+** Responses API
+#+begin_src python
+import os
+from dotenv import load_dotenv
+from openai import OpenAI
+
+load_dotenv()
+
+# Клиент читает ключ и базовый URL из окружения
+client = OpenAI(
+    api_key=os.getenv("OPENAI_API_KEY"),
+    base_url=os.getenv("OPENAI_API_BASE", "https://api.openai.com/v1"),
+)
+
+resp = client.responses.create(
+    model=os.getenv("OPENAI_API_MODEL", "gpt-5"),  # название модели
+    instructions="Ты дружелюбный ассистент. Отвечай кратко и по делу.",  # Краткая инструкция ассистенту (необязательно)
+    input="Привет! Расскажи, что ты умеешь.",  # Сам запрос (строка или массив «контента»)
+    # Примеры полезных параметров:
+    # temperature=0.7,
+    # max_output_tokens=300,
+    # timeout=15,  # чтобы не вешать приложение при долгом ответе
+)
+
+# 1) Выводим ответ(самый простой способ)
+print(resp.output_text)
+
+# 2) При необходимости — посмотреть «сырой» объект целиком
+# (структура может меняться от версии к версии, это нормально)
+print(resp)
+
+## Альтернатива: Chat Completions (совместимость)
+## Если по каким-то причинам вам нужен именно чат-формат сообщений (с ролями system/user/assistant), используйте:
+# chat = client.chat.completions.create(
+#     model=os.getenv("OPENAI_MODEL", "gpt-4o"),
+#     messages=[
+#         {"role": "system", "content": "Ты дружелюбный ассистент. Отвечай кратко."},
+#         {"role": "user", "content": "Привет! Расскажи, что ты умеешь."}
+#     ],
+#     # temperature=0.7,
+#     # max_tokens=300,
+#     # timeout=15,
+# )
+
+# print(chat.choices[0].message.content)
+#+end_src
+** Готовый файл =hello_llm.py=
+#+begin_src python
+import os
+import sys
+import argparse
+from dotenv import load_dotenv
+from openai import OpenAI
+
+def main() -> int:
+    # 1) Загружаем переменные окружения (.env не обязателен)
+    load_dotenv()
+
+    # 2) Считываем аргументы запуска
+    parser = argparse.ArgumentParser(description="Первый запрос к LLM")
+    parser.add_argument(
+        "-q",
+        "--query",
+        default="Привет, бот! Назови столицу Франции.",
+        help="Текст запроса к модели (по умолчанию — простой вопрос)",
+    )
+    args = parser.parse_args()
+
+    # 3) Создаём клиента OpenAI (v1.x)
+    client = OpenAI(
+        api_key=os.getenv("OPENAI_API_KEY"),
+        # Если используете прокси, задайте свой базовый URL
+        base_url=os.getenv("OPENAI_API_BASE", "https://api.openai.com/v1"),
+        # при желании можно задать request_timeout=15 для всех вызовов
+    )
+
+    # 4) Делаем минимальный запрос (Responses API)
+    resp = client.responses.create(
+        model=os.getenv(
+            "OPENAI_MODEL", "gpt-4o"
+        ),  # подставьте свою модель при необходимости
+        instructions="Ты дружелюбный ассистент. Отвечай кратко и по делу.",
+        input=args.query,
+        # temperature=0.0,
+        # max_output_tokens=200,
+        # timeout=15,  # чтобы не зависать при долгом ответе
+    )
+
+    # 5) Печатаем ответ (готовый текст)
+    print(resp.output_text.strip())
+
+    # 6) (необязательно) печатаем число токенов, если оно доступно
+    usage = getattr(resp, "usage", None)
+    total = getattr(usage, "total_tokens", None) if usage is not None else None
+    if isinstance(total, int):
+        print(f"\n(токены: {total})")
+
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())
+#+end_src
+* Знакомство с LangChain – модели и простые цепочки
+** Установка LangChain и базовых сущностей
+#+begin_src zsh
+pip install langchain langgraph
+#+end_src
+=langchain-openai= это дополнительный модуль к библиотеке =langchain=. И несмотря
+на то что пакет =openai= уже установлен, =langchain-openai= нужен отдельно — он
+содержит адаптеры и классы (=ChatOpenAI=, =OpenAIEmbeddings= и др.), которые
+позволяют использовать OpenAI-модели внутри LangChain по единому интерфейсу
+** Основные сущности LangChain
+*** LLM Wrappers — обёртки для моделей
+#+begin_src python
+# Если вы используете фаил .env, не забывйте импортировать переменные.
+# В примерах далее мы будем сокращать этот шаг,
+# но имейте ввиду, если мы работаем с API, это необходимо делать
+import os
+from dotenv import load_dotenv
+from langchain_openai import OpenAI
+# from langchain_ollama import ChatOllama
+
+# при этом вызове OPENAI_API_KEY и OPENAI_API_BASE подгружаются в окружение
+# если вы так делаете, то в вызове класса OpenAI() эти аргументы указывать уже не нужно
+load_dotenv()
+
+# Название модели тоже иногда удобно брать из файла .env
+# тут мы берём его из файла, а если такой переменной в файле нет, то подставляем "gpt-5"
+MODEL_NAME = os.getenv("OPENAI_API_MODEL", "gpt-5")
+
+model = OpenAI(
+    # api_key=API_KEY, # если не используете dotenv то нужно указать
+    # base_url=API_BASE, # если не используете dotenv то нужно указать
+    model=MODEL_NAME,
+    temperature=0.5
+)
+# model = ChatOllama(
+#     model="deepseek-r1:latest",
+#     base_url="http://localhost:11434"
+# )
+
+response = model.invoke("Привет. Что ты умеешь?")
+print(response)
+#+end_src
+*** PromptTemplate — шаблон промпта
+#+begin_src python
+from langchain_core.prompts import PromptTemplate
+
+template = PromptTemplate.from_template("Перескажи суть теста: {article}")
+prompt = template.invoke({"article": "Здесь находится текст для пересказа."})
+
+print(prompt)
+
+# text='Перескажи суть теста: Здесь находится текст для пересказа.'
+#+end_src
+*** Chains — цепочки обработки
+Ключевая концепция LangChain. Цепочка – это последовательность единиц обработки, которые могут включать LLM, вызовы функций, логические узлы и т.п.
+#+begin_src python
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_openai import ChatOpenAI
+
+prompt = ChatPromptTemplate.from_template("Переведи на английский: {текст}")
+model = ChatOpenAI(model="gpt-4o", temperature=0)
+
+chain = prompt | model
+# то же, что и
+# from langchain_core.runnables import RunnableSequence
+# chain = RunnableSequence(first=prompt, last=model)
+
+result = chain.invoke({"текст": "Доброе утро"})
+# тот же результат, что и
+# prompt = prompt.invoke({"текст": "Доброе утро"})
+# result = model.invoke(prompt)
+print(result.content)
+#+end_src
+*** Tools (Инструменты)
+#+begin_src python
+from langchain.tools import tool
+
+@tool
+def search_database(query: str, limit: int = 10) -> str:
+    """Ищет записи в базе данных клиентов по запросу."""
+    return f"Found {limit} results for '{query}'"
+#+end_src
+*** Agents (Агенты)
+#+begin_src python
+from langchain.agents import create_agent
+
+agent = create_agent(
+    "gpt-5", tools=tools
+)
+#+end_src
+*** Memory — память диалога
+#+begin_src python
+from langchain.agents import create_agent
+from langgraph.checkpoint.memory import InMemorySaver
+
+agent = create_agent(
+    "gpt-5",
+    [get_user_info],
+    checkpointer=InMemorySaver(),  # хранение контекста в памяти
+)
+
+agent.invoke(
+    {"messages": [{"role": "user", "content": "Привет! Меня зовут Ваня"}]},
+    {"configurable": {"thread_id": "1"}},
+)
+#+end_src
+** Пример базового использования LangChain
+#+begin_src python
+from langchain_openai import ChatOpenAI
+
+chat = ChatOpenAI(
+    model_name="gpt-5",
+    temperature=0.7
+)
+
+response = chat.invoke("Какой сегодня день недели?")
+print(response)
+#+end_src
+- =ChatOpenAI= – класс LangChain для чат-моделей OpenAI. Мы указали =model_name= и
+  temperature. Он автоматически возьмет =OPENAI_API_KEY= из переменной окружения
+  (если она установлена), а также =OPENAI_API_BASE= – то есть интеграция с прокси
+  тоже сохраняется (LangChain внутри использует openai пакет, поэтому наши
+  настройки через =os.getenv= действуют). Мы могли бы явно передать
+  =openai_api_key = "..."= и =openai_api_base = "..."= в конструктор, но если они
+  настроены в окружении, то это не нужно.
+- Метод =invoke()= у =ChatOpenAI= принимает строку – ваш пользовательский запрос – и
+  возвращает строку-ответ от модели. За кулисами LangChain сам сформировал
+  =messages= с одной ролью =user=, вызвал =openai.ChatCompletion.create= и вернул
+  =content= ответа. То есть =chat.invoke("Какой сегодня день недели?")= примерно
+  эквивалентно тому, что мы делали руками ранее, только короче.
+- Мы сразу печатаем response. Модель, скорее всего, ответит чем-то вроде:
+  "Сегодня среда." (или другой день, модель не знает реального времени, но
+  попробует угадать или скажет, что не имеет доступа к календарю – зависит от её
+  знаний на момент обучения).
+** Основные компоненты (Runnables)
+*** Базовый синтаксис через оператор | (pipe)
+#+begin_src python
+import os
+from dotenv import load_dotenv
+from langchain_openai import ChatOpenAI
+from langchain_core.prompts import ChatPromptTemplate
+
+load_dotenv()
+MODEL = os.getenv("OPENAI_API_MODEL", "gpt-5")
+
+prompt = ChatPromptTemplate.from_template("Привет. Меня зовут {name}")
+llm = ChatOpenAI(model=MODEL)
+
+basic_chain = prompt | llm
+
+result = basic_chain.invoke({"name": "Вася"})
+print(result)
+#+end_src
+*** RunnablePassthrough — передача данных без изменений
+#+begin_src python
+from langchain_core.runnables import RunnablePassthrough
+
+# Просто передаёт входные данные дальше
+chain = RunnablePassthrough() | llm
+result = chain.invoke("Привет!")  # "Привет!" → llm
+print(result)
+#+end_src
+=RunnablePassthrough()= используется для создания словаря из входных данных:
+#+begin_src python
+# Создать словарь из входных данных
+chain = {"name": RunnablePassthrough()} | prompt | llm
+
+result = chain.invoke("Ваня") # → {"name": "Ваня"} → prompt → llm
+print(result)
+#+end_src
+*** RunnableLambda — применяет функцию
+#+begin_src python
+from langchain_core.runnables import RunnableLambda
+
+def uppercase(text):
+    return text.upper()
+
+chain = RunnableLambda(uppercase) | llm
+chain.invoke("hello")  # "HELLO" → llm
+#+end_src
+*** StrOutputParser — извлечь текст из ответа LLM
+Простая цепочка выводит нам объект =AIMessage= и для того чтобы нам из него
+получить только ответ, нам бы приходилось каждый раз доставать его через атрибут
+=.content=, но мы можем упростить это и сразу парсить только ответ, если остальное
+нам не нужно.
+#+begin_src python
+from langchain_core.output_parsers import StrOutputParser
+
+chain_with_parser = prompt | llm | StrOutputParser()
+result_with_parser = chain_with_parser.invoke({"name": "Вася"})
+
+# С объектом из примере базового синтаксиса
+print(type(basic_chain)) # <class 'langchain_core.messages.ai.AIMessage'>
+print(basic_chain) # content='Привет, Вася! 😊 Как дела?' additional_kwargs={'refusal': None} ...
+
+# если парсим ответ
+print(type(result_with_parser)) # <class 'str'>
+print(result_with_parser) # Привет, Вася! 😊  Как дела?
+#+end_src
+*** Создаём словарь используя =RunnablePassthrough()=
+#+begin_src python
+# Создать словарь из входных данных
+chain = {"name": RunnablePassthrough()} | prompt | llm
+
+result = chain.invoke("Ваня") # → {"name": "Ваня"} → prompt → llm
+print(result)
+#+end_src
+*** =.assign(key=value)= — добавляем элементы в словарь
+#+begin_src python
+chain = (
+    {"name": RunnablePassthrough()}
+    | RunnablePassthrough.assign(second_name=lambda x: "Иванов")
+) # Важно чтобы значением был объект runnable, lambda функция подходит для этого
+
+result = chain.invoke("Вася")
+print(result)
+# вывод: {'name': 'Вася', 'second_name': "Иванов"}
+#+end_src
+*** =.pick([keys])= — достаём элементы из словаря (подмножество элементов)
+#+begin_src python
+chain = (
+    {"name": RunnablePassthrough(), "age": lambda x: 25, "city": lambda x: "Москва"}
+    | RunnablePassthrough().pick(["name", "city"])
+)
+
+result = chain.invoke("Иван")
+print(result)
+# # вывод: {'name': 'Иван', 'city': 'Москва'}
+#+end_src
+*** RunnableParallel — параллельное выполнение
+#+begin_src python
+from langchain_core.runnables import RunnableParallel
+
+prompt1 = ChatPromptTemplate.from_template("Плюсы {topic}")
+prompt2 = ChatPromptTemplate.from_template("Минусы {topic}")
+
+# Выполняются ОДНОВРЕМЕННО
+parallel_chain = RunnableParallel(
+    pros=prompt1 | llm | StrOutputParser(),
+    cons=prompt2 | llm | StrOutputParser()
+)
+
+result = parallel_chain.invoke({"topic": "Python"})
+print(result)
+# result = {"pros": "...", "cons": "..."}
+#+end_src
+*** RunnableBranch — условная логика (if/else)
+#+begin_src python
+from langchain_core.runnables import RunnableBranch
+
+prompt_for_questions = ChatPromptTemplate.from_template("вопрос: {text}")
+prompt_for_statements = ChatPromptTemplate.from_template("не вопрос: {text}")
+
+def is_question(x):
+    return "?" in x["text"]
+
+branch = RunnableBranch(
+    (is_question, prompt_for_questions | llm),  # Если вопрос
+    prompt_for_statements | llm  # Иначе (default)
+)
+
+chain = {"text": RunnablePassthrough()} | branch | StrOutputParser()
+
+result = chain.invoke({"text": "Какая сегодня погода?"})
+print(result)
+#+end_src
+** Сохранение контекста диалога checkpointer
+*** =InMemorySaver()=
+1. =create_agent= — функция для быстрого создания агентов
+2. =InMemorySaver()= — автоматически сохраняет состояние между вызовами,
+   инициализируется при создании агента в аргументе =checkpointer=
+3. =thread_id= — уникальный идентификатор потока разговора, подаётся в словаре в
+   настраеваемых параметрах "configurable" при вызове метода =invoke()=
+#+begin_src python
+import os
+from langchain.agents import create_agent
+from langgraph.checkpoint.memory import InMemorySaver
+
+agent = create_agent(
+    model="gpt-4o-mini",
+    checkpointer=InMemorySaver(),  # Сохранение в памяти
+)
+
+# Конфигурация с уникальным ID потока разговора
+conv_1 = {"configurable": {"thread_id": "conversation_001"}}
+
+question1 = "Привет! Меня зовут Алиса"
+response1 = agent.invoke(
+    {"messages": [{"role": "user", "content": question1}]},
+    conv_1
+)
+print("пользователь 1:", question1)
+print("Бот:", response1["messages"][-1].content)
+
+question2 = "Какое у меня имя?"
+response2 = agent.invoke(
+    {"messages": [{"role": "user", "content": question2}]},
+    conv_1
+)
+print("пользователь 1:", question2)
+print("Бот:", response2["messages"][-1].content)
+
+# Новый пользователь с другим thread_id
+conv_2 = {"configurable": {"thread_id": "conversation_002"}}
+
+question3 = "Какое у меня имя?"
+response3 = agent.invoke(
+    {"messages": [{"role": "user", "content": question3}]},
+    conv_2
+)
+print("пользователь 2:", question3)
+print("Бот:", response3["messages"][-1].content)
+#+end_src
+*** Альтернативные варианты, например для SQLite или PostgreSQL
+Эти и другие дополнительные модули доустанавливаются отдельно =pip install
+langgraph-checkpoint-sqlite langgraph-checkpoint-postgres= и т.д.
+#+begin_src python
+# SQLite (для production)
+from langgraph.checkpoint.sqlite import SqliteSaver
+checkpointer = SqliteSaver.from_conn_string("database.db")
+
+# PostgreSQL (для масштабирования)
+from langgraph.checkpoint.postgres import PostgresSaver
+checkpointer = PostgresSaver.from_conn_string("postgresql://...")
+#+end_src
+*** Просмотр истории
+#+begin_src python
+# Получить состояние потока
+state = agent.get_state(config)
+print("История сообщений:")
+for msg in state.values["messages"]:
+    print(f"{msg.type}: {msg.content}")
+#+end_src
+*** Продвинутое управления памятью (middleware, =@before_model=)
+#+begin_src python
+from langchain.agents.middleware import before_model
+from langchain.agents import AgentState
+
+@before_model
+def trim_messages(state: AgentState, runtime) -> dict:
+    """Оставить только последние 10 сообщений"""
+    messages = state["messages"]
+    if len(messages) <= 10:
+        return None  # Изменений нет
+
+    # Сохраняем первое (системное) и последние 9
+    return {
+        "messages": [messages[0]] + messages[-9:]
+    }
+
+agent = create_agent(
+    model="gpt-4o-mini",
+    tools=[],
+    checkpointer=InMemorySaver(),
+    middleware=[trim_messages],  # Добавляем middleware
+)
+#+end_src
+Встраивание system-контекста:
+#+begin_src python
+agent = create_agent(
+    model="gpt-4o-mini",
+    tools=[],
+    checkpointer=InMemorySaver(),
+    system_message="Ты дружелюбный помощник по математике. "
+                   "Объясняй концепции просто и с примерами. "
+                   "Используй эмодзи для наглядности."
+)
+#+end_src
+** Создание консольного ChatGPT-бота
+- Хранилище истории =self.store = {}=
+- InMemoryChatMessageHistory элемент в хранилище истории
+- RunnableWithMessageHistory для цепочки с историей
+- Логирование
+#+begin_src python
+import os
+from dotenv import load_dotenv
+load_dotenv()
+
+import logging
+from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
+from langchain_core.chat_history import InMemoryChatMessageHistory # self.store[session_id] = InMemoryChatMessageHistory()
+from langchain_core.runnables.history import RunnableWithMessageHistory # self.chain_with_history = RunnableWithMessageHistory(
+from langchain_openai import ChatOpenAI
+
+# Создаём класс для CLI-бота
+class cli_bot():
+    def __init__(self, model_name, system_prompt="Ты полезный ассистент."):
+        # Создаём модель
+        self.chat_model = ChatOpenAI(
+            model_name=model_name,
+            temperature=0,
+            request_timeout=15
+        )
+
+        # Создаём Хранилище истории
+        self.store = {}
+
+        # Создаем шаблон промпта
+        self.prompt = ChatPromptTemplate.from_messages([
+            ("system", system_prompt), # Добавим возможность менять системный промпт
+            MessagesPlaceholder(variable_name="history"), # Создаем placeholder для истории чата. variable_name: Название переменной, хранящей историю сообщений.
+            ("human", "{question}"),
+        ])
+
+        # Создаём цепочку
+        self.chain = self.prompt | self.chat_model
+
+        # Создаём цепочку с историей
+        self.chain_with_history = RunnableWithMessageHistory(
+            self.chain, # Цепочка с историей
+            self.get_session_history, # метод для получения истории
+            input_messages_key="question", # ключ для вопроса
+            history_messages_key="history", # ключ для истории
+        )
+
+        # Настраиваем логирование в файл
+        logging.basicConfig(
+            filename="chat_session.log", level=logging.INFO,
+            format="%(asctime)s [%(levelname)s] %(message)s", datefmt="%Y-%m-%d %H:%M:%S",
+            encoding="utf-8"
+        )
+
+
+    # Метод для получения истории по session_id
+    def get_session_history(self, session_id: str):
+        if session_id not in self.store:
+            self.store[session_id] = InMemoryChatMessageHistory()
+        return self.store[session_id]
+
+    def __call__(self, session_id):
+        print("Чат-бот запущен! Можете задавать вопросы. \n - Для выхода введите 'выход'.\n - Для очистки контекста введите 'сброс'.\n")
+        logging.info("=== New session ===")
+        while True:
+            try:
+                user_text = input("Вы: ").strip()
+            except (KeyboardInterrupt, EOFError):
+                print("\nБот: Завершение работы.")
+                break
+            if not user_text:
+                continue
+
+            logging.info(f"User: {user_text}")
+            msg = user_text.lower()
+            if msg in ("выход", "стоп", "конец"):
+                print("Бот: До свидания!")
+                logging.info("Пользователь завершил сессию. Сессия окончена.")
+                break
+            if msg == "сброс":
+                if session_id in self.store:
+                    del self.store[session_id]
+                print("Бот: Контекст диалога очищен.")
+                logging.info("Пользователь сбросил контекст.")
+                continue
+
+            try:
+                responce = self.chain_with_history.invoke(
+                    {"question": user_text},
+                    {"configurable": {"session_id": session_id}}
+                )
+            except Exception as e:
+                # Логируем и выводим ошибку, продолжаем чат
+                logging.error(f"[error] {e}")
+                print(f"[Ошибка] {e}")
+                continue
+
+            # Форматируем и выводим ответ
+            bot_reply = responce.content.strip()
+            logging.info(f"Bot: {bot_reply}")
+            print(f"Бот: {bot_reply}")
+
+
+if __name__ == "__main__":
+    model = os.getenv("OPENAI_API_MODEL", "gpt-5")
+    system_prompt = '''Ты полезный ассистент. Ты всегда дружелёбен и вежлив. Отвечай подробно и по существу.'''
+
+    bot = cli_bot(
+        model_name=model,
+        system_prompt=system_prompt
+    )
+    bot("user_123")
+#+end_src
+* Prompt Engineering
+- Роль модели.
+- Цель (задача).
+- Формат ответа.
+- Контекст (исходные данные, фрагмент документа, сведения о пользователе,
+  предыдущие сообщения в диалоге и т.д.).
+- Ограничения (чего делать не следует, помогают предотвратить нежелательное
+  поведение: утечку конфиденциальной информации, токсичные высказывания,
+  галлюцинации фактов).
+- Примеры
+- Тон.
+** Шаблоны сообщений
+- =StringPromptValue= и =ChatPromptValue= — это универсальные контейнеры для готового промпта.
+- =.format= и =.format_messages= требуют именованные аргументы
+- =.invoke= требует словарь
+*** PromptTemplate() – шаблон для однострочного текстового промпта =<class 'langchain_core.prompt_values.StringPromptValue'>=
+- =prompt.to_string()=
+- =prompt.to_messages()=
+#+begin_src python
+from langchain_core.prompts import PromptTemplate
+
+# Метод.from_template() позволяет более кратко создать шаблон с переменными,
+# этот метод автоматически считывает их из фигурных скобок.
+template = PromptTemplate.from_template("Перескажи суть текста: {article}")
+"""Это аналогично вот такой записи:
+template = PromptTemplate(
+    template="Перескажи суть текста: {article}",
+    input_variables=["article"]
+    )
+Если это простой шаблон с переменными, то короче записать через
+PromptTemplate.from_template(), а если нужно указывать дополнительные
+аргументы, то нужно использовать PromptTemplate()"""
+
+# Вариант 1 — format (возвращает просто строку)
+prompt = template.format(article="Здесь находится текст для пересказа.") # передаются именованные аргументы
+print(prompt)
+
+# Вариант 2 — invoke (возвращает объект типа StringPromptValue)
+prompt = template.invoke({"article": "Здесь находится текст для пересказа."}) # передаётся словарь
+print(prompt) # text='Перескажи суть теста: Здесь находится текст для пересказа.'
+print(prompt.text) # Перескажи суть теста: Здесь находится текст для пересказа.
+print(prompt.to_string()) # Перескажи суть теста: Здесь находится текст для пересказа.
+print(type(prompt)) # <class 'langchain_core.prompt_values.StringPromptValue'>
+print(prompt.to_messages()) # [HumanMessage(content='Перескажи суть теста: Здесь находится текст для пересказа.', additional_kwargs={}, response_metadata={})]
+#+end_src
+*** ChatPromptTemplate – шаблон для моделей чат-формата =<class 'langchain_core.prompt_values.ChatPromptValue'>=
+- =prompt_chatobj.to_string()=
+- =prompt.messages[0].content=
+Pаботаeт с последовательностью сообщений (с ролями вроде system, human, ai):
+- =SystemMessage=,
+- =HumanMessage=,
+- =AIMessage=.
+**** Пример 1 =.from_template()=
+#+begin_src python
+from langchain_core.prompts import ChatPromptTemplate
+
+prompt = ChatPromptTemplate.from_template("Переведи на английский: {текст}")
+prompt = prompt.invoke({"текст": "Доброе утро"})
+print(prompt)
+# messages=[HumanMessage(content='Переведи на английский: Доброе утро',
+# additional_kwargs={}, response_metadata={})]
+print(prompt.messages[0].content) # Переведи на английский: Доброе утро
+#+end_src
+**** Пример 2 =.from_messages()=
+#+begin_src python
+from langchain_core.prompts import (
+    ChatPromptTemplate,
+    SystemMessagePromptTemplate,
+    HumanMessagePromptTemplate
+)
+
+# Создаём шаблон чата с системным и пользовательским сообщением
+chat_template = ChatPromptTemplate.from_messages([
+    SystemMessagePromptTemplate.from_template("Ты — опытный переводчик."),
+    HumanMessagePromptTemplate.from_template("Переведи текст с английского на русский:\n\"{input_text}\"")
+])
+
+# Вариант 1 — format_messages (возвращает список сообщений/объектов для модели)
+messages_list = chat_template.format_messages(input_text="Hello, world!")
+print(messages_list)
+# [SystemMessage(content='Ты — опытный переводчик.', additional_kwargs={},
+# response_metadata={}), HumanMessage(content='Переведи текст с английского на
+# русский:\n"Hello, world!"', additional_kwargs={}, response_metadata={})]
+
+# Вариант 2 — invoke (возвращает объект ChatPromptValue со списком внутри него)
+prompt_chatobj = chat_template.invoke({"input_text": "Hello, world!"})
+print(prompt_chatobj)
+# messages=[SystemMessage(content='Ты — опытный переводчик.',
+# additional_kwargs={}, response_metadata={}), HumanMessage(content='Переведи
+# текст с английского на русский:\n"Hello, world!"', additional_kwargs={},
+# response_metadata={})]
+print(prompt_chatobj.to_string())
+# System: Ты — опытный переводчик.
+# Human: Переведи текст с английского на русский:
+# 'Hello, world!'
+print(type(prompt_chatobj)) # <class 'langchain_core.prompt_values.ChatPromptValue'>
+#+end_src
+*** Передача промпта в модель.
+Для передачи в модель =ChatOpenAI= можно использовать любой из описанных выше вариантов промпта.
+#+begin_src python
+from langchain_openai import ChatOpenAI
+
+llm = ChatOpenAI(model_name="gpt-5")
+
+for prompt in [prompt_text, prompt_strobj, messages_list, prompt_chatobj]:
+    response = llm.invoke(prompt)
+    print(response.content)
+#+end_src
+Ответ =response.content= будет переводом строки ="Hello, world!"= на русский.
+*** =ChatPromptTemplate.from_messages()= и =MessagesPlaceholder=
+#+begin_src python
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.prompts import MessagesPlaceholder
+
+template = """\
+Привет, {name}. Я помощник по вопросам здоровья. Чем займёмся сегодня?
+"""
+chat_prompt_template = ChatPromptTemplate.from_messages([("system", template)]) # .from_messages() используется для задания формата сообщений
+messages_placeholder = MessagesPlaceholder(variable_name="history") # Теперь этот placeholder можно вставлять внутрь основного шаблона ChatPromptTemplate
+chat_prompt_template = ChatPromptTemplate.from_messages([
+    messages_placeholder,
+    ("human", "{input}")
+])
+#+end_src
+#+begin_src python
+from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
+
+# Создаем placeholder для истории чата
+history_placeholder = MessagesPlaceholder(variable_name="history")
+# variable_name: Название переменной, хранящей историю сообщений.
+
+# Основная структура шаблона
+chat_prompt_template = ChatPromptTemplate.from_messages([
+    history_placeholder,
+    ("system", "Вы ассистент-помощник."),
+    ("human", "{question}")
+])
+
+# Форматирование шаблона с передачей конкретной истории и нового ввода
+formatted_prompt = chat_prompt_template.format_prompt(
+    question="Что приготовить на ужин?",
+    history=[
+        {"role": "user", "content": "Хочется что-нибудь вкусненькое."},
+        {"role": "ai", "content": "Попробуйте пасту карбонара"}
+    ]
+)
+"""В format_prompt() передается список сообщений, составляющих историю диалога.
+Каждое сообщение представлено в виде словаря с ключами "role" и "content",
+определяющими роли участников диалога и содержание их реплик соответственно."""
+
+# Преобразование в строку для отправки в LLM
+print(formatted_prompt.to_string())
+#+end_src
+*** jinja2 форматирование шаблонов
+- стандартные f‑строк безопаснее и проще.
+- будьте осторожны: не подставляйте в Jinja‑шаблон данные из непроверенных
+  источников, так как теоретически это может привести к исполнению нежелательных
+  выражений
+#+begin_src python
+from langchain_core.prompts import PromptTemplate
+
+template_str = "Привет, {% if formal %}уважаемый{% else %}дорогой{% endif %} {{ name }}!"
+prompt = PromptTemplate(
+    template=template_str,
+    input_variables=["name", "formal"],
+    template_format="jinja2"
+)
+
+print(prompt.format_prompt(name="Иван", formal=True).to_string())
+# Вывод: "Привет, уважаемый Иван!"
+#+end_src
+*** =prompt.partial()=
+#+begin_src python
+from langchain_core.prompts import PromptTemplate
+
+# Создаём шаблон с двумя переменными
+template = "Привет, {name}! {instruction}"
+
+prompt = PromptTemplate(
+    template=template,
+    input_variables=["name", "instruction"]
+)
+
+# Частично фиксируем одну из переменных
+partial_prompt = prompt.partial(instruction="Пожалуйста, расскажи о себе.")
+
+# Теперь у нового шаблона осталась только одна незаполненная переменная
+print(partial_prompt.input_variables)  # ['name']
+
+# Подставляем оставшееся значение
+result = partial_prompt.format(name="Иван")
+print(result) # Привет, Иван! Пожалуйста, расскажи о себе.
+#+end_src
+*** Чейнинг промптов (многошаговость)
+#+begin_src python
+from langchain_openai import ChatOpenAI
+from langchain_core.prompts import PromptTemplate
+from langchain_core.runnables import RunnablePassthrough
+from langchain_core.output_parsers import StrOutputParser
+
+MODEL = os.getenv("OPENAI_API_MODEL", "gpt-5")
+
+llm = ChatOpenAI(model=MODEL)
+
+prompt1 = PromptTemplate.from_template("Назови 5 популярных достопримечательностей в городе {city}.")
+prompt2 = PromptTemplate.from_template("Составь маршрут на 3 дня по городу {city}, включив следующие места: {places_list}.")
+
+chain = (
+    {"city": RunnablePassthrough()}
+    | RunnablePassthrough.assign(
+        places_list=lambda x: (prompt1 | llm | StrOutputParser()).invoke(x)
+    ) # добавляет результат как новый ключ places_list. На выходе получаем словарь с двумя ключами: city и places_list.
+    | prompt2
+    | llm
+    | StrOutputParser() # извлекает чистый текст из AIMessage
+)
+
+# Запуск
+result = chain.invoke({"city": "Париж"})
+print(result)
+#+end_src
+** Structured output (=.with_structured_output()=)
+*** Output Parsers
+- =StrOutputParser= извлекает текстовое содержимое (=content=) из =AIMessage= и возвращает обычную строку.
+- =CommaSeparatedListOutputParser=, =JsonOutputParser=, =ListOutputParser=,
+  =PydanticOutputParser=, =XMLOutputParser= и другие — наоборот, извлекают некую
+  структуру из строки ответа модели и преобразуют её в объект (словарь, JSON,
+  Pydantic-модель и т.д.)
+**** Преобразование ответа в JSON
+#+begin_src python
+import os
+from dotenv import load_dotenv
+from langchain_openai import ChatOpenAI
+from langchain_core.prompts import PromptTemplate
+from langchain_core.output_parsers.json import JsonOutputParser
+
+load_dotenv()
+MODEL = os.getenv("OPENAI_API_MODEL", "gpt-5")
+
+llm = ChatOpenAI(model=MODEL)
+
+# JsonOutputParser()
+parser = JsonOutputParser()
+format_instructions = parser.get_format_instructions()
+
+prompt = PromptTemplate(
+    template="Пожалуйста, верни данные в формате JSON.\n{format_instructions}\n{question}",
+    input_variables=["question"],
+    partial_variables={"format_instructions": format_instructions}
+)
+
+chain = prompt | llm | parser
+
+result = chain.invoke({"question": "Что такое LangChain?"})
+print(result)  # вывод: {'question': 'Что такое LangChain?', 'answer': 'LangChain — это ...'}
+#+end_src
+- Нативный режим возврата данных строго в формате JSON
+  =.bind(response_format={"type": "json_object"})=. Работает не всегда,
+  необходима модель семейства GPT-4/5 с поддержкой JSON-режима.
+- =OutputParser= универсален и не зависит от конкретного API
+#+begin_src python
+import os
+from dotenv import load_dotenv
+from langchain_openai import ChatOpenAI
+
+load_dotenv()
+
+json_llm = ChatOpenAI(model="gpt-5").bind(response_format={"type": "json_object"})
+
+responce = json_llm.invoke("верни JSON объект с ключом 'random_ints' и значением из 10 случайных чисел в диапазоне [0-99]")
+
+print(responce.content) # вывод: '\n{\n  "random_ints": [23, 87, 45, 12, 78, 34, 56, 90, 11, 67]\n}'
+#+end_src
+*** PydanticOutputParser
+1. генерирует инструкцию format_instructions на основе модели,
+2. после получения ответа парсит его:
+   → JSON-строка → dict → YourModel(**dict)
+   (при ошибке — выбрасывает =OutputParserException=)
+#+begin_src python
+import os
+from dotenv import load_dotenv
+from langchain_openai import ChatOpenAI
+from langchain_core.prompts import PromptTemplate
+from langchain_core.output_parsers import PydanticOutputParser
+from pydantic import BaseModel, Field, conint
+
+load_dotenv()
+MODEL = os.getenv("OPENAI_API_MODEL", "gpt-5")
+
+llm = ChatOpenAI(model=MODEL)
+
+# Определяем схему данных
+class BookInfo(BaseModel):
+    title: str = Field(..., description="Название книги")
+    author: str = Field(..., description="Имя автора")
+    tags: list[str] = Field(..., description="Список тегов или жанров")
+    rating: conint(ge=0, le=10) = Field(description="Оценка книги по десятибалльной шкале")
+
+# Создаём парсер
+output_parser = PydanticOutputParser(pydantic_object=BookInfo)
+format_instructions = output_parser.get_format_instructions()
+
+# Шаблон промпта
+prompt = PromptTemplate(
+    template=(
+        "Ответь на вопрос в требуемом формате.\n"
+        "{format_instructions}\n"
+        "Вопрос: {user_question}\nОтвет:"
+    ),
+    input_variables=["user_question"],
+    partial_variables={"format_instructions": format_instructions},
+)
+
+# цепочка
+chain = prompt | llm | output_parser
+
+# Запуск
+result = chain.invoke({"user_question": "Расскажи о книге '1984' Джорджа Оруэлла."})
+print(type(result)) # <class '__main__.BookInfo'>
+print(result) # title='1984', author='Джордж Оруэлл', tags=['антиутопия', 'классика']
+#+end_src
+*** Метод =.with_structured_output()=
+Современные версии LangChain позволяют не использовать =PydanticOutputParser= явно
+— вместо этого можно создать “структурированную” LLM, которая сама возвращает
+Pydantic-объект:
+#+begin_src python
+import os
+from dotenv import load_dotenv
+from langchain_openai import ChatOpenAI
+from pydantic import BaseModel, Field
+
+load_dotenv()
+MODEL = os.getenv("OPENAI_API_MODEL", "gpt-5")
+
+llm = ChatOpenAI(model=MODEL)
+
+class Profile(BaseModel):
+    name: str = Field(description="Имя пользователя")
+    age: int = Field(description="Возраст в годах")
+    premium: bool = Field(description="Есть премиум-подписка")
+
+structured_llm = llm.with_structured_output(Profile)
+
+result = structured_llm.invoke("Создай профиль русского пользователя средних лет")
+print(type(result))   # <class '__main__.Profile'>
+print(result.name)    # Алексей Петрович
+print(result.age)     # 37
+print(result.premium) # False
+#+end_src
+** PromptOps (Prompt Operations)
+*** Версионирование промптов в YAML
+#+begin_src python
+import yaml
+
+with open("prompts.yaml", "r", encoding="utf-8") as f:
+    data = yaml.safe_load(f)
+prompt_text = data["prompts"]["support_answer"]["v2"]
+print(prompt_text)
+#+end_src
+*** A/B-эксперименты и feature flags
+Фича-флаги – это переключатели функциональности в приложении. По сути,
+переменные (в конфиге, базе или сервисе feature-flag), которые определяют, какое
+поведение включено. Например, можно завести флаг =USE_NEW_PROMPT=True/False=
+
+Для реализации  A/B теста можно использовать простую функцию, вроде такой:
+#+begin_src python
+import yaml
+import random
+from langchain_core.prompts import PromptTemplate
+
+with open("prompts.yaml", "r", encoding="utf-8") as f:
+    data = yaml.safe_load(f)
+
+user_id = 123123
+question = "Почему мой бот не отвечает?"
+
+# --- Определяем, какую версию выдать (A/B) ---
+def select_version(id, a, b, b_chance=0.5):
+    random.seed(id)
+    ver = b if random.random() < b_chance else a
+    return PromptTemplate(
+        template=data["prompts"]["assistent_system"][ver],
+        input_variables=["question"]
+    )
+
+prompt_template = select_version(user_id, "v1", "v2", b_chance=0.1)
+#+end_src
+** Few-shot метод
+*Few-shot* prompting основан на том, что в запрос (prompt) к модели включаются
+несколько примеров входных данных и ожидаемых ответов.
+
+Например, если нужно, чтобы модель выдавала ответ в виде таблицы, списка или
+текста в определённом стиле, достаточно привести 2–3 готовых примера — и новый
+ответ, с высокой вероятностью, будет следовать этому шаблону.
+
+*Few-shot* подсказки особенно полезны, когда обычного *zero-shot* режима (только
+инструкция без примеров) недостаточно
+*** =FewShotPromptTemplate()=
+#+begin_src python
+import os
+from dotenv import load_dotenv
+from langchain_core.prompts import PromptTemplate, FewShotPromptTemplate
+from langchain_openai import ChatOpenAI
+
+load_dotenv()
+MODEL = os.getenv("OPENAI_MODEL", "gpt-5")
+
+llm = ChatOpenAI(model=MODEL, temperature=0)
+
+# шаблон одного примера
+example_prompt = PromptTemplate.from_template(
+    "Ввод: {input}\nВывод: {output}"
+)
+
+# список few-shot примеров
+examples = [
+    {"input": "happy", "output": "sad"},
+    {"input": "tall", "output": "short"}
+]
+
+# few-shot промпт объединяет примеры с префиксом и суффиксом
+prompt = FewShotPromptTemplate(
+    examples=examples,
+    example_prompt=example_prompt,
+    prefix="Дайте антоним каждого слова:",
+    suffix="Ввод: {input}\nВывод:",
+    input_variables=["input"]
+)
+
+formatted_prompt = prompt.format(input="young")
+response = llm.invoke(formatted_prompt)
+
+print(response.content) # Вывод: old
+#+end_src
+*** =ExampleSelector= Динамический подбор примеров dynamic few-shot (например, =SemanticSimilarityExampleSelector=)
+- =ExampleSelector= может выбирать примеры динамически — по семантическому
+  сходству с текущим запросом.
+- При поступлении нового вопроса вычисляется эмбеддинг запроса, выбираются N
+  наиболее близких примеров и добавляются в промпт.
+- Это создаёт динамический few-shot, где каждый запрос получает наиболее
+  релевантный контекст.
+#+begin_src zsh
+pip install -U langchain-community langchain-huggingface sentence_transformers​​​​​​ chromadb
+#+end_src
+#+begin_src python
+import os
+from dotenv import load_dotenv
+
+from langchain_core.prompts import PromptTemplate, FewShotPromptTemplate
+from langchain_core.example_selectors import SemanticSimilarityExampleSelector
+from langchain_community.vectorstores import Chroma
+from langchain_openai import ChatOpenAI
+
+load_dotenv()
+MODEL = os.getenv("OPENAI_MODEL", "gpt-5")
+llm = ChatOpenAI(model=MODEL, temperature=0)
+
+# Локальные эмбеддинги без OpenAI
+from langchain_huggingface import HuggingFaceEmbeddings
+embeddings = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
+
+# # эмбеддинги OpenAI (раскомментируйте если решили использовать их)
+# from langchain_openai import OpenAIEmbeddings
+# embeddings = OpenAIEmbeddings()
+
+example_prompt = PromptTemplate.from_template("Вопрос: {question}\nОтвет: {answer}")
+examples = [
+    {"question": "Что делать, если опоздал на работу?",
+     "answer": "Притворись, что это спецплан компании по тестированию терпения коллег."},
+    {"question": "Как победить лень?",
+     "answer": "Скажи лени, что завтра — её выходной, и действуй, пока она отдыхает."},
+    {"question": "Что делать, если забыл день рождения друга?",
+     "answer": "Сделай вид, что это сюрприз для него, и улыбайся, когда он удивлённо морщит лоб."}
+]
+
+# Создание ExampleSelector (динамический выбор k ближайших примеров)
+example_selector = SemanticSimilarityExampleSelector.from_examples(
+    examples=examples, # список заранее заданных примеров (вопрос–ответ).
+    embeddings=embeddings, # модель эмбеддингов, которая превращает текст в числовые векторы.
+    vectorstore_cls=Chroma, # векторное хранилище, куда помещаются эти векторы.
+    k=2  # выбираем 2 ближайших примера (по косинусному сходству)
+)
+
+# Few-shot шаблон с динамическим ExampleSelector
+prompt = FewShotPromptTemplate(
+    example_selector=example_selector, # example_selector, а не examples
+    example_prompt=example_prompt,
+    prefix="Отвечай на вопросы в шутливо-ироничном стиле, как в примерах:",
+    suffix="Вопрос: {question}\nОтвет:",
+    input_variables=["question"]
+)
+
+# Новый запрос — ExampleSelector выберет ближайший пример по смыслу
+question = "Как объяснить начальнику, что проект задерживается?"
+formatted_prompt = prompt.format(question=question)
+response = llm.invoke(formatted_prompt)
+
+print(response.content)
+#+end_src
+** Настройка тональности через =SystemMessage=
+Персона помогает задать модели характер и поведение, делая взаимодействие более
+естественным и узнаваемым. В LangChain это реализуется просто — через
+=SystemMessage= в цепочке.
+*** SystemMessage
+Например:
+Ты — виртуальный ассистент банка, общаешься уважительно, придерживаешься
+официального стиля, не используешь сленг.
+#+begin_src python
+import os
+from dotenv import load_dotenv
+from langchain_openai import ChatOpenAI
+from langchain_core.prompts import ChatPromptTemplate
+
+load_dotenv()
+MODEL = os.getenv("OPENAI_MODEL", "gpt-5")
+
+prompt = ChatPromptTemplate.from_messages([
+    ("system", "Ты дружелюбный ассистент, отвечаешь просто и с позитивом."),
+    ("user", "{question}")
+])
+
+llm = ChatOpenAI(model=MODEL, temperature=0.7)
+chain = prompt | llm
+
+result = chain.invoke({"question": "Как улучшить концентрацию при работе?"})
+print(result.content)
+#+end_src
+*** Сохранение SystemMessage в истории
+**** Пример с напоминанием
+#+begin_src python
+import os
+from dotenv import load_dotenv
+from langchain_openai import ChatOpenAI
+from langchain_core.chat_history import InMemoryChatMessageHistory
+from langchain_core.runnables.history import RunnableWithMessageHistory
+from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder, HumanMessagePromptTemplate, SystemMessagePromptTemplate
+from langchain_core.messages import SystemMessage
+
+load_dotenv()
+MODEL = os.getenv("OPENAI_MODEL", "gpt-5")
+
+llm = ChatOpenAI(model_name=MODEL, temperature=0.9)
+
+# Задаём роли и стиль общения через системный промпт
+support = "Ты опытный ассистент поддержки интернет провайдера. Ты всегда вежлив и доброжелателен. Отвечай не длиннее 100 символов."
+client = "Ты раздражённый клиент у которого не работает интернет. Стиль общения грубый. Отвечай не длиннее 100 символов."
+
+prompt_template = ChatPromptTemplate.from_messages([
+    SystemMessagePromptTemplate.from_template("{system}"),
+    MessagesPlaceholder(variable_name="history"),
+    HumanMessagePromptTemplate.from_template("{user_input}")
+])
+
+chain = prompt_template | llm
+
+store = {}
+def get_session_history(session_id: str):
+    if session_id not in store:
+        store[session_id] = InMemoryChatMessageHistory()
+    return store[session_id]
+
+chain_with_history = RunnableWithMessageHistory(
+    chain,
+    get_session_history,
+    input_messages_key="user_input",
+    history_messages_key="history",
+)
+
+# 🔑 КЛЮЧЕВАЯ ФУНКЦИЯ: напоминаем роль внутри истории
+def chat_with_reminder(response, remind_every=6):
+    response = response if isinstance(response, str) else response.content
+    history = get_session_history('support')
+    non_system = [m for m in history.messages if not isinstance(m, SystemMessage)]
+
+    if len(non_system) > 0 and len(non_system) % remind_every == 0:
+        history.add_message(SystemMessage(content=f"НАПОМИНАНИЕ: {support}"))
+        print(f"⚠️ Добавлено напоминание роли (сообщение #{len(non_system)})")
+
+    response = chain_with_history.invoke(
+        {"system": support, "user_input": response},
+        {"configurable": {"session_id": 'support'}})
+    return response
+
+# Демо: длинный диалог
+response = "У меня за 3 года не было разрывов, а тут СРАЗУ ТРИ РАЗРЫВА!!!"
+print('[1] Клиент:', response)
+
+for i in range(12):
+    response = chat_with_reminder(response)
+    print(f'[{i+1}] Поддержка:', response.content, '\n')
+
+    response = chain_with_history.invoke(
+         {"system": client, "user_input": response},
+         {"configurable": {"session_id": 'client'}}
+    )
+    print(f'[{i+2}] Клиент:', response.content)
+
+# Посмотрим структуру истории
+print("\n📊 Структура истории поддержки:")
+for i, msg in enumerate(get_session_history('support').messages):
+    msg_type = msg.__class__.__name__
+    preview = msg.content[:50] + "..." if len(msg.content) > 50 else msg.content
+    print(f"  {i+1}. {msg_type}: {preview}")
+#+end_src
+**** Пример с добавлением system промпта в начало истории
+Для замера токенов используем библиотеку
+#+begin_src zsh
+pip install -U tiktoken
+#+end_src
+#+begin_src python
+import os
+from dotenv import load_dotenv
+from langchain_openai import ChatOpenAI
+from langchain_core.chat_history import BaseChatMessageHistory
+from langchain_core.messages import BaseMessage, SystemMessage, HumanMessage
+import tiktoken
+
+load_dotenv()
+MODEL = os.getenv("OPENAI_MODEL", "gpt-5")
+
+llm = ChatOpenAI(model_name=MODEL, temperature=0.9)
+
+# Кастомная память с автоматическим добавлением системного промпта
+class MemoryWithSystemPrepend(BaseChatMessageHistory):
+    def __init__(self, system_prompt: str, max_tokens: int = 4000):
+        self.system_prompt = system_prompt
+        self._messages = []  # Храним только диалог (без system)
+        self.max_tokens = max_tokens
+        self.encoder = tiktoken.get_encoding("cl100k_base")
+
+    def count_tokens(self, messages):
+            total = 0
+            for msg in messages:
+                total += len(self.encoder.encode(msg.content))
+            return total
+
+    @property
+    def messages(self):
+        """Подготовка истории: prepend system + усечение до max_tokens"""
+        history = [SystemMessage(content=self.system_prompt)] + self._messages
+
+        while self.count_tokens(history) > self.max_tokens and len(history) > 1:
+            history.pop(1)
+
+        return history
+
+    def add_message(self, message: BaseMessage):
+        if not isinstance(message, SystemMessage):
+            self._messages.append(message) # добавляем сообщения только в диалог
+
+    def clear(self):
+        self._messages = []
+
+
+# Использование
+support_memory = MemoryWithSystemPrepend("Ты опытный ассистент поддержки интернет-провайдера. Ты всегда вежлив и доброжелателен. Отвечай не длиннее 100 символов.")
+client_memory = MemoryWithSystemPrepend("Ты раздражённый клиент у которого не работает интернет. Стиль общения грубый. Отвечай не длиннее 100 символов.")
+
+# Простой чат без RunnableWithMessageHistory для наглядности
+def simple_chat(user_input: str, memory: MemoryWithSystemPrepend):
+    memory.add_message(HumanMessage(content=user_input))
+    response = llm.invoke(memory.messages)
+    memory.add_message(response)
+
+    return response.content
+
+# Демо: длинный диалог
+response = "У меня за 3 года не было разрывов, а тут СРАЗУ ТРИ РАЗРЫВА!!!"
+print('[1] Клиент:', response)
+
+for i in range(12):
+    response = simple_chat(response, support_memory)
+    print(f"[{i+1}] Поддержка: {response}\n")
+    response = simple_chat(response, client_memory)
+    print(f"[{i+2}] Клиент: {response}")
+
+print("\n📊 Что видит модель (первые 6 сообщений в памяти поддержки):")
+for msg in support_memory.messages[:6]:
+    print(f"  - {msg.__class__.__name__}: {msg.content[:50]}...")
+
+print(f"\n💾 Реально хранится сообщений: {len(support_memory._messages)}")
+print(f"📤 Отправляется в модель сообщений (+ system): {len(support_memory.messages)}")
+#+end_src
+
+*** Проверка соответствия стилю
+Основные подходы:
+- Правила и шаблоны (статический анализ)
+- LLM-оценка (self-check)
+**** Проверка с помощью условия (используя =RunnableLambda= и регулярные выражения)
+#+begin_src python
+import os
+from dotenv import load_dotenv
+import re
+from langchain_openai import ChatOpenAI
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.runnables import RunnableLambda
+
+load_dotenv()
+MODEL = os.getenv("OPENAI_MODEL", "gpt-5")
+
+llm = ChatOpenAI(model_name=MODEL, temperature=0.9)
+
+def check_style(text: str) -> str:
+    """Проверяет наличие слова 'ты' в ответе"""
+    if re.search(r'\bты\b|\bтебя\b|\bтвой\b|\bтвоя\b|\bтвоё\b', text, re.IGNORECASE):
+        print(f"⚠️ НАРУШЕНИЕ СТИЛЯ: обнаружено обращение на 'ты' в ответе: {text[:100]}...")
+    return text
+
+# Тест 1: правильный стиль
+print("Тест 1: правильный стиль")
+prompt = ChatPromptTemplate.from_messages([
+    ("system", "Ты помощник компании. Обращайся к клиенту на 'Вы'. Отвечай кратко, не более 100 символов."),
+    ("human", "{question}")
+])
+
+chain = prompt | llm | StrOutputParser() | RunnableLambda(check_style)  # ← Проверка стиля
+result = chain.invoke({"question": "Здравствуйте, я не могу разобраться с оплатой, куда нажимать?"})
+print(f"Ответ: {result}\n")
+
+# Тест 2: неправильный стиль (специально провоцируем)
+print("\nТест 2: провоцируем нарушение")
+bad_prompt = ChatPromptTemplate.from_messages([
+    ("system", "Общайся неформально, на 'ты'. Отвечай кратко, не более 100 символов."),
+    ("human", "{question}")
+])
+
+bad_chain = bad_prompt | llm | StrOutputParser() | RunnableLambda(check_style)
+result = bad_chain.invoke({"question": "Здравствуйте, я не могу разобраться с оплатой, куда нажимать?"})
+print(f"Ответ: {result}")
+#+end_src
+**** Проверка с помощью LLM
+#+begin_src python
+import os
+from dotenv import load_dotenv
+from langchain_openai import ChatOpenAI
+from langchain_core.prompts import ChatPromptTemplate, HumanMessagePromptTemplate, SystemMessagePromptTemplate
+
+load_dotenv()
+MODEL = os.getenv("OPENAI_MODEL", "gpt-5")
+llm = ChatOpenAI(model_name=MODEL, temperature=0.3,)
+
+system_message = "Ты – помощник, оценивающий стиль ответа по заданным правилам. \
+Критерии: (1) тон ответа – деловой, вежливый; (2) речь от третьего лица, \
+избегать местоимения 'я'; (3) нет жаргона, только профессиональные термины. \
+Ответь в формате JSON с полями: formality_score (0-10), no_first_person (True/False), comment."
+
+user_message = "Оцени стиль следующего ответа:\n\"\"\"\n{answer_text}\n\"\"\""
+
+prompt = ChatPromptTemplate.from_messages([
+    SystemMessagePromptTemplate.from_template(system_message),
+    HumanMessagePromptTemplate.from_template(user_message)
+])
+
+chain = prompt | llm
+
+response = chain.invoke({"answer_text": 'Проделана работа по улучшению бизнес метрик, клиенты остались довольны'})
+print(response.content)
+
+# Вывод:
+'''
+{
+  "formality_score": 7,
+  "no_first_person": true,
+  "comment": "Ответ выдержан в деловом стиле, без использования местоимения «я» и жаргона. Тон достаточно формальный, однако фраза может быть чуть более развернутой для усиления профессионального звучания."
+}
+'''
+#+end_src
+* RAG Retrieval-Augmented Generation
+1. Загрузка данных (=PyPDFLoader=, =PyMuPDFLoader=, =WebBaseLoader=, =TextLoader=)
+2. Препроцессинг данных (очистка текста, нормализация, фильтрация и дедупликацияб добавление/проверка метаданных)
+3. Разбиение на чанки (=RecursiveCharacterTextSplitter= или =TokenTextSplitter=)
+4. Построение эмбеддингов (=HuggingFaceEmbeddings=)
+5. Векторное хранилище (FAISS-индекс)
+6. Ретривер (с параметрами top-k, score_threshold)
+7. Механизм отказов (отсутствие релевантных документов, низкие скоры, ошибки загрузки модели или индекса, пустые запросы)
+8. LLM (хранением шаблонов промптов в YAML файле)
+9. Тестирование
+** Библиотеки для загрузчиков
+Все загрузчики находятся в пакете =langchain_community=.
+Остальные библиотеки вам возможно все не понадобятся, но если вам необъодимо
+работать с каким-то типом документов, то стоит поставить.
+#+begin_src zsh
+pip install -U langchain-community
+# Для PyPDFLoader
+pip install -U pypdf
+# Для PyMuPDFLoader (более мощный вариант)
+pip install -U pymupdf
+# Для работы со статическими веб-страницами:
+pip install -U beautifulsoup4
+# Для работы с динамическими веб-страницами:
+pip install -U selenium unstructured
+# Для продвинутой обработки Markdawn:
+pip install -U markdown unstructured
+# Для работы с Word документами (.docx):
+pip install -U docx2txt
+# Для работы с JSON:
+pip install -U jq
+#+end_src
+** Объект =Document=, методы =.page_content= и =.metadata=
+- =page_content= – текстовое содержимое (строка)
+- =metadata= – словарь с метаданными (источник, страница и т.д.)
+#+begin_src python
+# Структура Document
+doc = docs[0]
+print(type(doc))  # <class 'langchain_core.documents.base.Document'>
+print(doc.page_content)  # текст
+print(doc.metadata)  # {'source': '...', 'page': 0, ...}
+#+end_src
+** Загрузка докуметов различных форматов
+*** Загрузка PDF
+**** PyPDFLoader – базовый загрузчик с новым API
+#+begin_src python
+from langchain_community.document_loaders import PyPDFLoader
+
+# Инициализация загрузчика с параметрами
+loader = PyPDFLoader(
+    file_path="docs/document.pdf",
+    # mode="page",  # "page" - по страницам (по умолчанию), "single" - весь документ
+    # extract_images=False,  # извлекать изображения
+)
+
+# Загрузка документов
+docs = []
+for doc in loader.lazy_load():
+    docs.append(doc)
+
+# Или просто:
+docs = loader.load()
+
+# Просмотр результата
+print(f"Всего документов: {len(docs)}")
+print(f"Первая страница:\n{docs[0].page_content[:200]}...")
+print(f"Метаданные: {docs[0].metadata}")
+#+end_src
+**** PyMuPDFLoader – более продвинутый вариант с расширенными возможностями
+#+begin_src python
+from langchain_community.document_loaders import PyMuPDFLoader
+
+loader = PyMuPDFLoader(
+    file_path="docs/document.pdf",
+    # mode="page",  # "page" или "single"
+    # extract_images=False,  # извлечение изображений
+    # extract_tables="markdown",  # извлечение таблиц в формате markdown
+)
+
+docs = []
+for doc in loader.lazy_load():
+    docs.append(doc)
+
+print(f"Загружено {len(docs)} страниц из PDF")
+print(f"Метаданные: {docs[0].metadata}")
+#+end_src
+- В новом API нумерация страниц начинается с 0, а не с 1. Используйте
+  lazy_load() для эффективной работы с большими файлами
+*** Загрузка статических веб-страниц =WebBaseLoader= и =BeautifulSoup=
+#+begin_src python
+from langchain_community.document_loaders import WebBaseLoader
+
+# Загрузка одной страницы
+loader = WebBaseLoader("https://docs.langchain.com/oss/python/langchain/overview")
+docs = loader.load()
+
+print(f"Загружено документов: {len(docs)}")  # обычно 1
+print(f"Источник: {docs[0].metadata['source']}")
+print(f"Первые 2000 символов:\n{docs[0].page_content[:2000]}")
+#+end_src
+Фильтрация контента с =BeautifulSoup=
+#+begin_src python
+from langchain_community.document_loaders import WebBaseLoader
+import bs4
+
+loader = WebBaseLoader(
+    web_paths=("https://docs.langchain.com/oss/python/langchain/overview",),
+    bs_kwargs={
+        "parse_only": bs4.SoupStrainer(id="content")
+    }
+)
+
+docs = loader.load()
+print(docs[0].page_content[:2000])
+#+end_src
+*** Загрузка динамических веб-страниц =SeleniumURLLoader=
+- Принимает список URL‑адресов (=urls: List[str]=).
+- Запускает браузер через Selenium (Chrome или Firefox) с опциями (=browser=,
+  =binary_location=, =executable_path=, =headless=, =arguments=).
+- Загружает страницу как браузер (в том числе выполняет JavaScript), затем
+  извлекает HTML‑контент и передаёт его в парсер (например, unstructured) для
+  извлечения текста.
+- Возвращает список объектов =Document=, у каждого из которых поля =page_content=
+  (текст) и =metadata= (например, URL) присутствуют.
+- Имеет метод =load_and_split(text_splitter)= для загрузки и разбивки на куски.
+*** Загрузка Markdown (MD) =TextLoader= и =UnstructuredMarkdownLoader=
+**** =TextLoader=
+#+begin_src python
+from langchain_community.document_loaders import TextLoader
+
+loader = TextLoader("README.md", encoding="utf-8")
+docs = loader.load()
+
+print(f"Содержимое: {docs[0].page_content[:200]}")
+print(f"Метаданные: {docs[0].metadata}")
+#+end_src
+**** =UnstructuredMarkdownLoader= для обработки Markdown с разбиением по структуре
+#+begin_src python
+from langchain_community.document_loaders import UnstructuredMarkdownLoader
+
+loader = UnstructuredMarkdownLoader(
+    "README.md",
+    mode="elements",  # разбивает по элементам структуры (заголовки, параграфы)
+    encoding="utf-8"
+)
+docs = loader.load()
+
+print(f"Загружено элементов: {len(docs)}")
+for i, doc in enumerate(docs[:3]):
+    print(f"\nЭлемент {i+1}:")
+    print(f"Тип: {doc.metadata.get('category', 'N/A')}")
+    print(f"Текст: {doc.page_content[:100]}...")
+#+end_src
+*** Загрузка Word (.docx) =Docx2txtLoader=
+#+begin_src python
+from langchain_community.document_loaders import Docx2txtLoader
+
+loader = Docx2txtLoader("docs/report.docx")
+docs = loader.load()
+
+print(f"Содержимое: {docs[0].page_content[:200]}")
+#+end_src
+*** Загрузка CSV  =CSVLoader=
+#+begin_src python
+from langchain_community.document_loaders.csv_loader import CSVLoader
+
+loader = CSVLoader(
+    file_path="docs/train.csv",
+    encoding="utf-8",
+    csv_args={
+        "delimiter": ",",
+    }
+)
+docs = loader.load()
+
+# Каждая строка CSV становится отдельным Document
+print(f"Загружено {len(docs)} строк")
+print(f"Первая строка: {docs[0].page_content}")
+print(f"Метаданные: {docs[0].metadata}")
+#+end_src
+*** Загрузка JSON =JSONLoader=
+#+begin_src python
+from langchain_community.document_loaders import JSONLoader
+
+loader = JSONLoader(
+    file_path="docs\report.json",
+    jq_schema=".",  # путь внутри JSON для извлечения данных
+    text_content=False
+)
+docs = loader.load()
+
+print(f"Загружено документов: {len(docs)}")
+print(f"Первый документ: {docs[0].page_content}")
+#+end_src
+
+*** =DirectoryLoader= для загрузки нескольких файлов из директории
+#+begin_src python
+from langchain_community.document_loaders import DirectoryLoader, TextLoader
+
+# Загрузка всех .md файлов из директории
+loader = DirectoryLoader(
+    "docs/",
+    glob="**/*.md",  # паттерн для поиска файлов
+    loader_cls=TextLoader,  # класс загрузчика для каждого файла
+    loader_kwargs={"encoding": "utf-8"},  # параметры для загрузчика
+    show_progress=True,  # показывать прогресс
+    use_multithreading=True,  # использовать многопоточность
+)
+
+docs = loader.load()
+print(f"Загружено файлов: {len(docs)}")
+#+end_src
+** Объединение документов =all_docs = pdf_docs + html_docs=
+#+begin_src python
+from langchain_community.document_loaders import PyMuPDFLoader, WebBaseLoader
+import bs4
+
+# Загрузка PDF
+pdf_loader = PyMuPDFLoader("docs/document.pdf")
+pdf_docs = pdf_loader.load()
+print(f"Загружено {len(pdf_docs)} страниц из PDF")
+
+# Загрузка HTML
+html_loader = WebBaseLoader(
+    web_paths=("https://docs.langchain.com/oss/python/langchain/overview",),
+    bs_kwargs={
+        "parse_only": bs4.SoupStrainer(id="content")
+    }
+)
+html_docs = html_loader.load()
+print(f"Загружено {len(html_docs)} документов из HTML")
+
+# Объединение всех документов
+all_docs = pdf_docs + html_docs
+print(f"Всего документов: {len(all_docs)}")
+
+# Просмотр структуры
+for i, doc in enumerate(all_docs[:3]):  # первые 3 документа
+    print(f"\n--- Документ {i+1} ---")
+    print(f"Источник: {doc.metadata.get('source', 'N/A')}")
+    print(f"Первые 150 символов: {doc.page_content[:150]}...")
+#+end_src
+** Разбиение текста на чанки
+*** Разбиение на чанки =TextSplitter=
+LangChain предлагает классы =TextSplitter=. Они делят текст по разделителям
+(параграфам, предложениям) до заданной длины. Например
+=RecursiveCharacterTextSplitter= сначала пытается разрезать по параграфам, если
+они слишком длинные – по предложениям и т.д., чтобы не разорвать слова или
+связанные фразы без нужды:
+#+begin_src python
+from langchain_text_splitters import RecursiveCharacterTextSplitter
+
+text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=100)
+# chunk_size=1000 – каждый фрагмент не длиннее 1000 символов
+# chunk_overlap=100 – последние 100 символов предыдущего фрагмента будут дублироваться в начале следующего
+
+splitted_docs = text_splitter.split_documents(all_docs)
+
+print(f"Было документов: {len(all_docs)}, стало фрагментов: {len(splitted_docs)}")
+#+end_src
+*** Разбиение по токенам =TokenTextSplitter=
+#+begin_src python
+from langchain_text_splitters import TokenTextSplitter
+
+text_splitter = TokenTextSplitter(encoding_name="cl100k_base", chunk_size=200, chunk_overlap=20)
+# encoding_name="cl100k_base" – это кодировка (token‑encoder) из пакета tiktoken, разработанного OpenAI.
+# chunk_size=200 – означает примерно 200 токенов GPT‑4/5, а
+# chunk_overlap=20 – обеспечивает плавность перехода.
+
+splitted_docs = text_splitter.split_documents(all_docs)
+
+print(f"Было документов: {len(all_docs)}, стало фрагментов: {len(splitted_docs)}")
+#+end_src
+*** Разбиение в оптимальных местах =RecursiveCharacterTextSplitter=
+#+begin_src python
+from langchain_text_splitters import RecursiveCharacterTextSplitter
+
+splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=100)
+chunks = splitter.split_text(large_text)
+#+end_src
+*** Семантическое разбиение текста =HTMLHeaderTextSplitter=, =MarkdownHeaderTextSplitter=
+#+begin_src python
+from langchain_text_splitters import HTMLHeaderTextSplitter
+
+splitter = HTMLHeaderTextSplitter(
+    headers_to_split_on=["h1", "h2", "h3"],
+    chunk_size=500,
+    chunk_overlap=50
+)
+chunks = splitter.split_text(html_text)
+#+end_src
+** Эмбеддинги, сторы (FAISS/Qdrant и т.п.) и Retriever
+*** Эмбеддинг модель
+#+begin_src zsh
+pip install -U langchain-huggingface sentence_transformers
+#+end_src
+#+begin_src python
+from langchain_huggingface import HuggingFaceEmbeddings
+embed_model = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
+# для OpenAI:
+# from dotenv import load_dotenv
+# load_dotenv()
+# from langchain_openai import OpenAIEmbeddings
+# embed_model = OpenAIEmbeddings(model="text-embedding-ada-002")
+
+vector = embed_model.embed_query("Пример текста для эмбеддинга")
+print(len(vector), vector[:5])
+# вывод: 384 [-0.0026632877998054028, 0.09645242989063263, ...]
+#+end_src
+Некоторые модели при загрузке могут выдавать ошибки, особенно если они
+используют собственный код или нестандартные конфигурации.
+*** Векторные хранилища и графы FAISS
+FAISS (Facebook AI Similarity Search) — это библиотека с открытым исходным кодом
+от Meta для работы с векторами, которая хранит их в памяти и строит индекс для
+быстрого поиска. Она проста и идеально подходит для небольших проектов и
+экспериментов. Графовые индексы FAISS позволяют ещё сильнее ускорять поиск
+похожих объектов.
+#+begin_src zsh
+# версия для CPU
+pip install -U faiss-cpu
+# версия для GPU с поддержкой CUDA (на windows проблемы с установкой, пользуйтесь CPU)
+pip install -U faiss-gpu
+#+end_src
+#+begin_src python
+# Создаём хранилище из наших чанков и указав модель эмбедингов:
+from langchain_community.vectorstores import FAISS
+
+vector_store = FAISS.from_documents(splitted_docs, embed_model)
+
+# После этого можно искать:
+query = "Когда основан МГУ?"
+docs_found = vector_store.similarity_search(query, k=2)
+
+for doc in docs_found:
+    print(doc.metadata, doc.page_content[:50])
+
+# Сохранение и загрузка индекса:
+# сохранение
+vector_store.save_local("index/my_faiss_index")
+# загрузка
+new_store = FAISS.load_local("index/my_faiss_index", embed_model)
+#+end_src
+*** Векторные хранилища и графы Qdrant
+Qdrant — полноценная база данных для векторов, где индексы тоже используются для
+поиска. Она хранит данные на диске, автоматически сохраняет изменения и
+позволяет работать с большими наборами векторов. Кроме скорости, Qdrant даёт
+возможность фильтровать данные по дополнительным признакам — например, искать
+похожие тексты только в определённой категории.
+#+begin_src zsh
+# Запуск Qdrant в Docker
+docker run -p 6333:6333 qdrant/qdrant
+# Для использование с LangChain установите пакеты:
+pip install -U qdrant-client langchain-qdrant
+#+end_src
+#+begin_src python
+# Подключаемся к локальному серверу:
+from langchain_qdrant import QdrantVectorStore
+
+vector_store = QdrantVectorStore.from_documents(
+    splitted_docs,
+    embed_model,
+    url="http://localhost:6333", # если не меняли, аргумент не обязателен
+    collection_name="my_documents"
+)
+
+docs_found = vector_store.similarity_search("Когда основан МГУ?", k=2)
+for doc in docs_found:
+    print(doc.page_content[:50])
+
+# С облаком (Qdrant Cloud):
+vector_store = QdrantVectorStore.from_documents(
+    docs,
+    embeddings,
+    url="https://your-instance.qdrant.io",
+    prefer_grpc=True,
+    api_key="your-api-key",
+    collection_name="my_documents"
+)
+#+end_src
+*** Retriever
+После индексации можно превратить хранилище в =Retriever=:
+#+begin_src python
+retriever = vector_store.as_retriever(
+    search_type='similarity', # стандартный поиск ближайших соседей по вектору (по умолчанию он и стоит, если аргумент не указывать)
+    search_kwargs={'k': 2}
+)
+
+docs = retriever.invoke("Когда у Алексея Муромского день рождения")
+for doc in docs:
+    print(doc.page_content)
+#+end_src
+*Retriever* – объект, который ищет по индексу. Обычно вызывается через
+=vectorstore.as_retriever()=. Он хранит ссылку на vector store и при вызове
+.invoke('запрос') возвращает список =k= подходящих =Document=.
+*** Чтение и очистка текста в цепочке
+#+begin_src python
+from langchain_core.runnables import RunnableLambda, RunnableParallel
+from langchain_community.document_loaders import PyMuPDFLoader, WebBaseLoader
+from langchain_text_splitters import TokenTextSplitter
+import bs4
+
+# 1. СОЗДАНИЕ RUNNABLE ЗАГРУЗЧИКОВ
+class LoaderRunnable(RunnableLambda):
+    def __init__(self, loader):
+        super().__init__(lambda _: list(loader.lazy_load()))
+        self.loader = loader
+
+load_pdf = LoaderRunnable(PyMuPDFLoader("docs/document.pdf"))
+load_html = LoaderRunnable(WebBaseLoader(
+    web_paths=("https://docs.langchain.com/oss/python/langchain/overview",),
+    bs_kwargs={"parse_only": bs4.SoupStrainer(id="content")}))
+
+
+# 2. СОЗДАНИЕ RUNNABLE ОБРАБОТЧИКОВ (Функции обработки тут - это просто заглушки)
+def clean_pdf_text(text: str) -> str:
+    return text
+
+def clean_html_text(text: str) -> str:
+    return text
+
+def normalize_text(text: str) -> str:
+    return text.lower()
+
+def apply_func_to_all_docs(func):
+    def process_docs(docs):
+        for doc in docs:
+            doc.page_content = func(doc.page_content)
+        return docs
+    return process_docs
+
+clean_pdf = RunnableLambda(apply_func_to_all_docs(clean_pdf_text))
+clean_html = RunnableLambda(apply_func_to_all_docs(clean_html_text))
+normalize_all = RunnableLambda(apply_func_to_all_docs(normalize_text))
+
+
+# 4. КОМПОЗИЦИЯ ЦЕПОЧКИ
+chain = (
+    RunnableParallel(pdf=load_pdf | clean_pdf,
+                     html=load_html | clean_html)
+    | RunnableLambda(lambda x: x["pdf"] + x["html"])
+    | normalize_all
+)
+
+# 5.1 ПРОСТОЙ ВЫЗОВ
+result = chain.invoke(None)
+
+# # 5.2 АСИНХРОННЫЙ ВЫЗОВ
+# import asyncio
+# async def load_and_split_all_docs():
+#     return await chain.ainvoke(None)
+# result = asyncio.run(load_and_split_all_docs())
+
+# 6. Смотрим результат
+for doc in result:
+        print(doc.page_content[:50])
+        print('Источник:', doc.metadata['source'], '\n')
+#+end_src
+
+*** LLM + Retriever
+#+begin_src python
+import os
+from dotenv import load_dotenv
+from langchain_openai import ChatOpenAI
+from langchain_community.retrievers import WikipediaRetriever
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.runnables import RunnablePassthrough
+load_dotenv()
+
+MODEL = os.getenv("OPENAI_MODEL", "gpt-5")
+llm = ChatOpenAI(model_name=MODEL, temperature=0)
+
+retriever = WikipediaRetriever(lang="ru", top_k_results=2) # pip install -U langchain-community wikipedia
+
+# Промпт для RAG
+prompt = ChatPromptTemplate.from_template("Ответь на вопрос, используя только следующий контекст:\nКонтекст: {context}\nВопрос: {question}\nОтвет:")
+
+# Функция для форматирования документов
+def format_docs(docs):
+    return "\n\n".join(doc.page_content for doc in docs)
+
+chain = (
+    {"context": retriever | format_docs, "question": RunnablePassthrough()}
+    | prompt
+    | llm
+)
+
+response = chain.invoke("Что такое LangChain?")
+print(response.content)
+#+end_src
+*** Agentic RAG (retriever tool)
+Агентный RAG — это умная система, которая сама решает, когда нужно искать
+информацию в базе знаний, а когда можно ответить сразу.
+#+begin_src python
+import os
+from dotenv import load_dotenv
+from langchain_openai import ChatOpenAI
+from langchain_huggingface import HuggingFaceEmbeddings
+from langchain_community.vectorstores import FAISS
+from langchain_core.documents import Document
+
+load_dotenv()
+MODEL = os.getenv("OPENAI_MODEL", "gpt-5")
+model = ChatOpenAI(model_name=MODEL, temperature=0)
+
+documents = [Document(page_content="Фирма ООО 'Одуванчик' основана в 2015 году"),
+             Document(page_content="Директор ООО 'Одуванчик' Смирнов Иван Петрович"),
+             Document(page_content="Адрес ООО 'Одуванчик' ул.Ленина д.5")]
+
+embeddings = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
+vector_store = FAISS.from_documents(documents, embeddings)
+retriever = vector_store.as_retriever(search_kwargs={"k": 3})
+#+end_src
+Превращаем retriever в tool:
+- Способ 1: С помощью декоратора =@tool=
+- Способ 2: Через специальные методы, как например для retriever'ов create_retriever_tool:
+#+begin_src python
+from langchain_core.tools import create_retriever_tool
+from langchain.agents import create_agent
+
+search_tool = create_retriever_tool(
+    retriever=retriever,
+    name="search_knowledge_base",
+    description="Ищет информацию в базе фирме ООО 'Одуванчик'"
+)
+
+agent = create_agent(
+    model=model,
+    system_prompt="Ты полезный ассистент. Когда тебя спрашивают про ООО 'Одуванчик' используй инструмент search_knowledge_base для поиска информации.",
+    tools=[search_tool]
+)
+
+response = agent.invoke({"messages": ["Привет! Как дела?"]})
+print(response['messages'][-1].content) # ответит сразу без ретривера
+
+response = agent.invoke({"messages": ["Что ты знаешь про ООО 'Одуванчик'?"]})
+print(response['messages'][-1].content) # полезет в ретривер за информацией
+#+end_src
+*** Зацикливание агента и =recursion_limit=
+Почему формула 2 * max_iterations + 1?
+Каждая итерация агента = 2 шага:
+- Агент думает и вызывает инструмент
+- Инструмент выполняется и возвращает результат
+- Плюс 1 для финального ответа.
+#+begin_src python
+from langchain.agents import create_agent
+from langgraph.errors import GraphRecursionError
+
+# Создаём агента
+agent = create_agent(
+    model="gpt-4",
+    tools=[search_tool, get_weather]
+)
+
+# Способ 1: Устанавливаем лимит при вызове
+max_iterations = 5
+recursion_limit = 2 * max_iterations + 1
+
+try:
+    result = agent.invoke(
+        {"messages": [{"role": "user", "content": "Какая погода?"}]},
+        {"recursion_limit": recursion_limit} # Передаём лимит
+        )
+    print(result["messages"][-1].content)
+except GraphRecursionError:
+    print("Агент остановлен: превышен лимит итераций")
+
+# Способ 2: Создаём агента с лимитом через .with_config()
+agent_with_limit = agent.with_config(recursion_limit=11)
+
+try:
+    result = agent_with_limit.invoke(
+        { "messages": [{
+            "role": "user",
+            "content": "Найди информацию о Python"
+            }]
+         })
+
+except GraphRecursionError:
+    print("Агент остановлен: превышен лимит итераций")
+#+end_src
+
+** Метрики качества RAG
+*** Метрики поиска (Retrieval):
+- Context Precision (точность контекста): Какая доля найденных документов действительно относится к вопросу.
+- Context Recall (полнота контекста): Насколько полно найденные документы покрывают факты, необходимые для ответа.
+- Precision@K: Сколько из топ-k найденных документов являются релевантными.
+- Recall@k: Cколько от всех релевантных документов нашлось в топ-k.
+- F1@k: комбинированная метрика поиска, гармоническое среднее precision и recall. Полезна, когда важно и то, и другое сбалансировано.
+**** Генерация тестов
+#+begin_src python
+import os
+from dotenv import load_dotenv
+from langchain_openai import ChatOpenAI
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.documents import Document
+load_dotenv()
+
+MODEL = os.getenv("OPENAI_MODEL", "gpt-5")
+llm = ChatOpenAI(model_name=MODEL, temperature=0)
+
+documents = [Document(page_content="Фирма ООО 'Одуванчик' основана в 2015 году", metadata={'id': 1}),
+             Document(page_content="Директор ООО 'Одуванчик' Смирнов Иван Петрович", metadata={'id': 2}),
+             Document(page_content="Адрес ООО 'Одуванчик' ул.Ленина д.5", metadata={'id': 3})]
+
+prompt = ChatPromptTemplate.from_template("""
+Ты – помощник, который придумывает вопросы по тексту.
+Прочитай текст и сформулируй вопрос, на который этот текст отвечает. Затем дай короткий точный ответ на этот вопрос.
+
+Формат:
+{{
+  "questions": [...],
+  "answers": [...],
+  "facts": [...],
+  "ground_truth_doc_id": "{doc_id}"
+}}
+
+Требования:
+- Сгенерируй 2–3 вопроса разной сложности по тексту.
+- Дай точные ответы, опираясь только на факты из текста.
+- Выдели список ключевых фактов, которые должен найти retriever.
+- Не придумывай информацию вне текста.
+
+Текст:
+{content}
+""")
+
+gen_chain = prompt | llm
+
+examples = []
+for doc in documents:
+    ex = gen_chain.invoke({"content": doc.page_content, "doc_id": doc.metadata["id"]})
+    examples.append(ex.content)
+#+end_src
+**** Подготовка данных
+Для каждого вопроса должны быть ground truth документы — список релевантных источников документов, содержащих ответ
+#+begin_src python
+from langchain_core.documents import Document
+
+# 1. Готовые документы
+documents = [Document(page_content="Фирма ООО 'Одуванчик' основана в 2015 году", metadata={'source': 'doc_1.pdf'}),
+             Document(page_content="Директор ООО 'Одуванчик' Смирнов Иван Петрович", metadata={'source': "doc_2.pdf"}),
+             Document(page_content="Адрес ООО 'Одуванчик' ул.Ленина д.5", metadata={'source': "doc_3.pdf"}),
+             Document(page_content="Иван Петрович отличный руководитель", metadata={'source': 'doc_4.pdf'}),
+             Document(page_content="В 2015 году мы основали нашу компанию", metadata={'source': "doc_5.pdf"}),
+             Document(page_content="Наша компания продаёт лучший продукт на рынке", metadata={'source': "doc_6.pdf"}),
+             Document(page_content="ул.Ленина д.5 это наш адрес с самого основания", metadata={'source': 'doc_7.pdf'})
+             ]
+
+# 2. ФОРМИРОВАНИЕ ground_truth_docs
+ground_truth_docs = {
+    "Когда основана компания?": ["doc_1.pdf", "doc_5.pdf"],
+    "Кто директор компании?": ["doc_2.pdf"],
+    "Какой адрес у компании?": ["doc_3.pdf", "doc_7.pdf"]
+}
+#+end_src
+**** Код для оценки Precision@K и Recall@K
+Precision@K: Сколько из топ-k найденных документов являются релевантными.
+Низкий precision – значит, много лишнего. Возможно, chunk слишком большой...
+- Recall@k: Cколько от всех релевантных документов нашлось в топ-k.
+Низкий recall – значит, retriever недостает нужные доки. Решения: повысить k, улучшить эмбеддинг...
+
+В поиске эти метрики противостоят. Если настроить retriever возвращать больше документов (увеличить k ) то:
+- recall растет (не упустим нужные документы)
+- precision падает (среди большего списка документов, доля релевантных меньше )
+#+begin_src python
+# Загружаем retriever
+embed_model = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
+vector_store = FAISS.from_documents(documents, embed_model)
+retriever = vector_store.as_retriever(search_kwargs={"k": 2})
+
+# Оценка качества поиска
+k = 2
+
+precision_total = 0
+recall_total = 0
+for question, true_docs in ground_truth_docs.items():
+    found_docs = retriever.invoke(question)
+    found_ids = [d.metadata["source"] for d in found_docs[:k]]
+
+    # Считаем, сколько релевантных нашли
+    relevant_found = sum(1 for doc_id in true_docs if doc_id in found_ids)
+    precision = relevant_found / k
+    precision_total += precision
+    recall = relevant_found / len(true_docs) if true_docs else 0
+    recall_total += recall
+
+    print(f"Вопрос: {question}")
+    print(f"  Эталонные документы: {true_docs}")
+    print(f"  Найденные документы: {found_ids}")
+    print(f"  Precision@{k}: {precision:.2f}")
+    print(f"  Recall@{k}: {recall:.2f} ({relevant_found}/{len(true_docs)})\n")
+
+precision_avg = precision_total / len(ground_truth_docs)
+print(f"Средняя Precision@{k}: {precision_avg:.2f}")
+recall_avg = recall_total / len(ground_truth_docs)
+print(f"Средняя Recall@{k}: {recall_avg:.2f}")
+#+end_src
+
+*** Метрики ответа (Generation):
+- Faithfulness — измеряет, насколько ответ опирается исключительно на предоставленный контекст и не содержит галлюцинаций.
+- AnswerRelevancy — оценивает соответствие ответа исходному вопросу и его информативность.
+- ContextRecall — определяет, насколько извлечённый retriever контекст покрывает все необходимые факты, содержащиеся в эталонном ответе.
+- ContextPrecision — измеряет долю действительно полезной информации среди извлечённых документов (насколько retriever не приносит “лишние” куски текста).
+- AnswerCorrectness — сравнивает фактическую корректность ответа с эталонным ответом.
+- ContextUtilization — определяет, насколько ответ реально использует информацию из контекста, а не опирается на внешние знания.
+- AnswerSimilarity — измеряет степень совпадения ответа с эталонным, не требуя буквального совпадения.
+**** Простая оценка через LLM (без сторонних фреймворков)
+#+begin_src python
+import os
+from dotenv import load_dotenv
+load_dotenv()
+from langchain_openai import ChatOpenAI
+
+MODEL = os.getenv("OPENAI_MODEL", "gpt-5")
+llm = ChatOpenAI(model_name=MODEL, temperature=0)
+
+examples = [{"query": "Когда основана компания?", "answer": "1999 год."},
+            {"query": "Кто основатели?", "answer": "Иван Иванов и Мария Петрова."}]
+
+predictions = [{"query": "Когда основана компания?", "result": "Компания создана в 1999 году."},
+               {"query": "Кто основатели?", "result": "Иван Иванов и Мария Петрова."}]
+
+def evaluate_qa_with_llm(query: str, prediction: str, reference: str) -> dict:
+    prompt = f"""Ты эксперт по оценке качества ответов.
+
+Вопрос: {query}
+Ожидаемый ответ: {reference}
+Полученный ответ: {prediction}
+
+Оцени, насколько полученный ответ соответствует ожидаемому по смыслу.
+Ответь ТОЛЬКО одним словом: CORRECT или INCORRECT"""
+
+    response = llm.invoke(prompt)
+    verdict = response.content.strip().upper()
+    score = 1.0 if verdict == "CORRECT" else 0.0
+
+    return score, verdict
+
+print("=== Оценка с помощью LLM ===\n")
+scores_llm = []
+for example, prediction in zip(examples, predictions):
+    score, verdict = evaluate_qa_with_llm(
+        query=example["query"],
+        prediction=prediction["result"],
+        reference=example["answer"]
+    )
+    scores_llm.append(score)
+    print(f"Вопрос: {example['query']}")
+    print(f"Полученный ответ: {prediction['result']}")
+    print(f"Ожидаемый ответ: {example['answer']}")
+    print(f"Оценка: {score} ({verdict})\n")
+
+avg_score_llm = sum(scores_llm) / len(scores_llm)
+print(f"Средняя оценка (LLM): {avg_score_llm:.2f}")
+#+end_src
+**** RAGAS
+=pip install ragas=
+#+begin_src python
+import os
+from dotenv import load_dotenv
+from ragas import evaluate
+from ragas.metrics import Faithfulness, AnswerRelevancy, ContextRecall
+from ragas.llms import llm_factory
+from openai import OpenAI
+from datasets import Dataset
+load_dotenv()
+
+# Настройка LLM для оценки
+MODEL = os.getenv("OPENAI_MODEL", "gpt-5")
+ragas_llm = llm_factory(MODEL, client=OpenAI())
+
+# Подготовка данных для оценки
+data = {
+    "user_input": [
+        "Когда основана компания?",
+        "Кто основатели?"
+    ],
+    "response": [
+        "Компания основана в 1999 году Иваном Ивановым и Марией Петровой.",
+        "Основатели — Иван Иванов и Мария Петрова."
+    ],
+    "retrieved_contexts": [
+        ["Компания основана в 1999 году основателями: Иван Иванов и Мария Петрова."],
+        ["Основатели компании — Иван Иванов и Мария Петрова, 1999 год."]
+    ],
+    "reference": [
+        "1999 год.",
+        "Иван Иванов и Мария Петрова."
+    ]
+}
+
+dataset = Dataset.from_dict(data)
+
+# Оценка с помощью RAGAS
+result = evaluate(
+    dataset=dataset,
+    metrics=[
+        Faithfulness(),           # Соответствие контексту (нет галлюцинаций)
+        AnswerRelevancy(),        # Релевантность ответа вопросу
+        ContextRecall()           # Полнота извлеченного контекста
+    ],
+    llm=ragas_llm
+)
+
+print("=== Результаты RAGAS ===")
+print(f"Faithfulness: {result['faithfulness']:.3f}")
+print(f"Answer Relevancy: {result['answer_relevancy']:.3f}")
+print(f"Context Recall: {result['context_recall']:.3f}")
+#+end_src
+** Гибридный поиск и реранк
+*** Гибридный поиск
+Объединение лексического (BM25) и семантического (эмбеддинги) поиска
+- Запрос пользователя обрабатывается двумя путями – семантическим и ключевым.
+- Топ-k результатов из обоих источников объединяются,
+- Дубли удаляются
+- Применяется механизм слияния рангов (например, RRF)
+- Отранжированные чанки передаются LLM для генерации ответа.
+**** BM25 скоры
+#+begin_src python
+pip install rank_bm25
+#+end_src
+- Допустим, у вас есть список текстов =docs=.
+- На выходе мы получаем словарь из топ k документов, ключи которого это id
+  документов из метаданных, а значения это скор его релевантности запросу.
+#+begin_src python
+# Импортируем BM25Okapi — класс для вычисления BM25, популярного метода лексического поиска
+from rank_bm25 import BM25Okapi
+import re
+
+# создаём список текстов
+corpus = [doc.page_content for doc in docs]
+
+# Индексируем исходные объекты Document в словарь
+id2doc = {d.metadata.get("id", str(i)): d for i, d in enumerate(docs)}
+
+# Определяем регулярное выражение для токенизации текста
+TOKEN_RE = re.compile(r"[A-Za-zА-Яа-я0-9_]+", re.UNICODE)
+
+# Функция токенизации: разбиваем строку на токены и приводим к нижнему регистру
+def tokenize(txt):
+    return [t.lower() for t in TOKEN_RE.findall(txt)]
+
+# Применяем токенизацию к каждому документу в корпусе
+tokenized_corpus = [tokenize(d) for d in corpus]
+
+# Создаём объект BM25Okapi на основе токенизированного корпуса
+# bm25 будет использоваться для вычисления релевантности документов запросу
+bm25 = BM25Okapi(tokenized_corpus)
+
+def bm25_candidates(query, k):
+    toks = tokenize(query) # токенезируем вопрос
+    scores = bm25.get_scores(toks)  # получаем скор
+    # Сортируем индексы документов по убыванию скоринга и выбираем top-k
+    top_idx = np.argsort(scores)[::-1][:k]
+    # Формируем словарь результатов: doc_id → BM25-score
+    res = {}
+    for i in top_idx:
+        doc_id = list(id2doc.keys())[i]
+        res[doc_id] = float(scores[i])
+    return res
+#+end_src
+**** Получение скора из векторного хранилища
+- В langchain метод =similarity_search_with_score()= у векторного хранилища
+  возвращает Tuple с документом и расстоянием типа float и чем оно меньше, тем
+  релевантней этот документ, поэтому нам нужно это значение инвертировать для
+  нормализации этого скора к диапозону [0,1], где 1 это наиболее релевантный, а
+  0 соответственно наименее
+- На выходе мы, как и в случае BM25-поиска, получаем словарь той же структуры, и
+  теперь нам удобно их совмещать.
+#+begin_src python
+from typing import Dict
+import numpy as np
+
+def vector_candidates(query, k):
+    # Выполняем векторный поиск: получаем пары (документ, расстояние)
+    # similarity_search_with_score возвращает dist — чем меньше, тем ближе документ
+    docs_scores = vector_store.similarity_search_with_score(query, k=k)
+
+    # Конвертируем расстояние в псевдо-скор: 1 / (1 + dist)
+    # Чем меньше dist → тем больше score. Значения будут в (0..1]
+    tmp = {d.metadata.get("id"): 1.0 / (1.0 + float(dist)) for d, dist in docs_scores}
+
+    # Нормализуем все скоры в диапазон [0..1], чтобы можно было
+    # далее безопасно комбинировать их с BM25
+    return normalize(tmp)
+
+
+def normalize(scores, reverse=False):
+    if not scores:
+        return {}
+    vals = np.array(list(scores.values()), dtype=float)
+    if reverse:
+        vals = -vals
+    lo, hi = float(vals.min()), float(vals.max())
+    if hi == lo:
+        return {k: 1.0 for k in scores}
+    keys = [key for key,_ in scores.items()]
+    norm = (vals - lo) / (hi - lo)
+    # Собираем обратно в словарь: doc_id → нормализованный скор
+    return {key: float(value) for key, value in zip(keys, norm)}
+#+end_src
+**** Reciprocal Rank Fusion (RRF)
+Алгоритм, объединяющий рейтинги документов из двух списков, суммируя вклад от
+рангов. Например, каждому документу присваивается суммарный скор по формуле
+=RRF_score = Σ (1 / (k + rank))= для каждого ранжированного списка. RRF избегает
+сложной нормализации баллов и эффективно комбинирует результаты от BM25 и
+векторного поиска.
+#+begin_src python
+from typing import Dict
+from collections import defaultdict
+
+def to_ranks(scores, higher_better=True):
+        items = sorted(scores.items(), key=lambda kv: kv[1], reverse=higher_better)
+        return {doc_id: rank+1 for rank, (doc_id, _) in enumerate(items)}
+
+def rrf(bm25, vec, rrf_k=60):
+    # превращаем оценки в ранги (1 — лучший)
+    ranks_bm25 = to_ranks(bm25, higher_better=True)
+    ranks_vec  = to_ranks(vec,  higher_better=True)
+    # объединяем носители
+    all_ids = set(ranks_bm25) | set(ranks_vec)
+    fused = defaultdict(float)
+    for doc_id in all_ids:
+        if doc_id in ranks_bm25:
+            fused[doc_id] += 1.0 / (rrf_k + ranks_bm25[doc_id])
+        if doc_id in ranks_vec:
+            fused[doc_id] += 1.0 / (rrf_k + ranks_vec[doc_id])
+    return dict(fused)
+#+end_src
+**** Взвешенное объединение баллов
+​​Оценки схожести предварительно нормализуются, потому как масштабы и знаки разных
+ретриверов разные и если этого не сделать, то сравнивать их в лоб будет не
+корректно, один просто перебьёт другой. Затем вычисляется итоговый скор по
+формуле: =α * score_BM25 + (1 - α) * score_vector=. Если α=0.5, вклад равный;
+более высокое α усиливает роль точного совпадения ключевых слов.
+#+begin_src python
+def weighted(bm25, vec, alpha):
+    bm25_n = normalize(bm25) # выше — лучше
+    # vec уже нормализован в [0..1]
+    vec_n = normalize(vec)
+    all_ids = set(bm25_n) | set(vec_n)
+    fused = {}
+    a = float(alpha)
+    for doc_id in all_ids:
+        fused[doc_id] = a * bm25_n.get(doc_id, 0.0) + (1.0 - a) * vec_n.get(doc_id, 0.0)
+    return fused
+#+end_src
+*** Cross-encoder reranking
+Cross-encoder - это модель (обычно на базе трансформера), которая принимает на
+вход пару «запрос–документ» и выдаёт степень их релевантности. В отличие от
+*bi-encoder*, где запрос и документ превращаются в эмбеддинги раздельно,
+кросс-энкодер совместно обрабатывает оба текста, что позволяет учесть более
+тонкие взаимосвязи. Благодаря этому *cross-encoder* способен более точно оценить,
+отвечает ли конкретный фрагмент документа на вопрос пользователя.
+
+В pipeline гибридного поиска cross-encoder используется для повторного ранжирования (reranking):
+- Сначала, гибридный поиск (BM25 + embeddings) извлекает расширенный список
+  кандидатов – например по 50 документов от каждого метода, итого до ~100
+  уникальных чанков.
+- Затем cross-encoder прогоняется для каждой пары «запрос–документ» из этого
+  списка и присваивает каждому документу новую оценку релевантности (как
+  правило, вероятность того, что документ содержит ответ).
+- Кандидаты сортируются по этому новому скору и отбираются топ N (например,
+  топ-5 или 10), для подачи в LLM.
+
+Для реранка можно использовать готовые модели, натренированные на задаче
+поискового ранжирования. Существуют публичные cross-encoder модели (например,
+из библиотеки =sentence-transformers=), возвращающие скор релевантности.
+#+begin_src python
+from sentence_transformers import CrossEncoder
+
+class SimpleReranker:
+    def __init__(self, model_name):
+        """
+        Args:
+            model_name: Название модели cross-encoder
+        """
+        self.model = CrossEncoder(model_name)
+
+    def rerank(self, query, documents, top_n=3):
+        """
+        Args:
+            query: Поисковый запрос
+            documents: Список документов для переоценки
+            top_n: Сколько документов возвращает
+        Returns:
+            Список топ-N документов после rerank
+        """
+
+        if not documents:
+            return []
+
+        # Подготавливаем пары (query, document)
+        pairs = [[query, doc.page_content] for doc in documents]
+
+        # Получаем скоры релевантности
+        scores = self.model.predict(pairs)
+
+        # Сортируем документы по скору
+        doc_score_pairs = list(zip(documents, scores))
+        doc_score_pairs.sort(key=lambda x: x[1], reverse=True)
+
+        # Отбираем топ-N документов (score записываем в метаданные)
+        result = []
+        for doc, score in doc_score_pairs[:top_n]:
+            doc.metadata = doc.metadata or {}
+            doc.metadata["rerank_score"] = float(score)
+            result.append(doc)
+
+        return result
+#+end_src
+*** Интеграция гибридного поиска и rerank в LangChain
+**** Свой Retriever
+Ретривер – это компонент, который по входному вопросу возвращает список релевантных документов.
+#+begin_src python
+from langchain_core.retrievers import BaseRetriever
+import hashlib
+
+class HybridRerankerRetriever(BaseRetriever):
+    first_retriever: BaseRetriever
+    second_retriever: BaseRetriever
+    reranker: SimpleReranker
+    k: int = 3
+
+    def _dedup_docs(self, docs):
+        '''объединение результатов с дедупликацией'''
+        seen = set()
+        result = []
+        for d in docs:
+            content = d.page_content
+            uid = hashlib.md5(content.encode("utf-8")).hexdigest()
+            if uid not in seen:
+                seen.add(uid)
+                result.append(d)
+        return result
+
+    def _get_relevant_documents(self, query):
+        """Вызывает два других ретривера
+        Объединяет их результаты, удаляя дубликаты методом _dedup_docs()
+        Вызывает реранкер, который возвращает топ k выдачи"""
+        first_docs = self.first_retriever.invoke(query)
+        second_docs = self.second_retriever.invoke(query)
+        merged = self._dedup_docs(first_docs + second_docs)
+
+        return self.reranker.rerank(query, merged, self.k)
+#+end_src
+**** Пример
+#+begin_src python
+from langchain_core.documents import Document
+from langchain_community.vectorstores import FAISS
+from langchain_huggingface import HuggingFaceEmbeddings
+from langchain_community.retrievers import BM25Retriever
+
+# создаём документы для теста
+docs = [
+    Document(page_content="Python - язык программирования для машинного обучения", metadata={"source": "0"}),
+    Document(page_content="Машинное обучение использует Python и математику", metadata={"source": "1"}),
+    Document(page_content="JavaScript работает в браузере", metadata={"source": "2"}),
+    Document(page_content="Deep learning - подраздел машинного обучения", metadata={"source": "3"}),
+    Document(page_content="React - библиотека для JavaScript", metadata={"source": "4"}),
+    Document(page_content="PyTorch - фреймворк для глубокого обучения", metadata={"source": "5"}),
+    Document(page_content="Node.js - среда выполнения JavaScript", metadata={"source": "6"}),
+    Document(page_content="Нейронные сети в deep learning", metadata={"source": "7"}),
+]
+
+emb = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
+vector_store = FAISS.from_documents(docs, emb)
+
+# инициализация гибридного retriever+reranker
+retriver = HybridRerankerRetriever(
+    first_retriever=vector_store.as_retriever(search_kwargs={"k": 5}),
+    second_retriever=BM25Retriever.from_documents(docs, k=5),
+    reranker=SimpleReranker("BAAI/bge-reranker-base"),
+    k=3
+    )
+
+# проверяем
+results = retriver.invoke("расскажи про машинное обучение")
+
+print("=== Гибридный BM25 + Vector + Rerank ===")
+for i, doc in enumerate(results, 1):
+    score = doc.metadata.get("rerank_score", 0)
+    print(f"{i}. {score:.4f} | {doc.page_content}")
+#+end_src
+
+** Порог «не знаю»: конфиденс/правила отказа
+*** Уровни внедрения отказов
+- Отказ на этапе ретривера (до LLM)
+- Отказ через промпт (на этапе LLM)
+- Пост-обработка ответа (после LLM)
+***  Интеграция Score в метаданные
+Реализуем обёртку над ретривером, которая будет имитировать обычный ретривер, но
+в метаданные будет записывать score.
+#+begin_src python
+# Шаг 1: Ретривер
+from typing import Dict, Any
+from langchain_core.retrievers import BaseRetriever
+
+class ScoredRetriever(BaseRetriever):
+    vector_store: Any
+    search_kwargs: Dict
+
+    def _get_relevant_documents(self, query):
+        docs_scores = self.vector_store.similarity_search_with_score(
+            query,
+            **self.search_kwargs
+        )
+        docs_with_scores = []
+        for doc, dist in docs_scores:
+            doc.metadata["score"] = 1.0 / (1.0 + float(dist))
+            docs_with_scores.append(doc)
+
+        return docs_with_scores
+#+end_src
+*** Проверка релевантности
+#+begin_src python
+# Шаг 2: Проверяем уверенность
+import random
+
+def check_confidence(inputs, threshold=0.55):
+    refusal_phrases = ["Извините, я не нашёл надёжной информации по вашему вопросу.",
+                       "Не знаю. В текущей базе знаний нет достаточного контекста.",
+                       "Не могу ответить уверенно — недостаточно релевантных источников."]
+    conf_docs = []
+    for doc in inputs['docs']:
+        score = doc.metadata.get('score', 0.0)
+        if score >= threshold:
+            conf_docs.append(doc)
+
+    if not conf_docs:
+        return {
+            'skip': True,
+            'answer': random.choice(refusal_phrases),
+            'docs': inputs['docs'],
+            'used_llm': False
+        }
+    inputs['docs'] = conf_docs
+    return inputs
+#+end_src
+*** Вызов LLM или пропуск шага
+#+begin_src python
+# Шаг 3: Если уверены - вызываем LLM
+import os
+from dotenv import load_dotenv
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.output_parsers import StrOutputParser
+from langchain_openai import ChatOpenAI
+
+load_dotenv()
+MODEL = os.getenv("OPENAI_API_MODEL", "gpt-5")
+llm = ChatOpenAI(model_name=MODEL, temperature=0)
+
+# inputs = {
+#             'skip': True,
+#             'answer': random.choice(refusal_phrases),
+#             'docs': inputs['docs'],
+#             'used_llm': False
+#         }
+def llm_or_skip(inputs):
+    if inputs.get('skip'):
+        return inputs
+
+    prompt = ChatPromptTemplate.from_messages([
+        ("system",
+            "Ты помощник по внутренней базе знаний. "
+            "Отвечай ТОЛЬКО на основе приведенного контекста. "
+            "Ссылайся на источники в тексте в квадратных скобках. "
+            "Если информации нет или ты не уверен — ответь: 'Не знаю'."),
+        ("user",
+            "Контекст:\n{context}\n\nВопрос: {question}\n\nОтвет:")
+    ])
+
+    # Форматируем контекст
+    context_texts = [f"Источник: {doc.metadata.get('source', 'неизвестен')}\n{doc.page_content}" for doc in inputs['docs']]
+    context = "\n\n---\n\n".join(context_texts)
+
+    # Вызываем LLM
+    llm_input = {'context': context,
+                 'question': inputs['question']}
+    response = (prompt | llm | StrOutputParser()).invoke(llm_input)
+
+    return {'answer': response,
+            'docs': inputs['docs']}
+#+end_src
+*** Сборка цепочки и тестовый запуск =chain = retriever_step | check_step | llm_step=
+#+begin_src python
+# Собираем полную цепочку
+from langchain_core.documents import Document
+from langchain_huggingface import HuggingFaceEmbeddings
+from langchain_community.vectorstores import FAISS
+from langchain_core.runnables import RunnableLambda
+
+
+docs = [
+    Document(page_content="Python - язык программирования для машинного обучения", metadata={"source": "0"}),
+    Document(page_content="Машинное обучение использует Python и математику", metadata={"source": "1"}),
+    Document(page_content="JavaScript работает в браузере", metadata={"source": "2"}),
+    Document(page_content="Deep learning - подраздел машинного обучения", metadata={"source": "3"}),
+    Document(page_content="React - библиотека для JavaScript", metadata={"source": "4"}),
+    Document(page_content="PyTorch - фреймворк для глубокого обучения", metadata={"source": "5"}),
+    Document(page_content="Node.js - среда выполнения JavaScript", metadata={"source": "6"}),
+    Document(page_content="Нейронные сети в deep learning", metadata={"source": "7"}),
+]
+
+test_queries = ["Расскажи про Rust",
+                "Расскажи про JavaScript",
+                "Расскажи про машинное обучение"]
+
+embed_model = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
+vector_store = FAISS.from_documents(docs, embed_model)
+retriever = ScoredRetriever(
+    vector_store=vector_store,
+    search_kwargs={"k": 5}
+    )
+
+retriever_step = RunnableLambda(lambda q: {'question': q, 'docs': retriever.invoke(q)})
+check_step = RunnableLambda(check_confidence)
+llm_step = RunnableLambda(llm_or_skip)
+
+chain = retriever_step | check_step | llm_step
+
+for query in test_queries:
+    print(f"\n{'='*60}")
+    print(f"Вопрос: {query}")
+    print('='*60)
+
+    result = chain.invoke(query)
+
+    print(f"\n💬 Ответ:\n{result['answer']}")
+
+    print(f"\n📚 Источники:")
+    for i, doc in enumerate(result['docs'], 1):
+        source = doc.metadata.get('source', 'неизвестен')
+        score = doc.metadata.get('score', 0)
+        print(f"   {i}. {source} (score: {score:.3f})")
+#+end_src
+* Интеграции и инструменты
+** tool‑вызовы
+*** Создание объекта =Tool=, метод =args_schema=
+#+begin_src python
+# Пример: инструмент Calculator
+from langchain.tools import tool
+from pydantic import BaseModel, Field
+
+# args_schema — это класс схемы (обычно на базе Pydantic BaseModel) или
+# JSON-схема, описывающая, какие аргументы инструмент принимает, их типы,
+# описание, обязательность и т.п.
+class CalcArgs(BaseModel):
+    a: int = Field(description="Первое число")
+    b: int = Field(description="Второе число")
+
+# имя инструмента это name="Calculator"
+@tool("Calculator", args_schema=CalcArgs)
+def calculate(a: str, b: str) -> str:
+    """Складывает два числа.""" # description обязателен. Альтернативный вариант @tool("Calculator", description="Складывает два числа")
+    return str(int(a) + int(b) + 1)
+# считаем неправильно, специально, чтобы убедиться что модель не сама считала, а использовала именно инструмент
+#+end_src
+*** Интеграция в агентов
+#+begin_src python
+import os
+from dotenv import load_dotenv
+from langchain.agents import create_agent
+from langchain_openai import ChatOpenAI
+
+load_dotenv()
+MODEL = os.getenv("OPENAI_MODEL", "gpt-5")
+model = ChatOpenAI(model_name=MODEL, temperature=0)
+
+system_prompt = """
+Ты агент-помощник.
+Если пользователь просит посчитать что-либо — ты ВСЕГДА вызываешь инструмент Calculator.
+Тебе нужно извлечь из текста два числа:
+ - первое число — аргумент a
+ - второе число — аргумент b
+Всегда отвечай пользователю тем, что получил из инструмента калькулятор - не считай сам
+"""
+
+agent = create_agent(
+    model=model,
+    system_prompt=system_prompt,
+    tools=[calculate],
+)
+
+response = agent.invoke({"messages": [{"role": "user", "content": "посчитай сумму 2 плюс 2"}]})
+"""
+HumanMessage(content='посчитай сумму 2 плюс 2', ...)
+AIMessage(..., tool_calls=[{'name': 'Calculator', 'args': {'a': '2', 'b': '2'}, 'id': '514820312', 'type': 'tool_call'}], ...),
+ToolMessage(content='5', name='Calculator', ...),
+AIMessage(content='5', ...)"""
+print(response['messages'][-1].content) # '5'
+#+end_src
+*** Метод =bind_tools= (добавление tool к уже готовой чат-модели)
+#+begin_src python
+from langchain_openai import ChatOpenAI
+
+model = ChatOpenAI(model_name="gpt-5", temperature=0)
+model_with_tools = model.bind_tools([calculate])
+#+end_src
+*** Function calling
+Современные модели (например, =GPT‑5=) поддерживают механизм function calling —
+формат, позволяющий модели возвращать структурированный вызов функции с
+заполненными аргументами. LangChain использует этот механизм как основу своих
+инструментов: через декоратор =@tool=, =args_schema=, метод =bind_tools= и агенты.
+Принцип одинаковый: мы описываем функцию в виде JSON-схемы, передаём её модели,
+и она сама выбирает, вызывать инструмент или сформировать обычный текстовый ответ.
+*** Обёртки над внешними API (примеры)
+**** Пример: погода
+#+begin_src python
+from langchain.tools import tool
+import requests
+
+def geocode(city: str):
+    '''Получает координаты по названию города'''
+    resp = requests.get(
+        "https://nominatim.openstreetmap.org/search",
+        params={"q": city, "format": "json", "limit": 1},
+        headers={"User-Agent": "weather-agent/1.0"}
+    )
+    data = resp.json()
+    if not data:
+        return None
+    return float(data[0]["lat"]), float(data[0]["lon"])
+
+@tool("get_weather")
+def get_weather(city: str) -> str:
+    """Возвращает текущую температуру в указанном городе."""
+    coords = geocode(city)
+    if not coords:
+        return f"Город «{city}» не найден."
+    lat, lon = coords
+    resp = requests.get(
+        "https://api.open-meteo.com/v1/forecast",
+        params={"latitude": lat, "longitude": lon, "current_weather": True},
+        timeout=5
+    )
+    data = resp.json()
+    cw = data.get("current_weather")
+    if not cw:
+        return "Не удалось получить текущую погоду."
+    return f"В городе {city} сейчас {cw['temperature']}°C."
+#+end_src
+**** Пример: конвертация валют
+#+begin_src python
+@tool("convert_currency")
+def convert_currency(amount: float, from_currency: str, to_currency: str) -> str:
+    """
+    Конвертирует сумму из from_currency в to_currency по актуальному курсу.
+
+    Пример: amount=10, from_currency='USD', to_currency='RUB'
+    """
+    from_currency = from_currency.upper()
+    to_currency = to_currency.upper()
+
+    try:
+        resp = requests.get("https://api.fxratesapi.com/latest", timeout=5)
+        resp.raise_for_status()
+        data = resp.json()
+        rates = data.get("rates")
+        if not rates:
+            return f"Не удалось получить курсы валют: {data}"
+
+        if from_currency not in rates:
+            return f"Неизвестная валюта-источник: {from_currency}"
+        if to_currency not in rates:
+            return f"Неизвестная валюта-назначение: {to_currency}"
+
+        # конвертация через базовую валюту API (USD)
+        amount_in_usd = amount / rates[from_currency]  # переводим в USD
+        converted_amount = round(amount_in_usd * rates[to_currency], 2)
+
+        return f"{amount} {from_currency} ≈ {converted_amount} {to_currency} (курс {to_currency}: {rates[to_currency]}, курс {from_currency}: {rates[from_currency]})"
+
+    except Exception as e:
+        return f"Ошибка при запросе курса: {e}"
+#+end_src
+**** Использование примеров
+#+begin_src python
+system_prompt = """
+Ты агент-помощник. У тебя есть следующие инструменты:
+
+get_weather: предоставляет прогноз погоды в указанном городе.
+- Ввод: название города.
+- Вывод: информация о погоде
+
+convert_currency: конвертирует валюты по текущему курсу
+- Ввод: значение, валюта из которой конвертируем, валюта в которую конвертируем.
+- Вывод: результат конвертации
+"""
+
+agent = create_agent(
+    model=model,
+    system_prompt=system_prompt,
+    tools=[get_weather, convert_currency],
+)
+
+response = agent.invoke({"messages": [{"role": "user", "content": "Подскажи какая сейчас погода в Лос-анджелесе и какой курс доллара к рублю"}]})
+print(response['messages'][-1].content)
+#+end_src
+*** Обработка ошибок и ретраи инструментов
+**** =timeout= и =max_retries= при инициализации модели
+#+begin_src python
+import os
+from dotenv import load_dotenv
+from langchain_openai import ChatOpenAI
+
+load_dotenv()
+MODEL = os.getenv("OPENAI_MODEL", "gpt-5")
+
+main_model = ChatOpenAI(
+    model_name=MODEL,
+    timeout=None,
+    max_retries=2
+    )
+#+end_src
+**** =middleware= и =ToolRetryMiddleware= для повторных вызовов
+=ToolRetryMiddleware= автоматически повторяет вызовы инструментов при ошибках
+Итоговая задержка рассчитывается по формуле =delay = initial_delay * (backoff_factor ** attempt) * jitter=
+#+begin_src python
+from langchain.agents import create_agent
+from langchain.agents.middleware import ToolRetryMiddleware
+
+agent = create_agent(
+    model=model,
+    tools=[get_weather, convert_currency],
+    middleware=[
+        ToolRetryMiddleware(
+            max_retries=3, # если ошибка, то пробуем ещё 3 раза
+            backoff_factor=2.0, # экспоненциальный backoff. Это означает, что
+            # время ожидания растёт в столько-то раз в геометрической прогрессии.
+            # При значении 2 с каждым повтором будет удваиваться: через 1 секунду,
+            # потом через 2, 4, 8 и т.д. Это даёт сервису время восстановиться, и
+            # снижает нагрузку
+            initial_delay=1.0, # задержка перед изначальной повторной попыткой в секундах
+            jitter=True, # ±25% случайного разброса в задержках. Если у нас 100
+            # параллельных запросов, и все провалились, то через 1 секунду они все
+            # разом повторятся и мы опять перегрузим удалённый сервер запросами.
+            # Джиттер решает это, то есть, 2-я попытка не ровно через 1 сек, а
+            # случайная величина от 0.75 до 1.25 и так далее с каждым повтором.
+            # Так повторные запросы размазываются по времени, уменьшая шанс нового
+            # массового сбоя. Это стандартная рекомендация от AWS и других крупных
+            # компаний. По умолчанию этот параметр включен True
+            retry_on=(ConnectionError, TimeoutError),
+            on_failure="return_message", # список ошибок, на которые реагируем, ConnectionError,TimeoutError и т.д.
+            max_delay=60, # Если сервис постоянно падает (например, API
+            # недоступно), нет смысла дергать его сотню раз – это лишь тратит
+            # время. Реализуется простая логика: после 3 подряд неудачных вызовов
+            # блокируем дальнейшие попытки на минуту (Значение по умолчанию). Это
+            # предотвращает: накопление висящих потоков, лишнюю нагрузку на уже и
+            # так проблемный сервис, cascades (когда сбой одного компонента тянет
+            # за собой сбой всей системы).
+        ),
+    ],
+)
+#+end_src
+**** =middleware= и =ModelFallbackMiddleware= для запасной модели
+Если дорогая и качественная модель недоступна, можно попробовать ответить менее мощной
+#+begin_src python
+from langchain.agents import create_agent
+from langchain.agents.middleware import ModelFallbackMiddleware
+
+agent = create_agent(
+    model="openai:gpt-4o",  # Основная модель
+    middleware=[
+        ModelFallbackMiddleware(
+            "openai:gpt-4o-mini",  # Сперва пробуем эту при ошибке
+            "anthropic:claude-sonnet-4-5-20250929"  # потом эту
+            )
+        ]
+)
+#+end_src
+**** Кастомные =Middleware=
+#+begin_src python
+from langchain.agents import create_agent
+from langchain.agents.middleware.types import AgentMiddleware, ModelRequest, ModelResponse
+from langchain_core.messages import AIMessage
+
+class FallbackModelMiddleware(AgentMiddleware):
+    def __init__(self, backup_model, fail_message="сервис недоступен"):
+        self.backup_model = backup_model
+        self.fail_message = fail_message
+
+    def wrap_model_call(self, request: ModelRequest, handler):
+        # Основная модель
+        try:
+            return handler(request)
+        except Exception:
+            # тут можно реализовывать логику на случай отказа основной модели
+            # например popup сообщение о смене модели в UI чата и т.п.
+            pass
+
+        # Подмена модели
+        try:
+            new_request = request.override(model=self.backup_model)
+            return handler(new_request)
+        except Exception:
+            # Если не работают обе, отдаём сообщение об этом
+            return ModelResponse(
+                result=[AIMessage(content=self.fail_message)]
+            )
+
+agent = create_agent(
+    model=main_model,
+    middleware=[
+        FallbackModelMiddleware(backup_model=my_backup_model)
+    ],
+)
+#+end_src
+**** Избежание рекурсии =recursion_limit=
+#+begin_src python
+result = agent.invoke(
+    {"messages": [{"role": "user", "content": "Какая погода в Москве?"}]},
+    {"recursion_limit": 11} # Передаём лимит
+)
+#+end_src
+** Веб‑поиск как инструмент и SERP кэш

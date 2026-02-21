@@ -7,6 +7,9 @@
 7. [Коэффициент корреляции Пирсона (Pearson correlation coefficient)](#Pearson_correlation_coefficient)
 8. [A/B тестирование (A/B testing)](#A/B_testing)
 
+Ошибка первого рода критичнее (FN / гипотеза верна, но отвергнута)
+$\alpha$ -- уровень значимости
+
 Нулевая гипотеза $H_0$ отклоняется, если значение $p$ меньше выбранного $\alpha$
 (вероятность ошибки первого рода)
 
@@ -44,7 +47,10 @@ print('p value:', res[1])
 значений X и Y из двух генеральных совокупностей вероятность того, что X
 больше, чем Y, равна вероятности того, что Y больше, чем X.
 
-P(x>y)=P(x<y)
+H0: P(x>y)=P(x<y)
+H1: P(x>y)!=P(x<y)
+
+Не учитывает величины наблюдений, а только их ранги.
 
 <https://en.wikipedia.org/wiki/Mann%E2%80%93Whitney_U_test>
 
@@ -59,7 +65,7 @@ from scipy import stats
 df = pd.read_csv('link')
 
 res = stats.mannwhitneyu(df[], df[])
-# (df[df['group'] == 'group_1']['characteristic'], df[df['group'] == 'group_2']['characteristic'])
+"(df[df['group'] == 'group_1']['characteristic'], df[df['group'] == 'group_2']['characteristic'])"
 print('p value:', res[1])
 ```
 
@@ -76,7 +82,7 @@ from scipy import stats
 df = pd.read_csv('link')
 
 res = stats.fligner(df[], df[])
-# (df[df['group'] == 'group_1']['characteristic'], df[df['group'] == 'group_2']['characteristic']) 
+"(df[df['group'] == 'group_1']['characteristic'], df[df['group'] == 'group_2']['characteristic'])" 
 print('p value:', res[1])
 ```
 
@@ -115,8 +121,8 @@ from scipy import stats
 df = pd.read_csv('link')
 
 res = stats.ttest_ind(df[], df[], equal_var=False) 
-# (df[df['group'] == 'group_1']['characteristic'], df[df['group'] == 'group_2']['characteristic'], equal_var=False)
-# equal_var=False is for not equal dispersions (see. Fligner-Killeen test)
+"""(df[df['group'] == 'group_1']['characteristic'], df[df['group'] == 'group_2']['characteristic'], equal_var=False)
+equal_var=False is for not equal dispersions (see. Fligner-Killeen test)"""
 print('p value:', res[1])
 ```
 
@@ -132,8 +138,8 @@ from scipy import stats
 df = pd.read_csv('link')
 
 res = stats.ttest_rel(df[], df[])
-# (df[df['group'] == 'group_1']['characteristic'], df[df['group'] == 'group_2']['characteristic'], equal_var=True)
-# equal_var=True is for equal dispersions (see. Fligner-Killeen test)
+"""(df[df['group'] == 'group_1']['characteristic'], df[df['group'] == 'group_2']['characteristic'], equal_var=True)
+equal_var=True is for equal dispersions (see. Fligner-Killeen test)"""
 print('p value:', res[1])
 ```
 
@@ -145,9 +151,10 @@ print('p value:', res[1])
 оценить значимость различий между фактическим (выявленным в результате
 исследования) количеством исходов или качественных характеристик выборки,
 попадающих в каждую категорию, и теоретическим количеством, которое можно
-ожидать в изучаемых группах при справедливости нулевой гипотезы. Выражаясь
-проще, метод позволяет оценить статистическую значимость различий двух или
-нескольких относительных показателей (частот, долей).
+ожидать в изучаемых группах при справедливости нулевой гипотезы.
+
+Выражаясь проще, метод позволяет оценить статистическую значимость различий двух
+или нескольких относительных показателей (частот, долей).
 
 Является наиболее часто употребляемым критерием для проверки гипотезы о
 принадлежности наблюдаемой выборки некоторому теоретическому закону
@@ -177,6 +184,7 @@ chi2, p_value, dof, exp = res
 ## Коэффициент корреляции Пирсона (Pearson correlation coefficient) <a name="Pearson_correlation_coefficient"></a>
 
 Коэффициент корреляции Пирсона и $p$-значение для проверки *некорреляции*.
+(ещё смотри коэффициент Спирмена)
 
 Коэффициент корреляции Пирсона измеряет линейную зависимость между двумя
 наборами данных. Вычисление $p$-значения основано на предположении, что каждый
@@ -198,15 +206,14 @@ from scipy import stats
 df = pd.read_csv('link')
 
 res = stats.pearsonr(df[], df[])
-# (df['characteristic_1'], df['characteristic_2']) 
+"(df['characteristic_1'], df['characteristic_2'])"
 print('Preason rho:', res[0])
 print('p value:', res[1])
 ```
 
 ## A/B тестирование (A/B testing) <a name="A/B_testing"></a>
 
-Нулевая гипотеза состоит в том, что вероятности успеха для обеих выборок (p1 и
-p2) равны.
+Нулевая гипотеза состоит в том, что вероятности успеха для обеих выборок (p1 и p2) равны.
 
 ### Метод 1:
 

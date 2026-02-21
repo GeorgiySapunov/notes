@@ -1,3 +1,6 @@
+# LLM
+[LangChain 1.0.x: c нуля до продакшн LLM-приложений](LLM/LangChain.org)  
+
 # Gentoo
 [gentoo installation checklist](gentoo/gentoo_installation_checklist.md)  
 [gentoo apps](gentoo/gentoo_apps.md)  
@@ -19,6 +22,7 @@
 # Arch
 
 [arch gnome](arch_gnome.md) - arch gnome installation  
+[arch gnome](arch_hyprland.md) - arch hyprland installation  
 
 # Also
 

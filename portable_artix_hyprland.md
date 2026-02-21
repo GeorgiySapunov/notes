@@ -145,7 +145,8 @@ If you are making changes to the home partition (like adding a user) in the chro
 
     echo hostname='portable' >> /etc/conf.d/hostname
 
-    pacman -S --noconfirm networkmanager networkmanager-openrc grub efibootmgr cryptsetup lvm2 \
+    pacman -S --noconfirm grub efibootmgr
+    pacman -S --noconfirm networkmanager networkmanager-openrc cryptsetup lvm2 \
     polkit polkit-qt5 \
     bluez bluez-utils bluez-openrc cups cups-openrc git wireplumber \
     pipewire-pulse pipewire artix-pipewire-loader man-db \
