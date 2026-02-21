@@ -1,4 +1,4 @@
-# archinstall
+# archinstall old
   setfont ter-128n
 ### disk layout
 
@@ -118,6 +118,7 @@ etc/xdg/reflector/reflector.conf change to:
 
     paru -S ttf-ms-fonts
     paru -S snapper-support
+    paru -S ibus-mozc
 
     # paru -S grub-btrfs # it's dependacy of snapper-support
     pacman -S inotify-tools

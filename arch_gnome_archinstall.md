@@ -1,5 +1,12 @@
 # archinstall
-  setfont ter-128n
+    setfont ter-128n
+    iwctl
+      device list
+      station wlan0 scan
+      station wlan0 get-networks
+      station wlan0 connect "mywifi"
+
+>>>>>>> 3c57d3f
 ### disk layout
 
     fat32:
@@ -160,6 +167,16 @@ then:
     ?nautilus-open-any-terminal
     
 ---
+### zstd
+
+/etc/fstab change btrfs to:
+
+    rw,noatime,compress=zstd,subvol=
+
+then:
+
+    btrfs filesystem defragment -r -v -czstd /
+
 ### 
 
     systemctl enable avahi-daemon
